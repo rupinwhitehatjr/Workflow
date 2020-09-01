@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>#QuestionNumber on Day #day in #Level</title>
+<link rel="stylesheet" href="../css/reset.css" />
+<link rel="stylesheet" href="../css/text.css" />
+<link rel="stylesheet" href="../css/960.css" />
+<link rel="stylesheet" href="../css/demo.css" />
+<link rel="stylesheet" href="../css/custom.css" />
+<link rel="stylesheet" href="css/reset.css" />
+<link rel="stylesheet" href="css/text.css" />
+<link rel="stylesheet" href="css/960.css" />
+<link rel="stylesheet" href="css/demo.css" />
+<link rel="stylesheet" href="css/custom.css" />
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-auth.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+<script>
+  // Your web app's Firebase configuration
+   var firebaseConfig = {
+    apiKey: "AIzaSyDKEEwYE0xq_Pb4RXyEjxQR_XnNS04kMgY",
+    authDomain: "renamingfilesforquiz.firebaseapp.com",
+    databaseURL: "https://renamingfilesforquiz.firebaseio.com",
+    projectId: "renamingfilesforquiz",
+    storageBucket: "renamingfilesforquiz.appspot.com",
+    messagingSenderId: "770560109780",
+    appId: "1:770560109780:web:b1df2f0b63dd95f0885f41"
+  }
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+</script>
+
+
+<script type="text/javascript" src="js/auth.js"></script>   
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/clipboardsaver.js"></script>
+
+</head>
+<body>
+
+<input type='hidden' id="questionnumber" value="#QuestionNumber"></input>
+<input type='hidden' id="day" value="#day"></input>
+<input type='hidden' id="level" value="#Level"></input>
+
+<div class="container_12">
+  <div class="grid_2">
+    <a href="javascript:goHome()" class="button">Home</a>
+  </div> 
+<div class="clear"></div> 
+
+<div class="container_12">
+  <h2>
+    Question Number&nbsp;<span id="QuestionNumber"></span> of C<span id="class"></span> in <span id="curriculum"></span>
+  </h2>
+</div>
+<div class="clear"></div> 
+
+<div class="container_12">
+
+  <div class="grid_7 textsection">
+    
+   <textarea placeholder="Add the Text of your Question Here." id="questionText" class="bigtextarea"></textarea>
+    
+  </div>
+
+  <div class="grid_4 centeredimage span4 target" id='questionImage'>
+   <p class="instructions">Click and Paste Your Question Image Here
+    <img class="statusicon" src="img/cross.png" style='display:none'>
+   </p>
+  </div>
+</div>
+  <!-- end .grid_12 -->
+  <div class="clear"></div>
+
+  
+
+<div class="container_12">
+
+<div class="grid_6">
+
+    <div class="textsection">
+      
+     <textarea placeholder="Add the Text of your Option A Here." id="optionAText" class="smalltextarea"></textarea>
+      
+    </div>
+
+    <div class="centeredimage span4 target" id='option1'>
+     <p class="instructions" id="option1label">Click and Paste Your Question Image Here
+    <img class="statusicon" src="img/cross.png" style='display:none'>
+     </p>
+    </div>
+</div>
+
+
+
+<div class="grid_6">
+
+    <div class="textsection">
+      
+     <textarea placeholder="Add the Text of your Option B Here." id="optionBText" class="smalltextarea"></textarea>
+      
+    </div>
+
+    <div class="centeredimage span4 target" id='option2'>
+     <p class="instructions" id="option2label">Click and Paste Your Question Image Here
+      <img class="statusicon" src="img/cross.png" style='display:none'>
+     </p>
+    </div>
+</div>
+
+</div>
+  <!-- end .grid_12 -->
+  <div class="clear"></div>
+
+  <div class="container_12">
+
+<div class="grid_6">
+
+    <div class="textsection">
+      
+     <textarea placeholder="Add the Text of your Option C Here." id="optionCText" class="smalltextarea"></textarea>
+      
+    </div>
+
+    <div class="centeredimage span4 target" id='option3'>
+     <p class="instructions" id="option3label">Click and Paste Your Question Image Here
+      <img class="statusicon" src="img/cross.png" style='display:none'>
+     </p>
+    </div>
+</div>
+
+
+
+<div class="grid_6">
+
+    <div class="textsection">
+      
+     <textarea placeholder="Add the Text of your Option D Here." id="optionDText" class="smalltextarea"></textarea>
+      
+    </div>
+
+    <div class="centeredimage span4 target" id='option4'>
+     <p class="instructions" id="option4label">Click and Paste Your Question Image Here
+      <img class="statusicon" src="img/cross.png" style='display:none'>
+    </p>
+    </div>
+</div>
+
+</div>
+  <!-- end .grid_12 -->
+  <div class="clear"></div>
+
+  
+ 
+
+  <!-- end .grid_12 -->
+  <div class="clear"></div>
+
+  <div class="grid_12">
+    <p>
+      <b>Answer Option:</b> #AnswerOption
+    </p>
+  </div>
+  <!-- end .grid_12 -->
+  <div class="clear"></div>
+
+   
+
+ 
+  <!-- end .grid_12 -->
+  <div class="clear"></div>
+
+  <div class="grid_2 centeredimage">
+    <a class='button' id="prevButton" href='javascript:goToPrev()'>Previous</a>
+    &nbsp;
+  </div>
+
+  <div class="grid_8">
+    <!--<a class='button' href='javascript:preFillData()'>test</a>-->
+    &nbsp;
+  </div>
+
+  
+  
+
+  <div class="grid_2 centeredimage" >
+    <a class='button' id="nextButton" href='javascript:goToNext()'>Next</a>
+    &nbsp;
+  </div>
+  
+  <div class="clear"></div>
+
+  <div class="grid_12">
+    
+      &nbsp;
+    
+  </div>
+  <!-- end .grid_12 -->
+  <div class="clear"></div>
+ 
+</div>
+<!-- end .container_16 -->
+</body>
+</html>
