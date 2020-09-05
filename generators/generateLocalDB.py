@@ -25,6 +25,7 @@ db = firestore.Client(project="test", credentials=credentials)
 
 step={}	
 step["index"]=10
+step["editable"]=True
 
 fields=[]
 levelObj={"label":"Curriculum","mandatory":True, "type":"dropdown", "options":["BEG", "INT", "ADV", "PRO", "APT"]}
@@ -40,7 +41,7 @@ fields.append(documentType)
 fields.append(documentURL)
 fields.append(systemURL)
 step["fields"]=fields
-
+step["name"]="Development and Creation"
 
 db.collection(u'CurriculumWorkflow').document().set(step)
 
@@ -48,6 +49,7 @@ db.collection(u'CurriculumWorkflow').document().set(step)
 step={}	
 step["index"]=20
 step["name"]="ID Review"
+step["editable"]=False
 fields=[]
 levelObj={}
 versionObject={}
