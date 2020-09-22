@@ -34,7 +34,7 @@ exports.copyLayout = functions.firestore
 	log.creatorName=userName
 	log.timestamp=Date.now();
 	log.action="Created"
-	console.log(log)
+	//console.log(log)
 	flowDocument.collection("log").doc().set(log)
 
     

@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Create a Workflow</title>
+<title>View Workflow</title>
 <link rel="stylesheet" href="css/reset.css" />
 <link rel="stylesheet" href="css/text.css" />
 <link rel="stylesheet" href="css/960.css" />
@@ -38,32 +38,101 @@
   var db = firebase.firestore();
 </script>
 
-
+<script type="text/javascript" src="js/common.js"></script>  
 <script type="text/javascript" src="js/auth.js"></script>  
-<script type="text/javascript" src="js/createWorkFlow.js"></script>      
+<script type="text/javascript" src="js/viewFlow.js"></script>      
 </head>
 <body>
 
 <div class="container_12">
 
-	<div class="grid_4">
+	<div class="grid_1">
+    &nbsp;  
+  </div>
+  <div class="grid_4">
       &nbsp;
-    </div>
-
-	<div class="grid_4">
-    	 <a class='button' id="CurriculumWorkflowButton" href='javascript:createNewWorkFlow("CurriculumWorkflow")'>Create a New Workflow</a>
-  
+  </div>
+  <div class="grid_6">
+      &nbsp;
   </div>
 
-	<div class="grid_4">
-	    <h5>
-	     &nbsp;
-	    <h5>
-  	</div>
+  <div class="grid_1">
+      &nbsp;
+  </div>
+
+	
   <!-- end .grid_12 -->
   <div class="clear"></div>  
   
 </div>
+
+<div class="container_12" id="flowsection">
+
+  <!--<div class="grid_1">
+    &nbsp;  
+  </div>
+  <div class="grid_4">
+      &nbsp;
+  </div>
+  <div class="grid_6">
+      &nbsp;
+  </div>
+
+  <div class="grid_1">
+      &nbsp;
+  </div>-->
+
+  
+  <!-- end .grid_12 -->
+  <!--<div class="clear"></div>  -->
+  
+</div>
+
+<div class="container_12" id="commentssection">
+
+  <!--<div class="grid_1">
+    &nbsp;  
+  </div>
+  <div class="grid_4">
+      &nbsp;
+  </div>
+  <div class="grid_6">
+      &nbsp;
+  </div>
+
+  <div class="grid_1">
+      &nbsp;
+  </div>-->
+
+  
+  <!-- end .grid_12 -->
+  <!--<div class="clear"></div>  -->
+  
+</div>
+
+<div class="container_12" id="actionlist">
+
+  <!--<div class="grid_1">
+    &nbsp;  
+  </div>
+  <div class="grid_4">
+      &nbsp;
+  </div>
+  <div class="grid_6">
+      &nbsp;
+  </div>
+
+  <div class="grid_1">
+      &nbsp;
+  </div>-->
+
+  
+  <!-- end .grid_12 -->
+  <!--<div class="clear"></div>  -->
+  
+</div>
+
+
 
 
 
