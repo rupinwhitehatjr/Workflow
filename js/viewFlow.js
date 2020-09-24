@@ -30,6 +30,7 @@ logDocument.then(function(querySnapshot) {
 stepsDocument=db.collection("Workflows")
                 .doc(flow_id)
                 .collection("steps")
+                .where("visible", "==", true)
                 .orderBy("index")
                 .get()
 

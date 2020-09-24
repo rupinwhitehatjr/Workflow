@@ -16,7 +16,8 @@ exports.copyLayout = functions.firestore
   	//console.log(flowType)
   	//createDefaultCollection(flowID)
   	makeCopy(flowType,flowID)
-  	addLogOnCreate(flowID,userName)  	
+  	addLogOnCreate(flowID,userName)
+    //updateReadyFlag(flowID)  	
   	//updateFlowOwner()
   	//addLog()
   	//console.log(context.auth.uid)
@@ -24,22 +25,30 @@ exports.copyLayout = functions.firestore
   	
   });
 
+  async function updateReadyFlag(flowID)
+  {
+    flowDocument=db.collection("Workflows").doc(flowID).update({"ready":true})
+    return 0;
+  }
+
   async function addLogOnCreate(flowID, userName)
   {
   	
     creatorName=""
     flowDocument=db.collection("Workflows").doc(flowID)   
 
-	log={}
-	log.creatorName=userName
-	log.timestamp=Date.now();
-	log.action="Created"
-	//console.log(log)
-	flowDocument.collection("log").doc().set(log)
+    log={}
+    log.creatorName=userName
+    log.timestamp=Date.now();
+    log.action="Created"
+    //console.log(log)
+    flowDocument.collection("log").doc().set(log)
 
     
     
   }
+
+ 
 
  
   async function makeCopy(workflowType, flowID)
@@ -48,9 +57,7 @@ exports.copyLayout = functions.firestore
 	const steps = await db.collection(workflowType).orderBy("index").get()
     flowDocument=db.collection("Workflows").doc(flowID)
     steps.forEach( (doc)=> {
-    	//console.log(doc.id)
-    	//structure={}
-    	//structure[doc.id]=doc.data()    	
+    	 	
         flowDocument.collection("steps").doc(doc.id).set(doc.data())
 
     })

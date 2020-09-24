@@ -6,6 +6,7 @@ import os
 from google.cloud import firestore
 import google.auth.credentials
 
+# use firebase emulators:start project --project test
 # Use a service account
 #cred = credentials.Certificate('config.json')
 #firebase_admin.initialize_app(cred)
@@ -28,6 +29,7 @@ creationData["flowType"]="CurriculumWorkflow"
 creationData["uid"]="abcd"
 creationData["email"]="rupin@whitehatjr.com"
 creationData["name"]="Rupin Chheda"
+creationData["ready"]=False
 
 db.collection(u'Workflows').document().set(creationData)
 
