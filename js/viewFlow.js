@@ -37,6 +37,7 @@ stepsDocument=db.collection("Workflows")
 stepsDocument.then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
         step=doc.data()
+        step_id=doc.id
         //console.log(step)
         stepName=step["name"]
         //create a Dynamic Div for every Step
@@ -48,9 +49,11 @@ stepsDocument.then(function(querySnapshot) {
         stepNameDiv=$("<div/>").attr("class", "grid_12 stepheader").text(stepName)
         $(stepholder).append($(stepNameDiv))
         fieldsList=step["fields"]
-        for (i=0;i<fieldsList.length;i++)
+        numberOfFields=fieldsList.length
+        $("#fieldCount").val(numberOfFields)
+        for (i=0;i<numberOfFields;i++)
         {
-            createField(doc.id, fieldsList[i])
+            createField(step_id, fieldsList[i], i)
         }
     });
 });
@@ -71,11 +74,11 @@ function appendLogHTML(logText)
 	
 }
 
-function createField(elementid, fieldMeta)
+function createField(stepid, fieldMeta, index)
 {
     type=fieldMeta["type"]
     label=fieldMeta["label"]
-    $("#"+elementid).append(
+    $("#"+stepid).append(
                 $('<div/>')
                 .attr("class", "grid_4 fieldlabel")
                 .append(label)
@@ -88,11 +91,15 @@ function createField(elementid, fieldMeta)
         options=fieldMeta["options"];
         
         dd=$("<select/>")
+                .attr("data-stepid",stepid)
+                .attr("data-index", index)
+                .attr("id", index)
+        $(dd).append($("<option/>"))
         for(index=0;index<options.length;index++)
         {
             $(dd).append($("<option/>").val(options[index]).text(options[index]))
         }
-        $("#"+elementid).append($(div).append($(dd)))
+        $("#"+stepid).append($(div).append($(dd)))
 
         //Create a div to go to next line.
         
@@ -103,13 +110,19 @@ function createField(elementid, fieldMeta)
         
         div=$('<div/>').attr("class", "grid_6 field")
 
-        inputBox=$('<input/>').attr("type", "text").attr('class', 'inputbox')
+        inputBox=$('<input/>')
+                .attr("type", "text")
+                .attr('class', 'inputbox')
+                .attr("data-stepid",stepid)
+                .attr("data-index", index)
+                .attr("id", index)
+        //console.log($(inputBox))        
         
-        $("#"+elementid).append($(div).append($(inputBox)))
+        $("#"+stepid).append($(div).append($(inputBox)))
 
         //Create a div to go to next line.
        
 
     }
-     $("#"+elementid).append($('<div/>').attr("class", "clear"))
+     $("#"+stepid).append($('<div/>').attr("class", "clear"))
 }
