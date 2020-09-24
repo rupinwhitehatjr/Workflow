@@ -169,7 +169,64 @@ font-size: 18px
   font-size: 15px;
 }
 
+.fieldlabel
+{
+  font-size: 20px;
+  
+  padding-top:10px;
+  padding-bottom:10px;
+  background-color: #00adb5;
+  margin-bottom:10px;
+  padding-left:10px;
+  color: #222831
+}
+div.field
+{
+  font-size: 15px;
+  
+  margin-top:10px;
+  margin-bottom:10px;
+}
+select
+{
+  width:80%;
+  height:30px;
+  font-size: 15px;
+}
 
+.step, #commentssection, #actionlist
+{
+  border:3px solid #cccccc;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  
+}
+.inputbox
+{
+  width:80%;
+  line-height:30px;
+}
+.logtext
+{
+  font-size: 20px;
+  
+  margin-bottom:10px;
+  padding-left:10px;
+  color: #222831
+}
+
+.stepheader
+{
+  font-size: 30px;  
+  padding-top:10px;
+  padding-bottom:10px;
+  background-color: #393e46;
+  margin-bottom:10px;
+  margin-left:0px;
+  width:100%!important;
+  color: #eeeeee;
+  padding-left:10px;
+}
 
 
 

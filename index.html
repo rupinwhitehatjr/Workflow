@@ -10,6 +10,16 @@
 <link rel="stylesheet" href="css/960.css" />
 <link rel="stylesheet" href="css/demo.css" />
 <link rel="stylesheet" href="css/custom.css" />
+
+
+  </head>
+  <body>
+    <!-- The surrounding HTML is left untouched by FirebaseUI.
+         Your app may use that space for branding, controls and other customizations.-->
+    <h1>Login Here</h1>
+    <div id="firebaseui-auth-container"></div>
+
+
 <!-- The core Firebase JS SDK is always required and must be listed first -->
 <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-firestore.js"></script>
@@ -54,11 +64,7 @@
       // The start method will wait until the DOM is loaded.
       ui.start('#firebaseui-auth-container', uiConfig);
     </script>
-  </head>
-  <body>
-    <!-- The surrounding HTML is left untouched by FirebaseUI.
-         Your app may use that space for branding, controls and other customizations.-->
-    <h1>Login Here</h1>
-    <div id="firebaseui-auth-container"></div>
+
+    
   </body>
 </html>
