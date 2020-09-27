@@ -40,13 +40,22 @@ stepsDocument.then(function(querySnapshot) {
         step_id=doc.id
         //console.log(step)
         stepName=step["name"]
+        stepForm=$("<form/>")
+        
         //create a Dynamic Div for every Step
         stepholder=$("<div/>")
                     .attr("class", 'step container_12')
                     .attr("id", doc.id)
+                    
+        
+        $(stepForm).append(stepholder)
+
         //Insert the div before the comment section
-        $(stepholder).insertBefore("#commentssection")
-        stepNameDiv=$("<div/>").attr("class", "grid_12 stepheader").text(stepName)
+        $(stepForm).insertBefore("#commentssection")
+        
+        stepNameDiv=$("<div/>")
+                    .attr("class", "grid_12 stepheader")
+                    .text(stepName)
         $(stepholder).append($(stepNameDiv))
         fieldsList=step["fields"]
         numberOfFields=fieldsList.length
@@ -89,11 +98,16 @@ function createField(stepid, fieldMeta, index)
         div=$('<div/>').attr("class", "grid_6 field")
 
         options=fieldMeta["options"];
+        mandatory=fieldMeta["mandatory"]
         
         dd=$("<select/>")
                 .attr("data-stepid",stepid)
                 .attr("data-index", index)
                 .attr("id", index)
+        if(mandatory)
+        {
+            $(dd).attr("required", true)
+        }        
         $(dd).append($("<option/>"))
         for(index=0;index<options.length;index++)
         {
@@ -117,7 +131,10 @@ function createField(stepid, fieldMeta, index)
                 .attr("data-index", index)
                 .attr("id", index)
         //console.log($(inputBox))        
-        
+        if(mandatory)
+        {
+            $(inputBox).attr("required", true)
+        } 
         $("#"+stepid).append($(div).append($(inputBox)))
 
         //Create a div to go to next line.

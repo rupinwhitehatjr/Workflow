@@ -29,9 +29,9 @@ function reject()
 }
 function approve()
 {
+	//check mandatory values
 	//read all fields
 	//save field values in the specific step
-	//check mandatory values
 	//send forward
 	var stepID;
 	fieldCount=$("#fieldCount").val()
