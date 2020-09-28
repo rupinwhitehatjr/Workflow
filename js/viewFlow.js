@@ -72,8 +72,11 @@ stepsDocument.then(function(querySnapshot) {
 
 function createEditableStep(stepDoc)
 {
-        var stepForm=$("<form/>")
+        //The whole logic assumes there will always be one form
+        // Because there can only be one step which is actionable.
         stepID=stepDoc.id
+        var stepForm=$("<form/>").attr("data-stepid",stepID)
+       
         stepContent=stepDoc.data()
         //create a Dynamic Div for every Step
         var stepholder=$("<div/>")
@@ -87,7 +90,7 @@ function createEditableStep(stepDoc)
         $(stepForm).insertBefore("#commentssection")
         
         var stepNameDiv=$("<div/>")
-                    .attr("class", "grid_12 stepheader")
+                    .attr("class", "grid_12 stepheader-active")
                     .text(stepName)
         $(stepholder).append($(stepNameDiv))
 
@@ -98,6 +101,7 @@ function createEditableStep(stepDoc)
         {
             createField(stepID, fieldsList[i], i)
         }
+        createHiddenField(stepID);
 }
 
 function createViewableStep(stepDoc)
@@ -136,11 +140,21 @@ function createViewableStep(stepDoc)
 function appendLogHTML(logText)
 {
 	
-	console.log(logText)
+	//console.log(logText)
 	$("#actionlist").append($('<div/>').attr("class", "grid_1"))
 	$("#actionlist").append($('<div/>').attr("class", "grid_10 logtext").append(logText))
 	$("#actionlist").append($('<div/>').attr("class", "grid_1"))
 	
+}
+
+//Create a hidden field inside the form
+function createHiddenField(stepid)
+{
+    $("#"+stepid).append(
+                $('<input/>')
+                .attr("type", "hidden")
+                .val(stepid)
+            )
 }
 
 function createField(stepid, fieldMeta, index)

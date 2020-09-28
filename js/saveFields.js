@@ -46,10 +46,10 @@ function approve()
 	validationResult=$("form").valid();
 	if(!validationResult)
 	{
-		return
+		return 0
 	}
 
-	var stepID;
+	var stepID=null;
 	fieldCount=$("#fieldCount").val()
 	fieldCount=parseInt(fieldCount)
 	fieldData=[];
@@ -80,12 +80,20 @@ function approve()
 	approvedData["by"]=getLoggedInUserObject()// common.js
 	approvedData["timestamp"]=Date.now();
 	
-
+	if(stepID===null)
+	{
+		stepID=$("form").attr("data-stepid")
+	}
+	console.log($("form").attr("data-stepid"))
+	console.log($("form"))
+	
 	db.collection("Workflows")
 		.doc(flowID)
 		.collection("steps")
 		.doc(stepID)
 		.update(approvedData)
+	
+	
 	
 	
 }

@@ -5,6 +5,8 @@ admin.initializeApp();
 
 let db = admin.firestore();
 
+
+
 exports.copyLayout = functions.firestore
   .document('Workflows/{flowID}')
   .onCreate((snapshot, context) => { 
@@ -59,7 +61,15 @@ exports.processSubmission = functions.firestore
     {
       
       addLogOnApprove(flowID,user_name,stepName)
-      setNextStepAsActive(flowID,nextStepIndex)
+      if(nextStepIndex!==null)
+      {
+        setNextStepAsActive(flowID,nextStepIndex)
+      }
+      else
+      {
+        console.log("Flow is completed")
+        //mark flow as completed
+      }
       updatedData={}
       updatedData["activestep"]=false
       updatedData["action"]=null
