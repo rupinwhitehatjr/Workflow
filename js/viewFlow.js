@@ -6,7 +6,7 @@ flow_id=params.id
 logDocument=db.collection("Workflows")
 				.doc(flow_id)
 				.collection("log")
-				.orderBy("timestamp", "desc")
+				.orderBy("timestamp")
 				.get()
 
 logDocument.then(function(querySnapshot) {
@@ -16,12 +16,21 @@ logDocument.then(function(querySnapshot) {
         action=log["action"]
         creatorName=log["creatorName"]
         timestamp=log["timestamp"]
+
         hrts=new Date(parseInt(timestamp));
         if(action==="Created")
         {
         	logText=creatorName +" "+ action.toLowerCase() +" this workflow on " +hrts
         	//console.log(logText)
         	appendLogHTML(logText)
+        }
+
+        if(action==="Approved")
+        {
+            stepName=log["stepName"]
+            logText=creatorName +" "+ action.toLowerCase() +" the " +stepName + " step at "+hrts
+            //console.log(logText)
+            appendLogHTML(logText)
         }
 
     });
@@ -39,39 +48,90 @@ stepsDocument.then(function(querySnapshot) {
         step=doc.data()
         step_id=doc.id
         //console.log(step)
-        stepName=step["name"]
-        stepForm=$("<form/>")
+       
+        stepState=step["activestep"]
+        if(stepState)
+        {
+            createEditableStep(doc)
+        }
+        else
+        {
+            createViewableStep(doc)
+        }
         
+    });
+
+    $(document).trigger("formloaded");
+});
+
+
+
+
+
+});
+
+function createEditableStep(stepDoc)
+{
+        var stepForm=$("<form/>")
+        stepID=stepDoc.id
+        stepContent=stepDoc.data()
         //create a Dynamic Div for every Step
-        stepholder=$("<div/>")
+        var stepholder=$("<div/>")
                     .attr("class", 'step container_12')
-                    .attr("id", doc.id)
+                    .attr("id", stepID)
                     
-        
+        var stepName=stepContent["name"]
         $(stepForm).append(stepholder)
 
         //Insert the div before the comment section
         $(stepForm).insertBefore("#commentssection")
         
-        stepNameDiv=$("<div/>")
+        var stepNameDiv=$("<div/>")
                     .attr("class", "grid_12 stepheader")
                     .text(stepName)
         $(stepholder).append($(stepNameDiv))
-        fieldsList=step["fields"]
+
+        fieldsList=stepContent["fields"]
         numberOfFields=fieldsList.length
         $("#fieldCount").val(numberOfFields)
         for (i=0;i<numberOfFields;i++)
         {
-            createField(step_id, fieldsList[i], i)
+            createField(stepID, fieldsList[i], i)
         }
-    });
-});
+}
 
+function createViewableStep(stepDoc)
+{
 
+        stepID=stepDoc.id
+        stepContent=stepDoc.data()
+        //create a Dynamic Div for every Step
+        var stepholder=$("<div/>")
+                    .attr("class", 'step container_12')
+                    .attr("id", stepID)
+                    
+        var stepName=stepContent["name"]
+        
 
+        //Insert the div before the comment section
+        $(stepholder).insertBefore("#commentssection")
+        
+        var stepNameDiv=$("<div/>")
+                    .attr("class", "grid_12 stepheader")
+                    .text(stepName)
 
+        $(stepholder).append($(stepNameDiv))
 
-});
+        fieldList=stepContent["fields"]
+        fieldData=stepContent["fieldValues"]
+        numberOfFields=fieldList.length
+        //$("#fieldCount").val(numberOfFields)
+        for (i=0;i<numberOfFields;i++)
+        {
+            viewField(stepID,fieldList[i], fieldData[i])
+        }
+
+}
 
 function appendLogHTML(logText)
 {
@@ -104,6 +164,7 @@ function createField(stepid, fieldMeta, index)
                 .attr("data-stepid",stepid)
                 .attr("data-index", index)
                 .attr("id", index)
+                .attr("name", index)
         if(mandatory)
         {
             $(dd).attr("required", true)
@@ -130,6 +191,7 @@ function createField(stepid, fieldMeta, index)
                 .attr("data-stepid",stepid)
                 .attr("data-index", index)
                 .attr("id", index)
+                .attr("name", index)
         //console.log($(inputBox))        
         if(mandatory)
         {
@@ -142,4 +204,36 @@ function createField(stepid, fieldMeta, index)
 
     }
      $("#"+stepid).append($('<div/>').attr("class", "clear"))
+}
+
+
+
+function viewField(stepID,fieldsList, fieldData)
+{
+    
+    label=fieldsList["label"]
+    value=fieldData;
+    $("#"+stepID).append(
+                $('<div/>')
+                .attr("class", "grid_4 fieldlabel")
+                .append(label)
+            )
+    
+        
+     
+    
+    
+        
+        div=$('<div/>').attr("class", "grid_6 field").append(value)
+
+        
+        //console.log($(inputBox))        
+        
+        $("#"+stepID).append($(div))
+
+        //Create a div to go to next line.
+       
+
+    
+     $("#"+stepID).append($('<div/>').attr("class", "clear"))
 }

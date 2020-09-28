@@ -2,10 +2,20 @@ $(document).ready(function(){
 
 
 
-
-
-
 });
+
+$(document).on("formloaded", function(event){
+
+	$("form").each(function(){
+		
+		$(this).validate({errorElement : 'span', errorClass: "formerror"});
+	
+
+	});
+	
+});
+
+
 
 /*$(document).on('change', 'select', function() {
     //console.log($(this).attr("data-stepid"))
@@ -33,6 +43,12 @@ function approve()
 	//read all fields
 	//save field values in the specific step
 	//send forward
+	validationResult=$("form").valid();
+	if(!validationResult)
+	{
+		return
+	}
+
 	var stepID;
 	fieldCount=$("#fieldCount").val()
 	fieldCount=parseInt(fieldCount)
@@ -56,9 +72,20 @@ function approve()
 	//console.log(flowID)
 	//console.log(stepID)
 
+	//Save the Data to the Specific Step
+	approvedData={}
+	approvedData["fieldValues"]=fieldData
+	approvedData["action"]="approved"
+	//approvedData["action"]="approved"
+	approvedData["by"]=getLoggedInUserObject()// common.js
+	approvedData["timestamp"]=Date.now();
+	
+
 	db.collection("Workflows")
 		.doc(flowID)
 		.collection("steps")
 		.doc(stepID)
-		.update({"fieldValues":fieldData})
+		.update(approvedData)
+	
+	
 }

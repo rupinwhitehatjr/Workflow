@@ -192,6 +192,8 @@ select
   width:50%;
   height:30px;
   font-size: 15px;
+  color:#000000 !important;
+  padding:0px !important;
 }
 
 .step, #commentssection, #actionlist
@@ -205,6 +207,8 @@ select
 {
   width:50%;
   line-height:30px;
+  color:#000000 !important;
+  padding:0 !important;
 }
 .logtext
 {
@@ -225,6 +229,12 @@ select
   margin-left:0px;
   width:100%!important;
   color: #eeeeee;
+  padding-left:10px;
+}
+
+.formerror
+{
+  color:red;
   padding-left:10px;
 }
 

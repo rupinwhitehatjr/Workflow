@@ -25,8 +25,10 @@ db = firestore.Client(project="test", credentials=credentials)
 
 step={}	
 step["index"]=10
-step["editable"]=True
-
+step["activestep"]=True
+step["visible"]=True
+step["nextStep"]=20
+step["previousStep"]=None
 fields=[]
 levelObj={"label":"Curriculum","mandatory":True, "type":"dropdown", "options":["BEG", "INT", "ADV", "PRO", "APT"]}
 versionObject={"label":"Version", "mandatory":True, "type":"dropdown", "options":["V1", "V2"]}
@@ -49,21 +51,24 @@ db.collection(u'CurriculumWorkflow').document().set(step)
 step={}	
 step["index"]=20
 step["name"]="ID Review"
-step["editable"]=False
-fields=[]
-levelObj={}
-versionObject={}
-classObject={}
-documentType={}
-documentURL={}
-systemURL={}
-fields.append(levelObj)
-fields.append(versionObject)
-fields.append(classObject)
-fields.append(documentType)
-fields.append(documentURL)
-fields.append(systemURL)
-step["fields"]=fields
+step["nextStep"]=None
+step["previousStep"]=10
+step["activestep"]=True
+step["visible"]=False
+# fields=[]
+# levelObj={}
+# versionObject={}
+# classObject={}
+# documentType={}
+# documentURL={}
+# systemURL={}
+# fields.append(levelObj)
+# fields.append(versionObject)
+# fields.append(classObject)
+# fields.append(documentType)
+# fields.append(documentURL)
+# fields.append(systemURL)
+# step["fields"]=fields
 
 
 db.collection(u'CurriculumWorkflow').document().set(step)

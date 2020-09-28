@@ -11,4 +11,15 @@ var getParams = function (url) {
 	return params;
 };
 
+function getLoggedInUserObject()
+{
+		user=firebase.auth().currentUser
+        //console.log(user.uid)
+        userData={}
+        userData["uid"]=user.uid
+        userData["email"]=user.email
+        userData["name"]=user.displayName
+        return userData;
+}
+
 
