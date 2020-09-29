@@ -33,6 +33,22 @@ logDocument.then(function(querySnapshot) {
             appendLogHTML(logText)
         }
 
+        if(action==="Rejected")
+        {
+            stepName=log["stepName"]
+            logText=creatorName +" "+ action.toLowerCase() +" the " +stepName + " step at "+hrts
+            //console.log(logText)
+            appendLogHTML(logText)
+        }
+
+        if(action==="Closed")
+        {
+           
+            logText=creatorName +" "+ action.toLowerCase() +" the  workflow at "+hrts
+            //console.log(logText)
+            appendLogHTML(logText)
+        }
+
     });
 });
 

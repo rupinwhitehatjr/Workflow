@@ -63,31 +63,36 @@ exports.processSubmission = functions.firestore
       addLogOnApprove(flowID,user_name,stepName)
       if(nextStepIndex!==null)
       {
-        setNextStepAsActive(flowID,nextStepIndex)
+        setStepAsActive(flowID,nextStepIndex)
       }
       else
       {
-        console.log("Flow is completed")
+        //console.log("Flow is completed")
         //mark flow as completed
+        addLogOnClose(flowID,user_name,stepName)
       }
-      updatedData={}
-      updatedData["activestep"]=false
-      updatedData["action"]=null
-      updatedData["by"]=null
-
-      db.collection("Workflows")
-        .doc(flowID)
-        .collection("steps")
-        .doc(stepId)
-        .update(updatedData)
-
       // set activestep to false
+      setCurrentStepAsInactive(flowID,stepId)
     }
     
-    /*if(action==="rejected")
+    if(action==="rejected")
     {
+      addLogOnReject(flowID,user_name,stepName)
 
-    }*/
+      if(previousStepIndex!==null)
+      {
+        setStepAsActive(flowID,previousStepIndex)
+      }
+      else
+      {
+        console.log("You reached the start of the Workflow")
+        //console.log("Flow is completed")
+        //mark flow as completed
+        //addLogOnClose(flowID,user_name,stepName)
+      }
+      // set activestep to false
+      setCurrentStepAsInactive(flowID,stepId)
+    }
 
     //console.log(newValue.by.name)
 
@@ -97,7 +102,22 @@ exports.processSubmission = functions.firestore
     
   });
 
-  async function setNextStepAsActive(flowID,stepIndex)
+
+  function setCurrentStepAsInactive(flowID, stepID)
+  {
+      updatedData={}
+      updatedData["activestep"]=false
+      updatedData["action"]=null
+      updatedData["by"]=null
+
+      db.collection("Workflows")
+        .doc(flowID)
+        .collection("steps")
+        .doc(stepID)
+        .update(updatedData)
+  }
+
+  async function setStepAsActive(flowID,stepIndex)
   {
     //console.log("Setting " + stepIndex+" as active.")
     step=await db.collection("Workflows")
@@ -106,6 +126,7 @@ exports.processSubmission = functions.firestore
                 .where("index", "==", stepIndex)
                 .limit(1)
                 .get()
+
     step.forEach((doc)=> {
               nextStepData={}
               nextStepData["visible"]=true
@@ -163,9 +184,40 @@ exports.processSubmission = functions.firestore
     log.action="Approved"
     log.stepName=stepName
     //console.log(log)
-    flowDocument.collection("log").doc().set(log)
-
+    flowDocument.collection("log").doc().set(log)    
     
+  }
+
+   async function addLogOnReject(flowID, userName, stepName)
+  {
+    
+    creatorName=""
+    flowDocument=db.collection("Workflows").doc(flowID)   
+
+    log={}
+    log.creatorName=userName
+    log.timestamp=Date.now();
+    log.action="Rejected"
+    log.stepName=stepName
+    //console.log(log)
+    flowDocument.collection("log").doc().set(log)    
+    
+  }
+
+  async function addLogOnClose(flowID, userName)
+  {
+    
+    creatorName=""
+    flowDocument=db.collection("Workflows").doc(flowID)   
+
+    log={}
+    log.creatorName=userName
+    // Just add a little delay to ensure the closed happens after everything else. 
+    log.timestamp=Date.now()+ 10;
+    log.action="Closed"
+    //log.stepName=stepName
+    //console.log(log)
+    flowDocument.collection("log").doc().set(log)    
     
   }
 

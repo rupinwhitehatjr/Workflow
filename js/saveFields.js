@@ -30,19 +30,8 @@ $(document).on('change', 'input', function() {
 
 });*/
 
-
-function reject()
+function userAction(action)
 {
-	//Just read the comment section
-	//add to the log
-	//send back to selected step.
-}
-function approve()
-{
-	//check mandatory values
-	//read all fields
-	//save field values in the specific step
-	//send forward
 	validationResult=$("form").valid();
 	if(!validationResult)
 	{
@@ -75,7 +64,7 @@ function approve()
 	//Save the Data to the Specific Step
 	approvedData={}
 	approvedData["fieldValues"]=fieldData
-	approvedData["action"]="approved"
+	approvedData["action"]=action
 	//approvedData["action"]="approved"
 	approvedData["by"]=getLoggedInUserObject()// common.js
 	approvedData["timestamp"]=Date.now();
@@ -84,16 +73,15 @@ function approve()
 	{
 		stepID=$("form").attr("data-stepid")
 	}
-	console.log($("form").attr("data-stepid"))
-	console.log($("form"))
+	//console.log($("form").attr("data-stepid"))
+	//console.log($("form"))
 	
 	db.collection("Workflows")
 		.doc(flowID)
 		.collection("steps")
 		.doc(stepID)
 		.update(approvedData)
-	
-	
-	
-	
 }
+
+
+
