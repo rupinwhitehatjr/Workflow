@@ -30,17 +30,36 @@ function createNewWorkFlow(flow_type)
         creationData["uid"]=user.uid
         creationData["email"]=user.email
         creationData["name"]=user.displayName
-        //creationData["ready"]=false
+        creationData["ready"]=false
         
         newFlowID=db.collection("Workflows").doc(doc_ref.id).set(creationData)
         newFlowID.then(snapshot=>{
             
-            //console.log(doc_ref.id)
-            URL="viewFlow.html?id="+doc_ref.id
-            window.location.replace(URL);
+            
            
 
         })
+
+        unsubscribe=db.collection("Workflows").doc(doc_ref.id)
+    .onSnapshot(function(doc) {
+        //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+        //console.log(source, " data: ", doc.data());
+        console.log(doc.metadata.hasPendingWrites)
+        if(!doc.metadata.hasPendingWrites)
+        {
+            if(doc.data().ready)
+
+                {
+                    
+                    unsubscribe()
+                    //console.log("we are ready");
+                    //console.log(doc_ref.id)
+                    URL="viewFlow.html?id="+doc_ref.id
+                    window.location.replace(URL);
+                    
+                }
+        }
+});
         //return doc_ref.id
 	
 	

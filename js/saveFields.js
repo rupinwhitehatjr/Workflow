@@ -75,6 +75,11 @@ function userAction(action)
 	}
 	//console.log($("form").attr("data-stepid"))
 	//console.log($("form"))
+	flowMeta={}
+	flowMeta["ready"]=false
+	db.collection("Workflows")
+		.doc(flowID)
+		.update(flowMeta)
 	
 	db.collection("Workflows")
 		.doc(flowID)

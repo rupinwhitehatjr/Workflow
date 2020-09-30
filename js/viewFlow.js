@@ -1,15 +1,91 @@
 $(document).ready(function(){
 
-params=getParams(window.location.href)
-//console.log(params)
+ params=getParams(window.location.href)
 flow_id=params.id
-logDocument=db.collection("Workflows")
-				.doc(flow_id)
-				.collection("log")
-				.orderBy("timestamp")
-				.get()
+//window.setInterval(checkResultReady, 3000);
+unsubscribe=db.collection("Workflows").doc(flow_id)
+    .onSnapshot(function(doc) {
+        //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+        //console.log(source, " data: ", doc.data());
+        console.log(doc.metadata.hasPendingWrites)
+        if(!doc.metadata.hasPendingWrites)
+        {
+            if(doc.data().ready)
 
-logDocument.then(function(querySnapshot) {
+                {
+                    //console.log("we are ready");
+                    $(document).trigger("dataready");
+                    unsubscribe()
+                }
+        }
+});
+
+
+
+    
+
+});
+
+$(document).on("dataready", function(event){
+
+    displayWorkflow();
+    
+});
+
+function checkResultReady()
+{
+    //ready=db.collection("Workflows").doc(flow_id)
+    console.log("Checking");
+}
+
+
+function displayWorkflow()
+{
+    params=getParams(window.location.href)
+    flow_id=params.id
+    populateSteps(flow_id)
+    populateLogs(flow_id)
+    //$(document).trigger("formloaded");
+}
+
+function populateSteps(flow_id)
+{
+    stepsDocument=db.collection("Workflows")
+                .doc(flow_id)
+                .collection("steps")
+                .where("visible", "==", true)
+                .orderBy("index")
+                .get()
+
+stepsDocument.then(function(querySnapshot) {
+    querySnapshot.forEach(function(doc) {
+        step=doc.data()
+        step_id=doc.id
+        //console.log(step)
+       
+        stepState=step["activestep"]
+        if(stepState)
+        {
+            createEditableStep(doc)
+        }
+        else
+        {
+            createViewableStep(doc)
+        }
+        
+    });
+});
+    
+}
+
+function populateLogs(flow_id)
+{
+    logDocument=db.collection("Workflows")
+                .doc(flow_id)
+                .collection("log")
+                .orderBy("timestamp")
+                .get()
+    logDocument.then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
         // doc.data() is never undefined for query doc snapshots
         log=doc.data();
@@ -20,9 +96,9 @@ logDocument.then(function(querySnapshot) {
         hrts=new Date(parseInt(timestamp));
         if(action==="Created")
         {
-        	logText=creatorName +" "+ action.toLowerCase() +" this workflow on " +hrts
-        	//console.log(logText)
-        	appendLogHTML(logText)
+            logText=creatorName +" "+ action.toLowerCase() +" this workflow on " +hrts
+            //console.log(logText)
+            appendLogHTML(logText)
         }
 
         if(action==="Approved")
@@ -51,40 +127,7 @@ logDocument.then(function(querySnapshot) {
 
     });
 });
-
-stepsDocument=db.collection("Workflows")
-                .doc(flow_id)
-                .collection("steps")
-                .where("visible", "==", true)
-                .orderBy("index")
-                .get()
-
-stepsDocument.then(function(querySnapshot) {
-    querySnapshot.forEach(function(doc) {
-        step=doc.data()
-        step_id=doc.id
-        //console.log(step)
-       
-        stepState=step["activestep"]
-        if(stepState)
-        {
-            createEditableStep(doc)
-        }
-        else
-        {
-            createViewableStep(doc)
-        }
-        
-    });
-
-    $(document).trigger("formloaded");
-});
-
-
-
-
-
-});
+}
 
 function createEditableStep(stepDoc)
 {

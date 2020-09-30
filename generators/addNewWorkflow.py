@@ -29,6 +29,7 @@ creationData["flowType"]="CurriculumWorkflow"
 creationData["uid"]="abcd"
 creationData["email"]="rupin@whitehatjr.com"
 creationData["name"]="Rupin Chheda"
+creationData["ready"]=False
 
 db.collection(u'Workflows').document().set(creationData)
 
