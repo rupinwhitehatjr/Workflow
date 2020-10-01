@@ -8,7 +8,7 @@ import google.auth.credentials
 import argparse
 import random
 import time
-# use firebase emulators:start project --project test
+# use firebase emulators:start --project test
 # Use a service account
 #cred = credentials.Certificate('config.json')
 #firebase_admin.initialize_app(cred)

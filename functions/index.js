@@ -281,12 +281,21 @@ exports.processSubmission = functions.firestore
   {
   	//console.log(flowType)
 	  const steps = await db.collection(workflowType).orderBy("index").get()
-    //flowDocument=db.collection("Workflows").doc(flowID)
+    flowDocument=db.collection("Workflows").doc(flowID)
+    flowSteps=[]
+
     steps.forEach( (doc)=> {
-    	 	console.log("copying")
+    	 	//console.log("copying")
         flowDocument.collection("steps").doc(doc.id).set(doc.data())
+        flowDetail={}
+        flowDetail['name']=doc.data().name
+        flowDetail['id']=doc.id
+        flowSteps.push(flowDetail)
 
     })
+
+    flowDocument.update({'allSteps':flowSteps})
+
 
 
     return 0

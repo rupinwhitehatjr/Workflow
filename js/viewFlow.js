@@ -7,14 +7,15 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
     .onSnapshot(function(doc) {
         //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
         //console.log(source, " data: ", doc.data());
-        console.log(doc.metadata.hasPendingWrites)
+        //console.log(doc.metadata.hasPendingWrites)
         if(!doc.metadata.hasPendingWrites)
         {
             if(doc.data().ready)
 
                 {
                     //console.log("we are ready");
-                    $(document).trigger("dataready");
+                    
+                    $(document).trigger("dataready", doc);
                     unsubscribe()
                 }
         }
@@ -26,9 +27,12 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
 
 });
 
-$(document).on("dataready", function(event){
+$(document).on("dataready", function(event, doc){
 
+    //console.log(doc.data())
+    displayBreadCrumbs(doc.data())
     displayWorkflow();
+    
     
 });
 
@@ -43,9 +47,43 @@ function displayWorkflow()
 {
     params=getParams(window.location.href)
     flow_id=params.id
+    //displayBreadCrumbs(flow_id)
     populateSteps(flow_id)
     populateLogs(flow_id)
+
     //$(document).trigger("formloaded");
+}
+
+function displayBreadCrumbs(doc_data)
+{
+    stepMeta=doc_data["allSteps"]
+    stepCount=stepMeta.length
+    activeStepID=doc_data["active_step_id"]
+    var activeFlag=false;
+    for(i=0;i<stepCount;i++)
+    {
+        activeFlag=false
+        step_name=stepMeta[i]["name"]
+        step_ID=stepMeta[i]["id"]
+
+        if(step_ID===activeStepID)
+        {
+            activeFlag=true
+        }
+
+        createBreadCrumb(step_name, step_ID,activeFlag)
+    }
+
+}
+
+function createBreadCrumb(stepName,id,isActive)
+{
+    stepcrumb=$("<li/>").text(stepName)
+    if(isActive)
+    {
+        $(stepcrumb).attr("class", "current")
+    }
+    $("#breadcrumb").append(stepcrumb)
 }
 
 function populateSteps(flow_id)
@@ -64,9 +102,13 @@ stepsDocument.then(function(querySnapshot) {
         //console.log(step)
        
         stepState=step["activestep"]
+        isReviewOnly=step["onlyreview"]
+        //console.log("isReviewOnly: "+isReviewOnly)
         if(stepState)
         {
-            createEditableStep(doc)
+            
+                createEditableStep(doc)
+            
         }
         else
         {
