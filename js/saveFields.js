@@ -45,6 +45,7 @@ function userAction(action)
 			return 0
 		}
 	}
+	openSavingModal();
 
 	var stepID=null;
 	fieldCount=$("#fieldCount").val()
@@ -105,15 +106,36 @@ function userAction(action)
 
 	flowMeta={}
 	flowMeta["ready"]=false
+
 	db.collection("Workflows")
 		.doc(flowID)
 		.update(flowMeta)
 	
-	db.collection("Workflows")
+	stepdDocument=db.collection("Workflows")
 		.doc(flowID)
 		.collection("steps")
 		.doc(stepID)
-		.update(approvedData)
+
+	stepdDocument.update(approvedData)
+
+	//
+
+	unsubscribe=stepdDocument.onSnapshot(function(doc) {
+        //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+        //console.log(source, " data: ", doc.data());
+        console.log(doc.metadata.hasPendingWrites)
+        if(!doc.metadata.hasPendingWrites)
+        {
+            
+                    
+            unsubscribe()
+            //console.log("we are ready");
+            //console.log(doc_ref.id)
+            location.reload(); 	
+                    
+                
+        }
+});
 		
 }
 

@@ -378,6 +378,18 @@ a:visited {
   display:block;
 }
 
+.stickyheader
+{
+  /*position: fixed;
+  top: 0;
+  background-color: #555!important;*/
+
+}
+.breadcrumbheader
+{
+  
+  /* background-color: #555!important;*/
+}
 
 
 

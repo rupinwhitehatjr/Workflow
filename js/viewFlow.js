@@ -1,6 +1,8 @@
 $(document).ready(function(){
 
- params=getParams(window.location.href)
+
+openWaitingModal();
+params=getParams(window.location.href)
 flow_id=params.id
 //window.setInterval(checkResultReady, 3000);
 unsubscribe=db.collection("Workflows").doc(flow_id)
@@ -35,6 +37,36 @@ $(document).on("dataready", function(event, doc){
     
     
 });
+
+$(document).on("formloaded", function(event){
+
+    closeAllModals()
+    
+    
+});
+
+function openWaitingModal()
+{
+    $("#loading").modal({
+        escapeClose: false,
+        clickClose: false,
+        showClose: false
+    });
+}
+
+function openSavingModal()
+{
+    $("#saving").modal({
+        escapeClose: false,
+        clickClose: false,
+        showClose: false
+    });
+}
+
+function closeAllModals()
+{
+    $.modal.close();
+}
 
 function checkResultReady()
 {
@@ -108,6 +140,7 @@ function createBreadCrumb(stepName,id,isActive)
 
 function populateSteps(flow_id)
 {
+    $("#fieldCount").val(0)
     stepsDocument=db.collection("Workflows")
                 .doc(flow_id)
                 .collection("steps")
@@ -120,7 +153,9 @@ stepsDocument.then(function(querySnapshot) {
         step=doc.data()
         step_id=doc.id
         //console.log(step)
-       
+        //set a default value for the number of fields.
+        
+
         stepState=step["activestep"]
         isReviewOnly=step["onlyreview"]
         //console.log("isReviewOnly: "+isReviewOnly)
