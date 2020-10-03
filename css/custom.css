@@ -7,7 +7,7 @@ p
 .button{
  	background-color: #4CAF50; /* Green */
   border: none;
-  color: white;
+  color: white!important;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
@@ -169,14 +169,13 @@ font-size: 18px
 
 .fieldlabel
 {
-  font-size: 20px;
-  
+  font-size: 20px;  
   padding-top:10px;
   padding-bottom:10px;
   background-color: #00adb5;
   margin-bottom:10px;
   padding-left:10px;
-  color: #222831
+  color: #222831;
 }
 div.field
 {
@@ -192,6 +191,7 @@ select
   font-size: 15px;
   color:#000000 !important;
   padding:0px !important;
+  font-family: inherit;
 }
 
 .step, #commentssection, #actionlist
@@ -207,6 +207,7 @@ select
   line-height:30px;
   color:#000000 !important;
   padding:0 !important;
+  font-family: inherit;
 }
 .logtext
 {
@@ -289,7 +290,7 @@ ul{
     border-width: 1.5em 0 1.5em 1em;
     border-style: solid;
     border-color: #ddd #ddd #ddd transparent;
-    left: -1em;
+    left: -0.9em;
   }
 
   #breadcrumb li.current::before{
@@ -304,14 +305,80 @@ ul{
     border-top: 1.5em solid transparent;
     border-bottom: 1.5em solid transparent;
     border-left: 1em solid #ddd;
-    right: -1em;
+    right: -0.9em;
   }
 
   #breadcrumb li.current::after{
     border-left-color: #99db76;
   }
 
+  .custommodal
+  {
+    text-align: center!important;
+    font-size: 20px;
+  }
+  .modalmessage
+  {
+    padding:15px;
+   }
+
+/* Comment Area */
+.commentbox
+{
+  width: 100%;
+  height: 75px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  resize: none;
+  margin-bottom: 20px;
+  font-size: 15px;
+  font-family: inherit;
+
+}
+input[type=text]:focus {
+  border: 3px solid #555;
+  background-color: lightblue;
+}
+select:focus {
+  border: 3px solid #555;
+  background-color: lightblue;
+}
+.commentbox:focus
+{
+  border: 3px solid #555;
+  background-color: lightblue;
+}
+.commenttext
+{
+  font-size:20px;
+  padding-bottom: 20px;
+}
+
+a:link {
+  color: #0000EE;
   
+  text-decoration: none;
+}
+
+a:visited {
+  color: #551A8B;
+  
+  text-decoration: none;
+}
+
+.invisible
+{
+  display:none;
+}
+.visible
+{
+  display:block;
+}
+
+
 
 
 

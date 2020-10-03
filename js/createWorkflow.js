@@ -33,13 +33,18 @@ function createNewWorkFlow(flow_type)
         creationData["ready"]=false
         
         newFlowID=db.collection("Workflows").doc(doc_ref.id).set(creationData)
-        newFlowID.then(snapshot=>{
-            
-            
+        newFlowID.then(snapshot=>{           
            
 
         })
 
+            $("#sticky").modal({
+                escapeClose: false,
+                clickClose: false,
+                showClose: false
+            });
+
+        
         unsubscribe=db.collection("Workflows").doc(doc_ref.id)
     .onSnapshot(function(doc) {
         //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";

@@ -50,8 +50,9 @@ function displayWorkflow()
     //displayBreadCrumbs(flow_id)
     populateSteps(flow_id)
     populateLogs(flow_id)
+    appendComments(flow_id)
 
-    //$(document).trigger("formloaded");
+    $(document).trigger("formloaded");
 }
 
 function displayBreadCrumbs(doc_data)
@@ -59,6 +60,8 @@ function displayBreadCrumbs(doc_data)
     stepMeta=doc_data["allSteps"]
     stepCount=stepMeta.length
     activeStepID=doc_data["active_step_id"]
+    closedState=doc_data["closed"]
+    
     var activeFlag=false;
     for(i=0;i<stepCount;i++)
     {
@@ -69,11 +72,28 @@ function displayBreadCrumbs(doc_data)
         if(step_ID===activeStepID)
         {
             activeFlag=true
+            updateHiddenField(activeStepID)
         }
 
         createBreadCrumb(step_name, step_ID,activeFlag)
     }
+    
+    // Workflow is closed, no need of showing buttons
+    //console.log(closedState)
+    if(closedState)
+    {
+       // console.log("removing section")
+        $("#buttonsection").remove()
+    }
+    else
+    {
+        $("#buttonsection").removeClass("invisible")
+    }
+}
 
+function updateHiddenField(activeStepID)
+{
+    $("#activestepid").val(activeStepID)
 }
 
 function createBreadCrumb(stepName,id,isActive)
@@ -104,15 +124,19 @@ stepsDocument.then(function(querySnapshot) {
         stepState=step["activestep"]
         isReviewOnly=step["onlyreview"]
         //console.log("isReviewOnly: "+isReviewOnly)
-        if(stepState)
+        if(!isReviewOnly)
         {
-            
+            if(stepState)
+            {
+               // console.log("Editable step")
                 createEditableStep(doc)
-            
-        }
-        else
-        {
-            createViewableStep(doc)
+                
+            }
+            else
+            {
+                //console.log("Viewable step")
+                createViewableStep(doc)
+            }
         }
         
     });
@@ -171,10 +195,45 @@ function populateLogs(flow_id)
 });
 }
 
+function appendComments(flow_id)
+{
+
+    commentDocument=db.collection("Workflows")
+                .doc(flow_id)
+                .collection("comments")
+                .orderBy("timestamp")
+                .get()
+
+    commentDocument.then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+            // doc.data() is never undefined for query doc snapshots
+            comment=doc.data();
+            comment_text=comment["comment"]
+            creatorName=comment["name"]
+            timestamp=comment["timestamp"]
+
+            hrts=new Date(parseInt(timestamp));
+
+            commentdiv=$("<div/>").attr("class", "grid_12 commenttext").text(comment_text)
+            blankdiv=$("<div/>").attr("class", "clear")
+            $(commentdiv).insertBefore("#commentinputsec")
+            $(blankdiv).insertBefore("#commentinputsec")
+        
+
+       
+
+        
+
+    });
+});
+
+}
+
 function createEditableStep(stepDoc)
 {
         //The whole logic assumes there will always be one form
         // Because there can only be one step which is actionable.
+       // console.log("edi6table")
         stepID=stepDoc.id
         var stepForm=$("<form/>").attr("data-stepid",stepID)
        
@@ -203,6 +262,9 @@ function createEditableStep(stepDoc)
             createField(stepID, fieldsList[i], i)
         }
         createHiddenField(stepID);
+
+        //Add validators to the newly created form.
+        $(stepForm).validate({errorElement : 'span', errorClass: "formerror"});
 }
 
 function createViewableStep(stepDoc)
@@ -231,6 +293,7 @@ function createViewableStep(stepDoc)
         fieldData=stepContent["fieldValues"]
         numberOfFields=fieldList.length
         //$("#fieldCount").val(numberOfFields)
+
         for (i=0;i<numberOfFields;i++)
         {
             viewField(stepID,fieldList[i], fieldData[i])
@@ -327,7 +390,8 @@ function viewField(stepID,fieldsList, fieldData)
 {
     
     label=fieldsList["label"]
-    value=fieldData;
+        
+    
     $("#"+stepID).append(
                 $('<div/>')
                 .attr("class", "grid_4 fieldlabel")
@@ -335,11 +399,27 @@ function viewField(stepID,fieldsList, fieldData)
             )
     
         
-     
-    
+        
+        value=fieldData;
+        fieldDisplay=null
+        if("displayAs" in fieldsList)
+        {
+            fieldDisplay=fieldsList["displayAs"]
+        }
+
+        fieldValue=value;
+        if(fieldDisplay==="url")
+        {
+            fieldValue=$("<a>")
+                        .attr("href", value)
+                        .attr("class", "fieldlink")
+                        .append(value)
+        }
+
+        
     
         
-        div=$('<div/>').attr("class", "grid_6 field").append(value)
+        div=$('<div/>').attr("class", "grid_6 field").append(fieldValue)
 
         
         //console.log($(inputBox))        

@@ -6,12 +6,15 @@ $(document).ready(function(){
 
 $(document).on("formloaded", function(event){
 
+	/*//console.log("formloaded");
+	//console.log($("form"));
 	$("form").each(function(){
 		
-		$(this).validate({errorElement : 'span', errorClass: "formerror"});
+		console.log($(this));
+		//$(this).
 	
 
-	});
+	});*/
 	
 });
 
@@ -32,10 +35,15 @@ $(document).on('change', 'input', function() {
 
 function userAction(action)
 {
-	validationResult=$("form").valid();
-	if(!validationResult)
+	primaryForm=$("form")
+
+	if($(primaryForm).length>0)
 	{
-		return 0
+		validationResult=$("form").valid();
+		if(!validationResult)
+		{
+			return 0
+		}
 	}
 
 	var stepID=null;
@@ -71,10 +79,30 @@ function userAction(action)
 	
 	if(stepID===null)
 	{
-		stepID=$("form").attr("data-stepid")
+		stepID=$("#activestepid").val()
+		//console.log(stepID)
 	}
 	//console.log($("form").attr("data-stepid"))
 	//console.log($("form"))
+	//return
+	commenttext=$("#new_comment_input").val()
+	commenttext=commenttext.trim()
+	console.log(commenttext)
+	if(commenttext!=="")
+	{
+		console.log("adding a comment")
+		commentmeta={}
+		commentmeta["by"]=getLoggedInUserObject()// common.js
+		commentmeta["timestamp"]=Date.now();
+		commentmeta["comment"]=commenttext
+		db.collection("Workflows")
+		.doc(flowID)
+		.collection("comments")
+		.doc()
+		.set(commentmeta)
+
+	}
+
 	flowMeta={}
 	flowMeta["ready"]=false
 	db.collection("Workflows")
@@ -86,6 +114,7 @@ function userAction(action)
 		.collection("steps")
 		.doc(stepID)
 		.update(approvedData)
+		
 }
 
 

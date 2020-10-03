@@ -7,7 +7,9 @@ let db = admin.firestore();
 
 
 
-exports.copyLayout = functions.firestore
+exports.copyLayout = functions
+  .region('asia-east2')
+  .firestore
   .document('Workflows/{flowID}')
   .onCreate((snapshot, context) => { 
   	flowID=context.params.flowID
@@ -17,18 +19,27 @@ exports.copyLayout = functions.firestore
   	var copydone=makeCopy(flowType,flowID)
   	var logdone=addLogOnCreate(flowID,userName)
     // Only update the Flow Facade when the copy is done
-    copydone.then(()=>{
-      updateFlowFacade(flowID) 
-      return 0 
-    })	
-    .catch(() => null)
+    copydone.then((querySnapshot)=> {
+          //console.log(querySnapshot.data().index)
+              flowMeta={}
+              flowMeta["ready"]=true
+              flowMeta["active_step_name"]=querySnapshot.data().name
+              flowMeta["active_step_id"]=querySnapshot.id
+              flowMeta["closed"]=false
+              updateFlowFacade(flowID, flowMeta)
+           
+              return 0
+            
+        }).catch(() => null)
   	
   	return 0
   	
   });
 
 
-exports.processSubmission = functions.firestore
+exports.processSubmission = functions
+  .region('asia-east2')
+  .firestore
   .document('Workflows/{flowID}/steps/{stepId}')
   .onUpdate((change, context) => {
 
@@ -64,16 +75,30 @@ exports.processSubmission = functions.firestore
       if(nextStepIndex!==null)
       {
         let activeStepPromise=setStepAsActive(flowID,nextStepIndex)
-        activeStepPromise.then(()=>{
-            updateFlowFacade(flowID)
-            return 0;
+
+        /*the activesteppromise variable holds the
+        data for the active step.
+        Use the same data to update the flow meta */
+
+
+        activeStepPromise.then((querySnapshot)=> {
+          //console.log(querySnapshot.data().index)
+              flowMeta={}
+              flowMeta["ready"]=true
+              flowMeta["active_step_name"]=querySnapshot.data().name
+              flowMeta["active_step_id"]=querySnapshot.id
+              flowMeta["closed"]=false
+              updateFlowFacade(flowID, flowMeta)
+           
+              return 0
             
-        })  
-        .catch(() => null)
+        }).catch(() => null)
+
+
       }
       else
       {
-        //console.log("Flow is completed")
+        console.log("Flow is completed")
         //mark flow as completed
         let logClose=addLogOnClose(flowID,user_name,stepName)
         logClose.then(()=>{
@@ -95,18 +120,28 @@ exports.processSubmission = functions.firestore
       {
         
         let activeStepPromise=setStepAsActive(flowID,previousStepIndex)
-        activeStepPromise.then(()=>{
-            updateFlowFacade(flowID)  
-            return 0
-        })  
-        .catch(() => null)
+
+        /*the activesteppromise variable holds the
+        data for the active step.
+        Use the same data to update the flow meta */
+
+        activeStepPromise.then((querySnapshot)=> {
+          //console.log(querySnapshot.data().index)
+              flowMeta={}
+              flowMeta["ready"]=true
+              flowMeta["active_step_name"]=querySnapshot.data().name
+              flowMeta["active_step_id"]=querySnapshot.id
+              flowMeta["closed"]=false
+              updateFlowFacade(flowID, flowMeta)
+           
+              return 0
+            
+        }).catch(() => null)
       }
       else
       {
         console.log("You reached the start of the Workflow")
-        //console.log("Flow is completed")
-        //mark flow as completed
-        //addLogOnClose(flowID,user_name,stepName)
+       
       }
       // set activestep to false
       setCurrentStepAsInactive(flowID,stepId)
@@ -144,7 +179,7 @@ exports.processSubmission = functions.firestore
                 .where("index", "==", stepIndex)
                 .limit(1)
                 .get()
-
+    let activestep= null
     step.forEach((doc)=> {
               nextStepData={}
               nextStepData["visible"]=true
@@ -156,10 +191,12 @@ exports.processSubmission = functions.firestore
                 .doc(doc.id)
                 .update(nextStepData)
 
+              activestep=doc
+
     })
 
-
-    return 0
+    //console.log(activestep)
+    return activestep
                 
   }
 
@@ -167,30 +204,10 @@ exports.processSubmission = functions.firestore
 
 
 
-  async function updateFlowFacade(flowID)
+  async function updateFlowFacade(flowID,flowMeta)
   {
-    activestep=await db.collection("Workflows")
-                .doc(flowID)
-                .collection("steps")
-                .where("activestep", "==", true)
-                .limit(1)
-                .get()
-
-    //console.log("facade")
-    activestep.forEach((doc)=> {
-              //console.log(doc.id)
-              data=doc.data()
-              flowMeta={}
-              flowMeta["ready"]=true
-              flowMeta["active_step_name"]=data.name
-              flowMeta["active_step_id"]=doc.id
-              flowMeta["closed"]=false
-              //console.log(flowMeta)
-              db.collection("Workflows")
-                .doc(flowID)
-                .update(flowMeta)
-
-    })
+    
+     db.collection("Workflows").doc(flowID).update(flowMeta)   
    
     return 0;
   }
@@ -283,13 +300,18 @@ exports.processSubmission = functions.firestore
 	  const steps = await db.collection(workflowType).orderBy("index").get()
     flowDocument=db.collection("Workflows").doc(flowID)
     flowSteps=[]
-
+    let activestep=null
     steps.forEach( (doc)=> {
     	 	//console.log("copying")
         flowDocument.collection("steps").doc(doc.id).set(doc.data())
         flowDetail={}
+
         flowDetail['name']=doc.data().name
         flowDetail['id']=doc.id
+        if(doc.data().activestep)
+        {
+          activestep=doc
+        }
         flowSteps.push(flowDetail)
 
     })
@@ -297,7 +319,6 @@ exports.processSubmission = functions.firestore
     flowDocument.update({'allSteps':flowSteps})
 
 
-
-    return 0
+    return activestep
   }
 
