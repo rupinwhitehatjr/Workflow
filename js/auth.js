@@ -4,14 +4,14 @@
           if (user) {
             //console.log(user)
             // User is signed in.
-            var displayName = user.displayName;
+            /*var displayName = user.displayName;
             var email = user.email;
             var emailVerified = user.emailVerified;
             var photoURL = user.photoURL;
             var uid = user.uid;
             var phoneNumber = user.phoneNumber;
             var providerData = user.providerData;
-            console.log(email)
+            console.log(email)*/
             user.getIdToken().then(function(accessToken) {
               //document.getElementById('sign-in-status').textContent = 'Signed in';
               //document.getElementById('sign-in').textContent = 'Sign out';
@@ -29,6 +29,9 @@
           } else {
             // User is signed out.
             console.log("User is Signed Out")
+            var provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithRedirect(provider);
+            //
             //document.getElementById('sign-in-status').textContent = 'Signed out';
             //document.getElementById('sign-in').textContent = 'Sign in';
            //document.getElementById('account-details').textContent = 'null';

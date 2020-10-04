@@ -32,11 +32,15 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
 $(document).on("dataready", function(event, doc){
 
     //console.log(doc.data())
-    displayBreadCrumbs(doc.data())
+    workflowMeta=doc.data()
+    displayBreadCrumbs(workflowMeta)
+
+  //  addHiddenFieldForStepID(workflowMeta["active_step_id"])
     displayWorkflow();
     
     
 });
+
 
 $(document).on("formloaded", function(event){
 
@@ -104,7 +108,7 @@ function displayBreadCrumbs(doc_data)
         if(step_ID===activeStepID)
         {
             activeFlag=true
-            updateHiddenField(activeStepID)
+            
         }
 
         createBreadCrumb(step_name, step_ID,activeFlag)
@@ -123,9 +127,14 @@ function displayBreadCrumbs(doc_data)
     }
 }
 
-function updateHiddenField(activeStepID)
+function addHiddenField(id, value)
 {
-    $("#activestepid").val(activeStepID)
+    console.log(id+" " +value);
+    var hiddenElement=$("<input/>").attr("type", "hidden")
+                  .attr("value", value)
+                  .attr("id", id)
+
+    $("body").append($(hiddenElement))
 }
 
 function createBreadCrumb(stepName,id,isActive)
@@ -140,7 +149,7 @@ function createBreadCrumb(stepName,id,isActive)
 
 function populateSteps(flow_id)
 {
-    $("#fieldCount").val(0)
+    
     stepsDocument=db.collection("Workflows")
                 .doc(flow_id)
                 .collection("steps")
@@ -173,6 +182,14 @@ stepsDocument.then(function(querySnapshot) {
                 createViewableStep(doc)
             }
         }
+        //Step is a review step and is active
+        //just add hidden fields
+        if(isReviewOnly && stepState)
+        {
+            addHiddenField("fieldCount", 0)
+            addHiddenField("activestepid", step_id)
+        }
+
         
     });
 });
@@ -291,12 +308,13 @@ function createEditableStep(stepDoc)
 
         fieldsList=stepContent["fields"]
         numberOfFields=fieldsList.length
-        $("#fieldCount").val(numberOfFields)
+                
         for (i=0;i<numberOfFields;i++)
         {
             createField(stepID, fieldsList[i], i)
         }
-        createHiddenField(stepID);
+        addHiddenField("fieldCount", numberOfFields)
+        addHiddenField("activestepid", stepID)
 
         //Add validators to the newly created form.
         $(stepForm).validate({errorElement : 'span', errorClass: "formerror"});
