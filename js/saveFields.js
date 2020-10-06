@@ -76,6 +76,7 @@ function userAction(action)
 	approvedData["action"]=action
 	//approvedData["action"]="approved"
 	approvedData["by"]=getLoggedInUserObject()// common.js
+	//approvedData["notify"]=getLoggedInUserObject()// common.js
 	approvedData["timestamp"]=Date.now();
 	
 	if(stepID===null)

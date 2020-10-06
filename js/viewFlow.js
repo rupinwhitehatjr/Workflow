@@ -129,7 +129,7 @@ function displayBreadCrumbs(doc_data)
 
 function addHiddenField(id, value)
 {
-    console.log(id+" " +value);
+    //console.log(id+" " +value);
     var hiddenElement=$("<input/>").attr("type", "hidden")
                   .attr("value", value)
                   .attr("id", id)
@@ -308,16 +308,27 @@ function createEditableStep(stepDoc)
 
         fieldsList=stepContent["fields"]
         numberOfFields=fieldsList.length
+        if("fieldValues" in stepContent)
+        {
+            fieldData=stepContent["fieldValues"]
+        }
+        else
+        {
+            fieldData=new Array(numberOfFields)
+        }
+        //console.log(fieldData[0])    
                 
         for (i=0;i<numberOfFields;i++)
         {
-            createField(stepID, fieldsList[i], i)
+            
+            createField(stepID, fieldsList[i], i, fieldData[i])
         }
         addHiddenField("fieldCount", numberOfFields)
         addHiddenField("activestepid", stepID)
 
         //Add validators to the newly created form.
         $(stepForm).validate({errorElement : 'span', errorClass: "formerror"});
+        
 }
 
 function createViewableStep(stepDoc)
@@ -374,7 +385,7 @@ function createHiddenField(stepid)
             )
 }
 
-function createField(stepid, fieldMeta, index)
+function createField(stepid, fieldMeta, index, fieldData)
 {
     type=fieldMeta["type"]
     label=fieldMeta["label"]
@@ -403,7 +414,12 @@ function createField(stepid, fieldMeta, index)
         $(dd).append($("<option/>"))
         for(index=0;index<options.length;index++)
         {
-            $(dd).append($("<option/>").val(options[index]).text(options[index]))
+            option=$("<option/>").val(options[index]).text(options[index])
+            if(options[index]===fieldData)
+            {
+                $(option).prop("selected", true);
+            }
+            $(dd).append($(option))
         }
         $("#"+stepid).append($(div).append($(dd)))
 
@@ -428,6 +444,10 @@ function createField(stepid, fieldMeta, index)
         {
             $(inputBox).attr("required", true)
         } 
+        if(fieldData!=undefined)
+        {
+            $(inputBox).val(fieldData)
+        }
         $("#"+stepid).append($(div).append($(inputBox)))
 
         //Create a div to go to next line.

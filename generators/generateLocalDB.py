@@ -30,7 +30,7 @@ step["visible"]=True
 step["nextStep"]=20
 step["previousStep"]=None
 fields=[]
-levelObj={"label":"Curriculum","mandatory":True, "type":"dropdown", "options":["BEG", "INT", "ADV", "PRO", "APT"]}
+levelObj={"label":"Curriculum","mandatory":True, "userGroupKey":True,"type":"dropdown", "options":["BEG", "INT", "ADV", "PRO", "APT"]}
 versionObject={"label":"Version", "mandatory":True, "type":"dropdown", "options":["V1", "V2"]}
 classObject={"label":"Class","mandatory":True, "type":"text"}
 documentType={"label":"Asset Type","mandatory":True, "type":"dropdown","options":["Class Document", "Summary"]}
@@ -70,9 +70,19 @@ step["visible"]=False
 # fields.append(systemURL)
 # step["fields"]=fields
 
+doc_ref = db.collection(u'CurriculumWorkflow').document()
+newid = doc_ref.id
+db.collection(u'CurriculumWorkflow').document(newid).set(step)
 
-db.collection(u'CurriculumWorkflow').document().set(step)
-	
+
+groupData=[]
+begGroupData={}
+groupData.append({"stepID":newid, "users":["rupin@whitehatjr.com", 'rupin.chheda@gmail.com']})
+
+begGroupData["groupList"]=groupData
+#userGroupData
+
+db.collection(u"UserGroups").document("BEG").set(begGroupData)
 
 
 # 	#fields=db.collection(u'CurriculumWorkflow').document(stepID).collection(u'Fields')

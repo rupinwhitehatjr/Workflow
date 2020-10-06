@@ -4,23 +4,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Welcome to the Curriculum Workflow</title>
+<title>Create a Workflow</title>
 <link rel="stylesheet" href="css/reset.css" />
 <link rel="stylesheet" href="css/text.css" />
 <link rel="stylesheet" href="css/960.css" />
 <link rel="stylesheet" href="css/demo.css" />
 <link rel="stylesheet" href="css/custom.css" />
-
-
-  </head>
-  <body>
-    <!-- The surrounding HTML is left untouched by FirebaseUI.
-         Your app may use that space for branding, controls and other customizations.-->
-    <h1>Login Here</h1>
-    <div id="firebaseui-auth-container"></div>
-
-
-<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-auth.js"></script>
@@ -32,6 +22,8 @@
 
 <script>
   // Your web app's Firebase configuration
+
+  
   var firebaseConfig = {
     apiKey: "AIzaSyDKEEwYE0xq_Pb4RXyEjxQR_XnNS04kMgY",
     authDomain: "renamingfilesforquiz.firebaseapp.com",
@@ -39,72 +31,53 @@
     projectId: "renamingfilesforquiz",
     storageBucket: "renamingfilesforquiz.appspot.com",
     messagingSenderId: "770560109780",
-    appId: "1:770560109780:web:b3bf0c8dccc073ff885f41"
+    appId: "1:770560109780:web:b1df2f0b63dd95f0885f41"
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
 </script>
 
 
-<script type="text/javascript" src="js/auth.js"></script>    
-<!-- <script type="text/javascript">
-      // FirebaseUI config.
-      var uiConfig = {
-        callbacks: {
-    signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-      // User successfully signed in.
-      // Return type determines whether we continue the redirect automatically
-      // or whether we leave that to developer to handle.
-      console.log(authResult)
-      console.log(redirectUrl)
-      return false;
-    },
-    uiShown: function() {
-      // The widget is rendered.
-      // Hide the loader.
-      //document.getElementById('loader').style.display = 'none';
-    }
-  },
+<script type="text/javascript" src="js/auth.js"></script>  
+<script type="text/javascript" src="js/createWorkflow.js"></script>      
+</head>
+<body>
+
+<div class="container_12">
+
+	<div class="grid_4">
+      &nbsp;
+    </div>
+
+	<div class="grid_4">
+    	 <a class='button' id="CurriculumWorkflowButton" href='javascript:createNewWorkFlow("CurriculumWorkflow")'>Create a New Workflow</a>
+  
+  </div>
+
+	<div class="grid_4">
+	    <h5>
+	     &nbsp;
+	    <h5>
+  	</div>
+  <!-- end .grid_12 -->
+  <div class="clear"></div>  
+  
+</div>
 
 
-        signInSuccessUrl: 'createWorkflow.html',
-        signInOptions: [
-          // Leave the lines as is for the providers you want to offer your users.
-          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-          
-        ],
-        
-      };
-
-      // Initialize the FirebaseUI Widget using Firebase.
-      var ui = new firebaseui.auth.AuthUI(firebase.auth());
-      // The start method will wait until the DOM is loaded.
-      ui.start('#firebaseui-auth-container', uiConfig);
-    </script> -->
-<script language="javascript">
-
-firebase.auth().getRedirectResult().then(function(result) {
-  if (result.credential) {
-    // This gives you a Google Access Token. You can use it to access the Google API.
-    var token = result.credential.accessToken;
-    // ...
-  }
-  // The signed-in user info.
-  var user = result.user;
-}).catch(function(error) {
-  // Handle Errors here.
-  var errorCode = error.code;
-  var errorMessage = error.message;
-  // The email of the user's account used.
-  var email = error.email;
-  // The firebase.auth.AuthCredential type that was used.
-  var credential = error.credential;
-  // ...
-});
+<div id="sticky" class="modal custommodal">
+ <div class='modalmessage'>Please wait, creating the Workflow</div>
+ <div><img src='img/loading.gif' height="52px"></div>
+</div>
 
 
 
-</script>
-    
-  </body>
+
+
+<!-- end .container_16 -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+</body>
 </html>

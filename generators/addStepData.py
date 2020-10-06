@@ -46,11 +46,11 @@ if args.flowID:
 
 stepDoc=db.collection(u'Workflows').document(flowID).collection("steps").document(stepID)
 formData={}
-formData["fieldValues"]=[1,2,3,4,5]
+formData["fieldValues"]=["BEG",2,3,4,5]
 formData["action"]="approved"
 userDetail={}
 userDetail["uid"]="abcd"
-userDetail["email"]="rupin@whitehatjr.com"
+userDetail["email"]="poonam11gala@gmail.com"
 userDetail["name"]="Rupin Chheda"
 
 formData["timestamp"]=time.time()
