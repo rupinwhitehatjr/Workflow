@@ -222,12 +222,12 @@ exports.processSubmission = functions
         // fetch the correct data from the UserGroups Collection
         userGroupKey=getGroupKey(stepData);
         //console.log(userGroupKey)
-        if(userGroupKey!=null)
+        if(userGroupKey!==null)
         {
               userGroups=db.collection("UserGroups").doc(userGroupKey).get()
           
 
-              userGroups.then(function(doc) {
+              userGroups.then((doc)=>{
               if (doc.exists) 
               {
                   //console.log("Document data:", doc.data());
@@ -256,9 +256,11 @@ exports.processSubmission = functions
 
                   }    
               } 
+
+              return 0
               
 
-              }).catch(function(error) {
+              }).catch((error)=> {
                 console.log("Error getting document during Get Roles:", error);
               });
           
