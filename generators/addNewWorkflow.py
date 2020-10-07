@@ -31,6 +31,8 @@ creationData["email"]="rupin@whitehatjr.com"
 creationData["name"]="Rupin Chheda"
 creationData["ready"]=False
 
-db.collection(u'Workflows').document().set(creationData)
+doc_ref = db.collection(u'Workflows').document()
+db.collection(u'Workflows').document(doc_ref.id).set(creationData)
 
+print(doc_ref.id)
 

@@ -26,11 +26,15 @@ exports.copyLayout = functions
               flowMeta["active_step_name"]=querySnapshot.data().name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
-              updateFlowFacade(flowID, flowMeta)
+              setFlowAsActive(flowID, flowMeta)
            
               return 0
             
-        }).catch(() => null)
+        }).catch((error) => {
+
+          //pconsole.error("An Error cccured while setting Flow as Active")
+          console.error(error.message);
+        })
   	
   	return 0
   	
@@ -80,5 +84,12 @@ exports.copyLayout = functions
 
 
     return activestep
+  }
+
+  async function setFlowAsActive(flowID,flowMeta)
+  {
+    
+     db.collection("Workflows").doc(flowID).update(flowMeta)  
+     return 0;
   }
 

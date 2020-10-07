@@ -12,12 +12,18 @@ exports.processSubmission = functions
 
     
     const newValue = change.after.data();
-    
-
-    if(newValue.action===null)
+    const sourceStepData=newValue
+    if("action" in newValue)
     {
-      //console.log("Retriggered")
-      return 0;
+      if(newValue.action===null)
+      {
+        //console.log("Retriggered")
+        return 0;
+      }
+    }
+    else
+    {
+      return 0
     }
 
     flowID=context.params.flowID
@@ -40,6 +46,10 @@ exports.processSubmission = functions
 
     }
 
+
+    //Based on the data in the current step, add roles from UserGroups
+    setRoles(flowID,newValue)
+
    
     //remove the action attribute
 
@@ -59,12 +69,19 @@ exports.processSubmission = functions
 
 
     */
+
+    
+
+
+
     if(action==="approved")
     {
       
       addLogOnApprove(flowID,user_name,stepName)
       if(nextStepIndex!==null)
       {
+        
+
         let activeStepPromise=setStepAsActive(flowID,nextStepIndex)
 
         /*The activesteppromise variable holds the
@@ -75,34 +92,38 @@ exports.processSubmission = functions
         
         */
 
-
-        activeStepPromise.then((querySnapshot)=> {
-          //console.log(querySnapshot.data().index)
+        targetStepData=null;
+        targetStepData=activeStepPromise.then((querySnapshot)=> {
+              //console.log(querySnapshot.data())
+              targetStepData=querySnapshot.data()
+              targetStepID=querySnapshot.id
               flowMeta={}
               flowMeta["ready"]=true
-              flowMeta["active_step_name"]=querySnapshot.data().name
+              flowMeta["active_step_name"]=targetStepData.name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
               updateFlowFacade(flowID, flowMeta)
-              updateNotificationQueue(querySnapshot.data());           
-              return 0
+
+              
+              updateNotificationQueue(sourceStepData, targetStepID,flowID)           
+              return targetStepData
             
-        }).catch(() => null)
+        }).catch((error)=> { console.log(error.message) });
 
 
       }
       else
       {
-        console.log("Flow is completed")
-        //mark flow as completed
-        let logClose=addLogOnClose(flowID,user_name,stepName)
-        logClose.then(()=>{
-            setWorkflowAsClosed(flowID)
-            //sendNotification(nextStepIndex);  
-            return 0
-            
-        })  
-        .catch(() => null)
+          console.log("Flow is completed")
+          //mark flow as completed
+          let logClose=addLogOnClose(flowID,user_name,stepName)
+          logClose.then(()=>{
+              setWorkflowAsClosed(flowID)
+              //sendNotification(nextStepIndex);  
+              return 0
+              
+          })  
+          .catch((error)=> {console.log(error.message);});
       }
       // set activestep to false
       //setCurrentStepAsInactive(flowID,stepId)
@@ -131,24 +152,27 @@ exports.processSubmission = functions
       {
         
         let activeStepPromise=setStepAsActive(flowID,previousStepIndex)
-
         /*the activesteppromise variable holds the
         data for the active step.
         Use the same data to update the flow meta */
-
-        activeStepPromise.then((querySnapshot)=> {
+        targetStepData=null;
+        targetStepData=activeStepPromise.then((querySnapshot)=> {
           //console.log(querySnapshot.data().index)
+              targetStepData=querySnapshot.data()
+              targetStepID=querySnapshot.id
               flowMeta={}
               flowMeta["ready"]=true
-              flowMeta["active_step_name"]=querySnapshot.data().name
+              flowMeta["active_step_name"]=targetStepData.name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
-              updateFlowFacade(flowID, flowMeta)
-              updateNotificationQueue(querySnapshot.data());
+              updateFlowFacade(flowID, flowMeta)             
            
-              return 0
+              updateNotificationQueue(sourceStepData, targetStepID,flowID)           
+              return targetStepData
             
-        }).catch(() => null)
+        }).catch((error)=> {
+                console.log(error.message);
+              });
       }
       else
       {
@@ -160,31 +184,70 @@ exports.processSubmission = functions
 
     }
 
+
+
    if(action==="rejected" || action==="approved")
    {
-       updatedValue=updateCurrentstep(flowID,stepId,newValue)
-       updatedValue.then((querySnapshot)=> {
+       //console.log("Printing targetstepdata")
+      // console.log(targetStepData)
+       updatedValue=updateCurrentstep(flowID,stepId,newValue)       
+       //updateNotificationQueue(sourceStepData, a, flowID)
+       
         
-              setRoles(flowID,newValue) 
-              return 0
-            
-        }).catch(() => null)
 
-    
-    }   
+   }   
 
     return 0
     
   });
 
-  function updateNotificationQueue(stepData)
-  {
-    /* In here we just manage a collection which has a list of documents pertaining to
-    all different kind of notifications that need to be sent.
-    A new function will start executing when a document is created.
-    This will help manage to code for various different notification types.
-    */
-  }
+async function updateNotificationQueue(sourceStepData, targetStepID, flowID)
+{
+  /* In here we just manage a collection which has a list of documents pertaining to
+  all different kind of notifications that need to be sent.
+  A new function will start executing when a document is created.
+  This will help manage to code for various different notification types.
+  */
+ 
+  step=db.collection("Workflows")
+      .doc(flowID)
+      .collection("steps")
+      .doc(targetStepID)
+      .get()
+
+  
+  step.then((doc)=>{
+    
+        
+      targetStepData=doc.data()     
+      notificationObject={}
+      notificationObject["actioner"]=sourceStepData.by
+      notificationObject["notify"]=targetStepData.users
+      notificationObject["action"]=sourceStepData.action
+      notificationObject["flowID"]=flowID
+      notificationObject["stepName"]=sourceStepData.name
+      //console.log(notificationObject)
+      db.collection("NotificationQueue").doc().set(notificationObject);
+      return 0
+
+
+  }).catch((error)=> {
+    console.log(error.message);
+  });
+
+
+
+  //console.log(targetStepData)
+ 
+
+
+
+
+  
+  
+return 0
+
+}
 
   function getGroupKey(stepData)
   {
@@ -235,6 +298,7 @@ exports.processSubmission = functions
                   userGroupList=docData["groupList"]
                   groupLength=userGroupList.length
                   //console.log(groupLength)
+                  batch=db.batch()
                   for(groupIndex=0;groupIndex<groupLength;groupIndex++)
                   {
 
@@ -248,20 +312,25 @@ exports.processSubmission = functions
                                   .arrayUnion
                                   .apply(null, users)
 
-                    db.collection("Workflows")
+                    b1=db.collection("Workflows")
                       .doc(flowID)
                       .collection("steps")
                       .doc(stepID)
-                      .update({"users":userListObject})
+                    batch.update(b1,{"users":userListObject})
+                      //.update()
 
-                  }    
+                  }
+                  batch.commit().then(function () {
+                      console.log("Batch Committed")
+                  });
+
               } 
 
               return 0
               
 
               }).catch((error)=> {
-                console.log("Error getting document during Get Roles:", error);
+                console.log(error.message);
               });
           
 
