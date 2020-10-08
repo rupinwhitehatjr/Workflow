@@ -12,6 +12,9 @@
             var phoneNumber = user.phoneNumber;
             var providerData = user.providerData;
             console.log(email)*/
+            closeAllModals()
+            $(document).trigger("authready")
+
             user.getIdToken().then(function(accessToken) {
               //document.getElementById('sign-in-status').textContent = 'Signed in';
               //document.getElementById('sign-in').textContent = 'Sign out';
@@ -42,5 +45,10 @@
       };
 
       window.addEventListener('load', function() {
+        $("#loginmodal").modal({
+        escapeClose: false,
+        clickClose: false,
+        showClose: false
+        });
         initApp();
       });

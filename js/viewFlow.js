@@ -67,10 +67,7 @@ function openSavingModal()
     });
 }
 
-function closeAllModals()
-{
-    $.modal.close();
-}
+
 
 function checkResultReady()
 {
@@ -166,6 +163,8 @@ stepsDocument.then(function(querySnapshot) {
         
 
         stepState=step["activestep"]
+        stepOwners=step["users"]
+        //console.log(stepOwners)
         isReviewOnly=step["onlyreview"]
         //console.log("isReviewOnly: "+isReviewOnly)
         if(!isReviewOnly)
@@ -188,6 +187,20 @@ stepsDocument.then(function(querySnapshot) {
         {
             addHiddenField("fieldCount", 0)
             addHiddenField("activestepid", step_id)
+        }
+        if(stepState)
+        {
+            /* We only remove the Reject button. 
+            Its important to remember that the last step will have the
+            nextStep property as null, but we still want the approve button to
+            be visible.
+            */
+            previousStepIndex=step["previousstep"]
+            if(!previousStepIndex)
+            {
+                $("#rejectButton").remove()
+            }
+            
         }
 
         

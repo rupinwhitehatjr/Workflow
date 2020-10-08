@@ -316,13 +316,15 @@ return 0
                       .doc(flowID)
                       .collection("steps")
                       .doc(stepID)
+                     
                     batch.update(b1,{"users":userListObject})
                       //.update()
 
                   }
-                  batch.commit().then(function () {
-                      console.log("Batch Committed")
-                  });
+                  batch.commit().then(()=> {
+                      //console.log("Batch Committed")
+                      return 0
+                  }).catch((error)=> {console.log(error.message)});
 
               } 
 

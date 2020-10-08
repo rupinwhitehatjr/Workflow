@@ -15,8 +15,9 @@ exports.copyLayout = functions
   	flowID=context.params.flowID
   	userName=snapshot.data().name
   	flowType=snapshot.data().flowType
+    email=snapshot.data().email
   	
-  	var copydone=makeCopy(flowType,flowID)
+  	var copydone=makeCopy(flowType,flowID,email)
   	var logdone=addLogOnCreate(flowID,userName)
     // Only update the Flow Facade when the copy is done
     copydone.then((querySnapshot)=> {
@@ -58,24 +59,40 @@ exports.copyLayout = functions
   }
 
 
-  async function makeCopy(workflowType, flowID)
+  async function makeCopy(workflowType, flowID, creatorEmail)
   {
     //console.log(flowType)
     const steps = await db.collection(workflowType).orderBy("index").get()
     flowDocument=db.collection("Workflows").doc(flowID)
+    
+
+    //console.log(createdBy)
     flowSteps=[]
     let activestep=null
     steps.forEach( (doc)=> {
         //console.log("copying")
-        flowDocument.collection("steps").doc(doc.id).set(doc.data())
-        flowDetail={}
+        stepData=doc.data()
+        
+        
 
-        flowDetail['name']=doc.data().name
-        flowDetail['id']=doc.id
         if(doc.data().activestep)
         {
+          usersObject=userListObject=admin
+                                  .firestore
+                                  .FieldValue
+                                  .arrayUnion(creatorEmail)
+          stepData["users"]=usersObject
           activestep=doc
         }
+
+
+        flowDocument.collection("steps").doc(doc.id).set(stepData)
+        
+        
+
+        flowDetail={}
+        flowDetail['name']=doc.data().name
+        flowDetail['id']=doc.id
         flowSteps.push(flowDetail)
 
     })

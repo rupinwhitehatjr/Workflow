@@ -8,9 +8,19 @@ $(document).ready(function(){
         console.log(doc.id, " => ", doc.data());
     });
 });*/
+    
 
 
 });
+
+$(document).on("authready", function(event){
+
+   $("#createWorkflowButtonsContainer").show()
+    
+    
+});
+
+
 
 function buttonAction(flow_type)
 {
@@ -27,7 +37,6 @@ function createNewWorkFlow(flow_type)
         //console.log(user.uid)
         creationData={}
         creationData["flowType"]=flow_type
-        creationData["uid"]=user.uid
         creationData["email"]=user.email
         creationData["name"]=user.displayName
         creationData["ready"]=false

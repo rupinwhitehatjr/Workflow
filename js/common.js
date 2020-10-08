@@ -23,3 +23,8 @@ function getLoggedInUserObject()
 }
 
 
+function closeAllModals()
+{
+    $.modal.close();
+}
+

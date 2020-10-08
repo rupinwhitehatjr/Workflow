@@ -104,12 +104,12 @@
   <div class="grid_2">
   &nbsp;  
   </div> 
-  <div class="grid_4">
-    <a class="button" 
+  <div class="grid_4 alignright">
+    <a id="rejectButton" class="button" 
     style='width:25%'
     onclick="javascript:userAction('rejected')">Reject
   </a>
-    <a 
+    <a  id="approveButton"
     class="button" 
     style='width:25%' 
     onclick="javascript:userAction('approved')">Approve
@@ -137,6 +137,11 @@
 
 <div id="saving" class="modal custommodal">
  <div class='modalmessage'>Saving your Data...</div>
+ <div><img src='img/loading.gif' height="52px"></div>
+</div>
+
+<div id="loginmodal" class="modal custommodal">
+ <div class='modalmessage'>Checking if you are Logged In</div>
  <div><img src='img/loading.gif' height="52px"></div>
 </div>
 
