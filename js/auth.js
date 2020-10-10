@@ -2,7 +2,7 @@
       initApp = function() {
         firebase.auth().onAuthStateChanged(function(user) {
           if (user) {
-            //console.log(user)
+            console.log("User signed in");
             // User is signed in.
             /*var displayName = user.displayName;
             var email = user.email;
@@ -46,9 +46,9 @@
 
       window.addEventListener('load', function() {
         $("#loginmodal").modal({
-        escapeClose: false,
-        clickClose: false,
-        showClose: false
+          escapeClose: false,
+          clickClose: false,
+          showClose: false
         });
         initApp();
       });

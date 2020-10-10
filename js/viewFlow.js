@@ -34,7 +34,7 @@ $(document).on("dataready", function(event, doc){
     //console.log(doc.data())
     workflowMeta=doc.data()
     displayBreadCrumbs(workflowMeta)
-
+    //$( document ).tooltip();
   //  addHiddenFieldForStepID(workflowMeta["active_step_id"])
     displayWorkflow();
     
@@ -72,7 +72,7 @@ function openSavingModal()
 function checkResultReady()
 {
     //ready=db.collection("Workflows").doc(flow_id)
-    console.log("Checking");
+    //console.log("Checking");
 }
 
 
@@ -136,7 +136,12 @@ function addHiddenField(id, value)
 
 function createBreadCrumb(stepName,id,isActive)
 {
-    stepcrumb=$("<li/>").text(stepName)
+    shortText=stepName;
+    if(!isActive)
+    {
+        shortText=stepName.substring(0,3)+"..."
+    }
+    stepcrumb=$("<li/>").text(shortText).attr("title", stepName)
     if(isActive)
     {
         $(stepcrumb).attr("class", "current")
@@ -195,7 +200,8 @@ stepsDocument.then(function(querySnapshot) {
             nextStep property as null, but we still want the approve button to
             be visible.
             */
-            previousStepIndex=step["previousstep"]
+            previousStepIndex=step["previousStep"]
+            //console.log("previousStepIndex: "+previousStepIndex)
             if(!previousStepIndex)
             {
                 $("#rejectButton").remove()
@@ -402,6 +408,7 @@ function createField(stepid, fieldMeta, index, fieldData)
 {
     type=fieldMeta["type"]
     label=fieldMeta["label"]
+    mandatory=fieldMeta["mandatory"]
     $("#"+stepid).append(
                 $('<div/>')
                 .attr("class", "grid_4 fieldlabel")
@@ -413,7 +420,7 @@ function createField(stepid, fieldMeta, index, fieldData)
         div=$('<div/>').attr("class", "grid_6 field")
 
         options=fieldMeta["options"];
-        mandatory=fieldMeta["mandatory"]
+       
         
         dd=$("<select/>")
                 .attr("data-stepid",stepid)

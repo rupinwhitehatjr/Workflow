@@ -77,7 +77,7 @@ db.collection(u'CurriculumWorkflow').document(newid).set(step)
 
 groupData=[]
 begGroupData={}
-groupData.append({"stepID":newid, "users":["rupin@whitehatjr.com", 'rupin.chheda@gmail.com']})
+groupData.append({"stepID":newid, "users":["rupin@whitehatjr.com", "#creator", 'rupin.chheda@gmail.com']})
 
 begGroupData["groupList"]=groupData
 #userGroupData

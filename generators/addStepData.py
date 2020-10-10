@@ -47,7 +47,7 @@ if args.flowID:
 stepDoc=db.collection(u'Workflows').document(flowID).collection("steps").document(stepID)
 formData={}
 formData["fieldValues"]=["BEG",2,3,4,5]
-formData["action"]="rejected"
+formData["action"]="approved"
 userDetail={}
 userDetail["uid"]="abcd"
 userDetail["email"]="poonam11gala@gmail.com"

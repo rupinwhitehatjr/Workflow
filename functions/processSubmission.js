@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 /* admin is initialised in index.js*/
 let db = admin.firestore();
 
-exports.processSubmission = functions
+ exports.processSubmission = functions
   .region('asia-east2')
   .firestore
   .document('Workflows/{flowID}/steps/{stepId}')
@@ -32,8 +32,31 @@ exports.processSubmission = functions
     action=newValue.action
     nextStepIndex=newValue.nextStep
     previousStepIndex=newValue.previousStep
-    
+    flowMeta=null
+    flowInfo=db.collection("Workflows").doc(flowID).get()
 
+    flowInfo.then((doc)=>{
+      //console.log(doc)
+      //console.log(nextStepIndex)
+      creatorMeta={}
+      //console.log(doc.data())
+      if(doc.exists)
+      {
+          flowMeta=doc.data()          
+          //console.log(flowMeta)
+          creatorMeta["email"]=flowMeta.email
+          
+      }
+      //console.log(creatorMeta)
+      setRoles(flowID,newValue,creatorMeta)
+      return 0
+        
+    })
+    .catch((error)=>{})
+
+    
+    
+    //return 0
     actionedby=newValue.by
     //console.log(user.name)
     //return 0;
@@ -47,8 +70,9 @@ exports.processSubmission = functions
     }
 
 
+
     //Based on the data in the current step, add roles from UserGroups
-    setRoles(flowID,newValue)
+    
 
    
     //remove the action attribute
@@ -102,9 +126,7 @@ exports.processSubmission = functions
               flowMeta["active_step_name"]=targetStepData.name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
-              updateFlowFacade(flowID, flowMeta)
-
-              
+              updateFlowFacade(flowID, flowMeta)              
               updateNotificationQueue(sourceStepData, targetStepID,flowID)           
               return targetStepData
             
@@ -226,6 +248,7 @@ async function updateNotificationQueue(sourceStepData, targetStepID, flowID)
       notificationObject["action"]=sourceStepData.action
       notificationObject["flowID"]=flowID
       notificationObject["stepName"]=sourceStepData.name
+      notificationObject["timestamp"]=Date.now();
       //console.log(notificationObject)
       db.collection("NotificationQueue").doc().set(notificationObject);
       return 0
@@ -248,6 +271,10 @@ async function updateNotificationQueue(sourceStepData, targetStepID, flowID)
 return 0
 
 }
+
+
+
+
 
   function getGroupKey(stepData)
   {
@@ -278,7 +305,7 @@ return 0
   }
 
 
-  async function setRoles(flowID, stepData)
+  async function setRoles(flowID, stepData, creatorMeta)
   {
     
     
@@ -306,6 +333,23 @@ return 0
                     users=userGroupList[groupIndex]["users"];
                     //console.log(stepID)
                     //console.log(users)
+                    if("email" in creatorMeta)
+                    {
+                      //console.log("email present")
+                      creatorEmail=creatorMeta["email"]
+                      //Replace the #creator with the email of the
+                      //creator
+                      for(userIndex=0;userIndex<users.length;userIndex++)
+                      {
+                        if(users[userIndex]==="#creator")
+                        {
+                          users[userIndex]=creatorEmail
+                        }
+                      }
+                      
+                    }
+                    //console.log(users)
+
                     userListObject=admin
                                   .firestore
                                   .FieldValue

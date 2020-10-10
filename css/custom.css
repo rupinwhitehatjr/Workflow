@@ -255,10 +255,16 @@ ul{
     margin: 0;
     padding: 0;
     list-style: none;
+
   }
  #breadcrumb{
-    overflow: hidden;
+    /*overflow: hidden;*/
     width: 100%;
+    
+    list-style-type: none;
+   
+    
+    white-space: nowrap;
   }
 
   #breadcrumb li{
@@ -268,7 +274,7 @@ ul{
 
   #breadcrumb li{
     background: #ddd;
-    padding: .7em 0.7em;
+    padding: .73em 0.7em;
     float: left;
     text-decoration: none;
     color: #444;
@@ -285,7 +291,7 @@ ul{
   #breadcrumb li::before{
     content: "";
     position: absolute;
-    top: 50%;
+    top: 51%;
     margin-top: -1.5em;
     border-width: 1.5em 0 1.5em 1em;
     border-style: solid;
@@ -395,6 +401,10 @@ a:visited {
 {
   text-align: right;
 }
+
+
+
+
 
 
 

@@ -10,7 +10,6 @@ exports.sendNotification = functions
   .firestore
   .document('NotificationQueue/{notificationid}')
   .onCreate((snapshot, context) => 
-
   { 
   	
   	console.log("Ready to Send Notification")
