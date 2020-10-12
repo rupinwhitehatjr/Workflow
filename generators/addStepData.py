@@ -51,7 +51,7 @@ formData["action"]="approved"
 userDetail={}
 userDetail["uid"]="abcd"
 userDetail["email"]="poonam11gala@gmail.com"
-userDetail["name"]="Rupin Chheda"
+userDetail["name"]="Anjali Kanitkar"
 
 formData["timestamp"]=time.time()
 

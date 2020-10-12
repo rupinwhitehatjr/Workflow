@@ -13,6 +13,10 @@ let db = admin.firestore();
     
     const newValue = change.after.data();
     const sourceStepData=newValue
+    flowID=context.params.flowID
+    stepId=context.params.stepId
+    //console.log(newValue)
+    //console.log(Date.now())
     if("action" in newValue)
     {
       if(newValue.action===null)
@@ -26,16 +30,17 @@ let db = admin.firestore();
       return 0
     }
 
-    flowID=context.params.flowID
-    stepId=context.params.stepId
-    //console.log(stepId)
+    
     action=newValue.action
     nextStepIndex=newValue.nextStep
     previousStepIndex=newValue.previousStep
     flowMeta=null
     flowInfo=db.collection("Workflows").doc(flowID).get()
-
-    flowInfo.then((doc)=>{
+    rolePromise=null;
+    /*We use the Role Promise at the end of the process to update 
+    Notification Queue
+    */
+    rolePromise=flowInfo.then((doc)=>{
       //console.log(doc)
       //console.log(nextStepIndex)
       creatorMeta={}
@@ -48,11 +53,16 @@ let db = admin.firestore();
           
       }
       //console.log(creatorMeta)
-      setRoles(flowID,newValue,creatorMeta)
-      return 0
+      //Based on the data in the current step, add roles from UserGroups
+      //creatorMeta is sent because some roles have a #creator tag on them
+      //those are the steps where the creator will be notified
+      rolesHaveBeenSet=setRoles(flowID,newValue,creatorMeta)
+      return rolesHaveBeenSet
         
     })
     .catch((error)=>{})
+
+
 
     
     
@@ -71,7 +81,7 @@ let db = admin.firestore();
 
 
 
-    //Based on the data in the current step, add roles from UserGroups
+    
     
 
    
@@ -97,7 +107,7 @@ let db = admin.firestore();
     
 
 
-
+    targetStepIndex=null
     if(action==="approved")
     {
       
@@ -105,8 +115,8 @@ let db = admin.firestore();
       if(nextStepIndex!==null)
       {
         
-
-        let activeStepPromise=setStepAsActive(flowID,nextStepIndex)
+       targetStepIndex=nextStepIndex
+       let activeStepPromise=setStepAsActive(flowID,nextStepIndex)
 
         /*The activesteppromise variable holds the
         data for the active step.
@@ -127,7 +137,7 @@ let db = admin.firestore();
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
               updateFlowFacade(flowID, flowMeta)              
-              updateNotificationQueue(sourceStepData, targetStepID,flowID)           
+             // updateNotificationQueue(sourceStepData, nextStepIndex,flowID)           
               return targetStepData
             
         }).catch((error)=> { console.log(error.message) });
@@ -173,6 +183,7 @@ let db = admin.firestore();
       if(previousStepIndex!==null)
       {
         
+        targetStepIndex=previousStepIndex
         let activeStepPromise=setStepAsActive(flowID,previousStepIndex)
         /*the activesteppromise variable holds the
         data for the active step.
@@ -187,9 +198,8 @@ let db = admin.firestore();
               flowMeta["active_step_name"]=targetStepData.name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
-              updateFlowFacade(flowID, flowMeta)             
-           
-              updateNotificationQueue(sourceStepData, targetStepID,flowID)           
+              updateFlowFacade(flowID, flowMeta)
+              //updateNotificationQueue(sourceStepData, targetStepID,flowID)           
               return targetStepData
             
         }).catch((error)=> {
@@ -212,41 +222,61 @@ let db = admin.firestore();
    {
        //console.log("Printing targetstepdata")
       // console.log(targetStepData)
-       updatedValue=updateCurrentstep(flowID,stepId,newValue)       
+       updatedValue=updateCurrentstep(flowID,stepId,newValue)
        //updateNotificationQueue(sourceStepData, a, flowID)
        
         
 
    }   
+   //console.log(rolePromise)
+   rolePromise.then(()=>{
+
+      //console.log("Resolved")
+      updateNotificationQueue(sourceStepData, targetStepIndex,flowID)
+      return 0
+
+    }).catch((error)=>{console.log("Promise Failed?")})
 
     return 0
     
   });
 
-async function updateNotificationQueue(sourceStepData, targetStepID, flowID)
+async function updateNotificationQueue(sourceStepData, targetStepIndex, flowID)
 {
   /* In here we just manage a collection which has a list of documents pertaining to
   all different kind of notifications that need to be sent.
   A new function will start executing when a document is created.
   This will help manage to code for various different notification types.
   */
- 
-  step=db.collection("Workflows")
+ //console.log(sourceStepData)
+ //console.log(targetStepIndex)
+ //console.log(flowID)
+  step=await db.collection("Workflows")
       .doc(flowID)
       .collection("steps")
-      .doc(targetStepID)
+      .where("index", "==", targetStepIndex)
       .get()
 
   
-  step.then((doc)=>{
+  step.forEach((doc)=>{
     
-        
-      targetStepData=doc.data()     
+      //console.log("Updating Notifications")  
+      targetStepData=doc.data()
+      if("users" in targetStepData)
+      {
+        notifyList=targetStepData.users
+      } 
+      else
+      {
+        notifyList=[]
+      }
+      //notifyList=[] //Temporary    
       notificationObject={}
       notificationObject["actioner"]=sourceStepData.by
-      notificationObject["notify"]=targetStepData.users
+      notificationObject["notify"]=notifyList
       notificationObject["action"]=sourceStepData.action
       notificationObject["flowID"]=flowID
+      notificationObject["targetStepIndex"]=targetStepIndex
       notificationObject["stepName"]=sourceStepData.name
       notificationObject["timestamp"]=Date.now();
       //console.log(notificationObject)
@@ -254,9 +284,9 @@ async function updateNotificationQueue(sourceStepData, targetStepID, flowID)
       return 0
 
 
-  }).catch((error)=> {
-    console.log(error.message);
-  });
+  })/*.catch((error)=> {
+    console.log(error.message +" "+targetStepID);
+  });*/
 
 
 
@@ -305,7 +335,7 @@ return 0
   }
 
 
-  async function setRoles(flowID, stepData, creatorMeta)
+   async function setRoles(flowID, stepData, creatorMeta)
   {
     
     
@@ -314,10 +344,15 @@ return 0
         //console.log(userGroupKey)
         if(userGroupKey!==null)
         {
-              userGroups=db.collection("UserGroups").doc(userGroupKey).get()
+             // console.log(userGroupKey)
+              userGroups= await db.collection("UserGroups")
+                          .where("groupKey", "==", userGroupKey)
+                          .get()
           
 
-              userGroups.then((doc)=>{
+              userGroups.forEach((doc)=>{
+              //console.log(doc.data())
+              batch=db.batch()
               if (doc.exists) 
               {
                   //console.log("Document data:", doc.data());
@@ -325,13 +360,13 @@ return 0
                   userGroupList=docData["groupList"]
                   groupLength=userGroupList.length
                   //console.log(groupLength)
-                  batch=db.batch()
+                  
                   for(groupIndex=0;groupIndex<groupLength;groupIndex++)
                   {
 
                     stepID=userGroupList[groupIndex]["stepID"];
                     users=userGroupList[groupIndex]["users"];
-                    //console.log(stepID)
+                   // console.log(stepID)
                     //console.log(users)
                     if("email" in creatorMeta)
                     {
@@ -356,31 +391,26 @@ return 0
                                   .arrayUnion
                                   .apply(null, users)
 
-                    b1=db.collection("Workflows")
+                   b1=db.collection("Workflows")
                       .doc(flowID)
                       .collection("steps")
                       .doc(stepID)
+                      //.update({"users":userListObject})
+                      batch.update(b1, {"users":userListObject})
                      
-                    batch.update(b1,{"users":userListObject})
-                      //.update()
+                     
+                   
 
                   }
-                  batch.commit().then(()=> {
-                      //console.log("Batch Committed")
-                      return 0
-                  }).catch((error)=> {console.log(error.message)});
-
-              } 
-
-              return 0
-              
-
-              }).catch((error)=> {
-                console.log(error.message);
+                  
+         
+              }
+              return batch.commit().then(function () {
+               //console.log("batch committed")
+               return 0
               });
-          
-
-        }
+            })
+      }
      
      return 0
       
@@ -421,7 +451,7 @@ return 0
               nextStepData={}
               nextStepData["visible"]=true
               nextStepData["activestep"]=true
-              nextStepData["action"]=null
+              nextStepData["action"]=null              
               db.collection("Workflows")
                 .doc(flowID)
                 .collection("steps")

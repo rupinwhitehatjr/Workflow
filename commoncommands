@@ -1,0 +1,5 @@
+firebase functions:config:get > .runtimeconfig.json
+
+firebase emulators:start --project test
+
+firebase deploy --only functions

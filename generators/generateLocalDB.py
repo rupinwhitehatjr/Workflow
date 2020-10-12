@@ -45,8 +45,10 @@ fields.append(systemURL)
 step["fields"]=fields
 step["name"]="Development and Creation"
 
-db.collection(u'CurriculumWorkflow').document().set(step)
-
+doc_ref = db.collection(u'CurriculumWorkflow').document()
+newid =doc_ref.id
+db.collection(u'CurriculumWorkflow').document(newid).set(step)
+step1ID=newid
 
 step={}	
 step["index"]=20
@@ -71,18 +73,35 @@ step["visible"]=False
 # step["fields"]=fields
 
 doc_ref = db.collection(u'CurriculumWorkflow').document()
-newid = doc_ref.id
+newid =doc_ref.id
 db.collection(u'CurriculumWorkflow').document(newid).set(step)
+step2ID=newid
+
+GroupData={}
 
 
-groupData=[]
-begGroupData={}
-groupData.append({"stepID":newid, "users":["rupin@whitehatjr.com", "#creator", 'rupin.chheda@gmail.com']})
+GroupData["groupKey"]="BEG"
+groupList=[]
 
-begGroupData["groupList"]=groupData
+
+group2={}
+group2["stepID"]=step2ID
+group2["users"]=["#creator",'anjali@whitehatjr.com']
+
+group1={}
+group1["stepID"]=step1ID
+group1["users"]=["#creator"]
+						 
+
+groupList.append(group1)
+groupList.append(group2)
+GroupData["groupList"]=groupList
+
+
 #userGroupData
-
-db.collection(u"UserGroups").document("BEG").set(begGroupData)
+#doc_ref = db.collection(u'UserGroups').document()
+#newid = doc_ref.id
+db.collection(u"UserGroups").document().set(GroupData)
 
 
 # 	#fields=db.collection(u'CurriculumWorkflow').document(stepID).collection(u'Fields')
