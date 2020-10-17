@@ -149,6 +149,15 @@ function createBreadCrumb(stepName,id,isActive)
     $("#breadcrumb").append(stepcrumb)
 }
 
+$(document).on("removealleditfeatures", function(event){
+
+   $("#commentinputsec").remove()
+   $("#commentinputholder").remove()
+   $("#buttonsection").remove()
+     
+    
+});
+
 function populateSteps(flow_id)
 {
     
@@ -172,9 +181,26 @@ stepsDocument.then(function(querySnapshot) {
         //console.log(stepOwners)
         isReviewOnly=step["onlyreview"]
         //console.log("isReviewOnly: "+isReviewOnly)
+        doesUserHaveEditAccess=false
+        userEmail=firebase.auth().currentUser.email
+        usersWhoHaveAccess=step["users"]
+        if(usersWhoHaveAccess.indexOf(userEmail)!==-1)
+        {
+          doesUserHaveEditAccess=true  
+        }
+
+       // console.log(doesUserHaveEditAccess)
+
+        if(stepState && !doesUserHaveEditAccess)
+        {
+            //The step is active, but the user does not have access
+            //to edit this step.
+            $(document).trigger("removealleditfeatures")
+
+        }
         if(!isReviewOnly)
         {
-            if(stepState)
+            if(stepState && doesUserHaveEditAccess)
             {
                // console.log("Editable step")
                 createEditableStep(doc)
@@ -287,8 +313,8 @@ function appendComments(flow_id)
 
             commentdiv=$("<div/>").attr("class", "grid_12 commenttext").text(comment_text)
             blankdiv=$("<div/>").attr("class", "clear")
-            $(commentdiv).insertBefore("#commentinputsec")
-            $(blankdiv).insertBefore("#commentinputsec")
+            $(commentdiv).insertBefore("#commentsep")
+            $(blankdiv).insertBefore("#commentsep")
         
 
        
@@ -376,7 +402,14 @@ function createViewableStep(stepDoc)
         fieldData=stepContent["fieldValues"]
         numberOfFields=fieldList.length
         //$("#fieldCount").val(numberOfFields)
-
+        if(!fieldData)
+        {
+            fieldData=[]
+            for (i=0;i<numberOfFields;i++)
+            {
+                fieldData.push("")
+            }
+        }
         for (i=0;i<numberOfFields;i++)
         {
             viewField(stepID,fieldList[i], fieldData[i])

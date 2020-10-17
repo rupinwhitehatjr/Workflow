@@ -10,9 +10,8 @@
 <link rel="stylesheet" href="css/960.css" />
 <link rel="stylesheet" href="css/demo.css" />
 <link rel="stylesheet" href="css/custom.css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-auth.js"></script>
@@ -43,15 +42,15 @@
 
 <script type="text/javascript" src="js/common.js"></script>  
 <script type="text/javascript" src="js/auth.js"></script>  
-<script type="text/javascript" src="js/viewFlow.js"></script>
-<script type="text/javascript" src="js/saveFields.js"></script>  
+<script type="text/javascript" src="js/addRoles.js"></script>
+
 
     
 </head>
 <body>
 
-<div class="container_12">
-  <div class="grid_12">
+  <div class="container_12">
+  <div class="grid_12 ">
     &nbsp;
   </div>
   <!-- end .grid_12 -->
@@ -59,48 +58,75 @@
   
 </div>
 
+<div class="container_12 step" id="p_container">
+  <div class="grid_12 stepheader">Select the Process</div>
 
-<div class="container_12 breadcrumbheader">
-
-	<div class="grid_12 stickyheader">
-    <ul id="breadcrumb">
-
-    <!--<li>Lorem ipsum</li>
-    <li class='current'>Vivamus nisi eros</li>
-    <li>Nulla sed lorem risus</li>
-    <li>Nam iaculis commodo</li>
-    <li>Current crumb</li>-->
-  </ul>
+  <div class="grid_4 fieldlabel">
+    Process Name
   </div>
-  
+   <div class="grid_6 field">
+    <select id="process_selector">
+      <option value="-1" selected>Select</option>
+      <option value="CurriculumWorkflow">
+        CurriculumWorkflow
+      </option>
+    </select>
+  </div>
+  <!-- end .grid_12 -->
+  <div class="clear"></div>
 
-	
+
+  
   <!-- end .grid_12 -->
   <div class="clear"></div>  
   
 </div>
 
-<div class="container_12" id="commentssection">
-  <div class="grid_12 stepheader">
-    Comments
-  </div> 
-  <div class="clear"></div>
+
+<div class="container_12 step" id="groupKeyFields">
+  <div class="grid_12 stepheader">Select Step and Field Values</div>
 
   
-  <div class="grid_1" id="commentsep">
-   &nbsp;
-  </div>
   <div class="clear"></div>  
 
+  <div class="grid_4 fieldlabel">
+    Step Name
+  </div>
+   <div class="grid_6 field" >
+      <select id="stepList" disabled>
+      
+    </select>
+  </div>
 
-  <div class="grid_3" id="commentinputsec">
-    <p>Add a New Comment</p>
-  </div> 
+  <div class="clear"></div>  
+  
+</div>
 
-  <div class="grid_9" id="commentinputholder">
-    <textarea id="new_comment_input" class="commentbox" value=""></textarea>
-  </div> 
+<div class="container_12 step" id="stepNotifyList">
+  <div class="grid_12 stepheader">
+   <div class="headertitle">Update Notify List</div>
+   <div class="keyname" id="keyname" style="display: none">Grouping</div>
+</div>
+
+
+  
   <div class="clear"></div> 
+
+<div class="grid_4 notifylistheader">
+   Step Name
+</div>
+
+<div class="grid_7 notifylistheader">
+   Current Notify List
+</div>
+
+
+
+<div class="clear"></div> 
+
+
+
+  
   
 </div>
 
@@ -112,14 +138,11 @@
   &nbsp;  
   </div> 
   <div class="grid_4 alignright">
-    <a id="rejectButton" class="button" 
-    style='width:25%'
-    onclick="javascript:userAction('rejected')">Reject
-  </a>
+   
     <a  id="approveButton"
     class="button" 
     style='width:25%' 
-    onclick="javascript:userAction('approved')">Approve
+    onclick="javascript:saveRoles()">Save
     </a>
   </div>   
 </div>
@@ -127,35 +150,33 @@
 
 
 
-<div class="container_12" id="actionlist">
-  <div class="grid_12 stepheader">
-    Activity
-  </div>
-  
-  
-</div>
+
+
+	
+
+
+
+
+
 
 
 
 <div id="loading" class="modal custommodal">
- <div class='modalmessage'>Loading your workflow...</div>
- <div><img src='img/loading.gif' height="52px"></div>
-</div>
-
-<div id="saving" class="modal custommodal">
- <div class='modalmessage'>Saving your Data...</div>
+ <div class='modalmessage'>Loading...</div>
  <div><img src='img/loading.gif' height="52px"></div>
 </div>
 
 <div id="loginmodal" class="modal custommodal">
- <div class='modalmessage'>Checking if you are Logged In</div>
+ <div class='modalmessage'>Please Wait..</div>
  <div><img src='img/loading.gif' height="52px"></div>
 </div>
 
 
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-
+<script src="/js/jquery.connections.js"></script>
 <!-- end .container_16 -->
 </body>
 </html>

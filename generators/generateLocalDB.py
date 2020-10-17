@@ -30,18 +30,17 @@ step["visible"]=True
 step["nextStep"]=20
 step["previousStep"]=None
 fields=[]
-levelObj={"label":"Curriculum","mandatory":True, "userGroupKey":True,"type":"dropdown", "options":["BEG", "INT", "ADV", "PRO", "APT"]}
-versionObject={"label":"Version", "mandatory":True, "type":"dropdown", "options":["V1", "V2"]}
-classObject={"label":"Class","mandatory":True, "type":"text"}
+levelObj={"label":"Curriculum","mandatory":True,"isSearchTerm":True, "userGroupKey":True,"type":"dropdown", "options":["BEG", "INT", "ADV", "PRO", "APT"]}
+versionObject={"label":"Version", "mandatory":True, "isSearchTerm":True,"type":"dropdown", "options":["V1", "V2"]}
+classObject={"label":"Class","mandatory":True,"isSearchTerm":True, "type":"text"}
 documentType={"label":"Asset Type","mandatory":True, "type":"dropdown","options":["Class Document", "Summary"]}
 documentURL={"label":"Document URL","mandatory":True, "type":"text"}
-systemURL={"label":"System URL","type":"label"}
 fields.append(levelObj)
 fields.append(versionObject)
 fields.append(classObject)
 fields.append(documentType)
 fields.append(documentURL)
-fields.append(systemURL)
+
 step["fields"]=fields
 step["name"]="Development and Creation"
 

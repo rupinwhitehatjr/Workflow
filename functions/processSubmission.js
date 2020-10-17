@@ -30,7 +30,7 @@ let db = admin.firestore();
       return 0
     }
 
-    
+    searchTermsArray=[]
     action=newValue.action
     nextStepIndex=newValue.nextStep
     previousStepIndex=newValue.previousStep
@@ -50,17 +50,25 @@ let db = admin.firestore();
           flowMeta=doc.data()          
           //console.log(flowMeta)
           creatorMeta["email"]=flowMeta.email
+
+          /*if("searchTerms" in flowMeta)
+          {
+            searchTermsArray=searchTermsArray.concat(flowMeta.searchTerms)
+          }*/
           
       }
+
+      
+
       //console.log(creatorMeta)
       //Based on the data in the current step, add roles from UserGroups
       //creatorMeta is sent because some roles have a #creator tag on them
       //those are the steps where the creator will be notified
       rolesHaveBeenSet=setRoles(flowID,newValue,creatorMeta)
-      return rolesHaveBeenSet
+      return doc.data()
         
     })
-    .catch((error)=>{})
+    .catch((error)=>{console.error(error.message)})
 
 
 
@@ -73,6 +81,7 @@ let db = admin.firestore();
     user_name=actionedby.name
     stepName=newValue.name
     fields=newValue.fields
+    fieldValues=null
     if("fieldValues" in newValue)
     {
       fieldValues=newValue.fieldValues
@@ -80,7 +89,11 @@ let db = admin.firestore();
     }
 
 
-
+    /*if(fieldValues.length>0 && fields.length>0)
+    {
+      newSearchTerms=getSearchTerms(fields,fieldValues)
+      searchTermsArray=searchTermsArray.concat(newSearchTerms)
+    }*/
     
     
 
@@ -136,11 +149,12 @@ let db = admin.firestore();
               flowMeta["active_step_name"]=targetStepData.name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
+              
               updateFlowFacade(flowID, flowMeta)              
              // updateNotificationQueue(sourceStepData, nextStepIndex,flowID)           
               return targetStepData
             
-        }).catch((error)=> { console.log(error.message) });
+        }).catch((error)=> { console.error(error.message) });
 
 
       }
@@ -155,7 +169,7 @@ let db = admin.firestore();
               return 0
               
           })  
-          .catch((error)=> {console.log(error.message);});
+          .catch((error)=> {console.error(error.message);});
       }
       // set activestep to false
       //setCurrentStepAsInactive(flowID,stepId)
@@ -198,12 +212,13 @@ let db = admin.firestore();
               flowMeta["active_step_name"]=targetStepData.name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
+              
               updateFlowFacade(flowID, flowMeta)
               //updateNotificationQueue(sourceStepData, targetStepID,flowID)           
               return targetStepData
             
         }).catch((error)=> {
-                console.log(error.message);
+                console.error(error.message);
               });
       }
       else
@@ -229,19 +244,42 @@ let db = admin.firestore();
 
    }   
    //console.log(rolePromise)
-   rolePromise.then(()=>{
+   rolePromise.then((doc)=>{
 
       //console.log("Resolved")
-      updateNotificationQueue(sourceStepData, targetStepIndex,flowID)
+      //console.log(doc);
+      var existingSearchTerms=[]
+      searchTerms=[]
+      if("searchTerms" in doc)
+      {
+        existingSearchTerms=doc.searchTerms
+
+      }
+      //console.log(existingSearchTerms)  
+      searchTerms=appendSearchTerms(fields, fieldValues, existingSearchTerms)
+      
+      addSearchTermsToFlow(flowID,searchTerms)      
+      updateNotificationQueue(sourceStepData, targetStepIndex,flowID,searchTerms)
       return 0
 
-    }).catch((error)=>{console.log("Promise Failed?")})
+    }).catch((error)=>{console.error(error.message)})
 
     return 0
     
   });
 
-async function updateNotificationQueue(sourceStepData, targetStepIndex, flowID)
+
+function addSearchTermsToFlow(flowID,searchTerms)
+{
+  meta={}
+  meta["searchTerms"]=searchTerms
+  db.collection("Workflows").doc(flowID).update(meta);
+}
+
+async function updateNotificationQueue(sourceStepData, 
+                                      targetStepIndex,
+                                      flowID,
+                                      searchTermsArray)
 {
   /* In here we just manage a collection which has a list of documents pertaining to
   all different kind of notifications that need to be sent.
@@ -279,19 +317,16 @@ async function updateNotificationQueue(sourceStepData, targetStepIndex, flowID)
       notificationObject["targetStepIndex"]=targetStepIndex
       notificationObject["stepName"]=sourceStepData.name
       notificationObject["timestamp"]=Date.now();
+      
+      notificationObject["searchTerms"]=searchTermsArray
       //console.log(notificationObject)
       db.collection("NotificationQueue").doc().set(notificationObject);
       return 0
 
 
-  })/*.catch((error)=> {
-    console.log(error.message +" "+targetStepID);
-  });*/
+  })
 
 
-
-  //console.log(targetStepData)
- 
 
 
 
@@ -301,6 +336,64 @@ async function updateNotificationQueue(sourceStepData, targetStepIndex, flowID)
 return 0
 
 }
+
+function appendSearchTerms(fields,fieldValues, existingSearchTerms)
+{
+  newSearchTerms=existingSearchTerms;
+  //console.log(newSearchTerms)
+  for(fieldIndex=0;fieldIndex<fields.length;fieldIndex++)
+  {
+    field=fields[fieldIndex]
+    fieldValue=fieldValues[fieldIndex]
+    //console.log(field)
+    if(!("isSearchTerm" in field))
+    {
+      continue;
+    } 
+    isSearchTerm=field["isSearchTerm"]
+    //console.log(isSearchTerm)
+    if(!isSearchTerm)
+    {
+      continue;
+    }
+
+
+    searchTerm={}
+    fieldLabel=field["label"]
+    searchTerm["label"]=fieldLabel
+    searchTerm["value"]=fieldValue
+    existing=false;
+    if(newSearchTerms.length>0)
+    {
+        for(a=0;a<newSearchTerms.length;a++)
+        {
+          //console.log(newSearchTerms[a]["label"])
+          //console.log(fieldLabel)
+          if(newSearchTerms[a]["label"]===fieldLabel)
+          {
+            newSearchTerms[a]["value"]=fieldValue
+            existing=true
+            break;
+          }
+          
+        }
+
+     }
+
+      if(!existing)
+      {
+        newSearchTerms.push(searchTerm)
+      }
+        
+
+      
+    
+  }
+  //console.log(newSearchTerms)
+  return newSearchTerms;
+}
+
+
 
 
 
@@ -474,7 +567,7 @@ return 0
   async function updateFlowFacade(flowID,flowMeta)
   {
     
-     db.collection("Workflows").doc(flowID).update(flowMeta)   
+     db.collection("Workflows").doc(flowID).update(flowMeta)  
    
     return 0;
   }

@@ -403,6 +403,93 @@ a:visited {
 }
 
 
+/* custom highlight */
+@keyframes highlight {
+  0% {
+    background: yellow
+  }
+  100% {
+    background: white;
+  }
+}
+
+.standout {
+  animation: highlight 1.5s;
+}
+
+.headertitle
+{
+  float:left;
+}
+.keyname
+{
+  float:right;
+  padding-right:20px;
+}
+.stepname
+{
+  font-size: 20px;  
+  padding-top:10px;
+  padding-bottom:10px;
+  background-color: #393e46;
+  margin-bottom:10px;
+  padding-left:10px;
+  color: #eeeeee;
+}
+.notifylistheader
+{
+  font-size: 20px;  
+  padding-top:10px;
+  padding-bottom:10px;
+  background-color: #393e46;
+  margin-bottom:10px;
+  padding-left:10px;
+  color: #eeeeee;
+  display: flex;  
+  flex-wrap: wrap;
+}
+
+.notifylistdiv
+{
+  
+  display: flex;  
+  flex-wrap: wrap;
+}
+
+.userdiv
+{
+  font-size: 15px;  
+  
+  color:#222831;
+  border-radius:14px;
+  border: 1px solid #222831;
+  margin-bottom: 2px;
+  padding:2px 10px 2px 10px;
+  width: max-content;
+  margin-left: 2px;
+}
+.deletebutton
+{
+ 
+  
+  
+  
+  padding: 2px;
+  width:max-content;
+  height: max-content; 
+  
+  margin-left: 10px;
+  cursor:pointer;
+}
+
+.newuserinput
+{
+  margin-left:3px;
+}
+.deleteimg
+{
+  width:16px;
+}
 
 
 

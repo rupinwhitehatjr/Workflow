@@ -5,6 +5,10 @@ const admin = require('firebase-admin');
 const sgMail = require('@sendgrid/mail')
 /* admin is initialised in index.js*/
 let db = admin.firestore();
+let storageObj=admin.storage()
+const path = require('path');
+const os = require('os');
+const fs = require('fs');
 
 //console.log(functions.config())
 apikey=functions.config().sendgrid.apikey
@@ -22,21 +26,18 @@ exports.sendNotification = functions
   .onCreate((snapshot, context) => 
   { 
 
+
+
   notificationData=snapshot.data()
+  //htmlbody=getHTMLBody(notificationData)  
   
-  msgObject={}
+ 
+
+
+  //msgObject={}
   targetStepIndex=notificationData.targetStepIndex
   recipients=notificationData.notify
-  flowID=notificationData.flowID
-
-  
-  msgObject.from="rupin@whitehatjr.com"
-  actionerName=notificationData.actioner.name
-  action = notificationData.action
-  subject=actionerName +" " +action+" a Workflow";
-  msgObject.subject=subject
-  msgObject.html=actionerName +" " +action+" a Workflow";
-  msgObject.text=actionerName +" " +action+" a Workflow";
+  flowID=notificationData.flowID 
 
 
   if(recipients.length===0)
@@ -48,19 +49,19 @@ exports.sendNotification = functions
         //console.log(msgObject)
         if(querySnapshot!==0)
         {
-          msgObject.to=querySnapshot.users
-          sendEmail(msgObject)
+          notificationData.notify=querySnapshot.users
+          sendEmail(notificationData)
         }
         return 0
 
-    }).catch((error)=>{console.log(error.message)})
+    }).catch((error)=>{console.error(error.message)})
 
 
   }
   else
   {
-    msgObject.to=recipients
-    sendEmail(msgObject)
+    
+    sendEmail(notificationData)
   }
   
 
@@ -90,17 +91,91 @@ async function getRecipientsList(flowID, stepIndex)
 
 }
 
-function sendEmail(messageObject)
+function sendEmail(notificationData)
 {
-  sgMail.send(messageObject).then(() => {
-    console.log('Email sent')
-    return 0
-  })
-  .catch((error) => {
+  msgObject={}
+  msgObject.from="rupin@whitehatjr.com"
+  actionerName=notificationData.actioner.name
+  action = notificationData.action
+  emailSubjectPart=""
+  if("searchTerms" in notificationData )
+  {
+    searchTermList=notificationData["searchTerms"]
+    noOfTerms=searchTermList.length;
+    if(noOfTerms>0)
+    {
+      subjectTerms=[]
+      for(sTermIndex=0;sTermIndex<searchTermList.length;sTermIndex++)
+      {
+        subjectTerms.push(searchTermList[sTermIndex]["value"])
+      }
+      emailSubjectPart=subjectTerms.join("-")
+      emailSubjectPart="["+emailSubjectPart+"]"
+    }
+
+  }
+  
+  subject=actionerName +" " +action+" the workflow";
+  subject=subject+" "+emailSubjectPart
+  msgObject.subject=subject
+  flowID=notificationData.flowID 
+
+  msgObject.to=notificationData.notify
+  //console.log(msgObject)
+  //return 0
+
+  htmlBody=getHTMLBody(notificationData)
+ 
+  htmlBody.then((htmltemplate)=>{
+    htmltemplate=htmltemplate.replace("@actioner", actionerName)
+    htmltemplate=htmltemplate.replace("@action", action)
+    htmltemplate=htmltemplate.replace("@flowid", flowID)
+    msgObject.html=htmltemplate
+
+    //console.log(notificationData)
+    sgMail.send(msgObject).then(() => {
+      console.log('Email sent')
+      return 0
+  }).catch((error) => {
     console.error(error)
   })
 
   return 0
+
+
+  }).catch((error)=>(console.error(error.message)))
   
+
+
+
+
+  
+  
+}
+
+async function getHTMLBody(notificationData)
+{
+  
+
+    const bucket = storageObj.bucket();
+    let fileName="email.html"
+    const tempFilePath = path.join(os.tmpdir(), fileName);
+    const filePath="email-templates/email.html"
+    await bucket.file(filePath).download({destination: tempFilePath});
+    var data="";
+    try {
+      data = fs.readFileSync(tempFilePath, 'utf8');
+      //console.log("data:"+data);    
+    } 
+    catch(e) 
+    {
+        console.error('Error:', e.stack);
+    }
+
+    return data
+
+      
+
+
 }
 
