@@ -34,6 +34,40 @@ let db = admin.firestore();
     action=newValue.action
     nextStepIndex=newValue.nextStep
     previousStepIndex=newValue.previousStep
+
+
+    /*Ensure that the current step is updated
+      because as we set roles and other things in the same step, 
+      it will retrigger the onUpdate and can have random things happpen
+      This act itself will retrigger onUpdate, but the action attribute will be
+      set to null, hence, the next retriggers will happen, but will have no effect
+
+      The correct way to do this is to cache the data in a document
+      in another "cache" collection which gets created when
+      user submits the workflow.
+
+      We can then update our Workflow steps without retriggering onUpdate.
+
+      The whole Workflows collection can then be strongly restricted using 
+      firestore rules, and can only be updated with functions.
+
+      This whole process can be refactored in that case, because
+
+      we can isolate the setting roles in a different function
+      altogether.
+
+
+    */
+    
+   if(action==="rejected" || action==="approved")
+   {
+       updatedValue=updateCurrentstep(flowID,stepId,newValue)
+   } 
+
+
+
+
+
     flowMeta=null
     flowInfo=db.collection("Workflows").doc(flowID).get()
     rolePromise=null;
@@ -51,11 +85,7 @@ let db = admin.firestore();
           //console.log(flowMeta)
           creatorMeta["email"]=flowMeta.email
 
-          /*if("searchTerms" in flowMeta)
-          {
-            searchTermsArray=searchTermsArray.concat(flowMeta.searchTerms)
-          }*/
-          
+                   
       }
 
       
@@ -161,7 +191,7 @@ let db = admin.firestore();
       else
       {
           console.log("Flow is completed")
-          //mark flow as completed
+          //mark the flow as completed
           let logClose=addLogOnClose(flowID,user_name,stepName)
           logClose.then(()=>{
               setWorkflowAsClosed(flowID)
@@ -233,16 +263,7 @@ let db = admin.firestore();
 
 
 
-   if(action==="rejected" || action==="approved")
-   {
-       //console.log("Printing targetstepdata")
-      // console.log(targetStepData)
-       updatedValue=updateCurrentstep(flowID,stepId,newValue)
-       //updateNotificationQueue(sourceStepData, a, flowID)
-       
-        
-
-   }   
+    
    //console.log(rolePromise)
    rolePromise.then((doc)=>{
 
@@ -435,77 +456,84 @@ function appendSearchTerms(fields,fieldValues, existingSearchTerms)
         // fetch the correct data from the UserGroups Collection
         userGroupKey=getGroupKey(stepData);
         //console.log(userGroupKey)
-        if(userGroupKey!==null)
+        if(!userGroupKey)
         {
-             // console.log(userGroupKey)
-              userGroups= await db.collection("UserGroups")
-                          .where("groupKey", "==", userGroupKey)
-                          .get()
-          
+          return 0
+        }
 
-              userGroups.forEach((doc)=>{
-              //console.log(doc.data())
-              batch=db.batch()
-              if (doc.exists) 
+        
+       
+        userGroups= await db.collection("UserGroups")
+                    .where("groupKey", "==", userGroupKey)
+                    .get()
+        
+
+            userGroups.forEach((doc)=>{
+            //console.log(doc.data())
+            batch=db.batch()
+            if(!doc.exists)
+            {
+              return 0
+            }
+            
+              //console.log("Document data:", doc.data());
+              docData=doc.data()
+              userGroupList=docData["groupList"]
+              groupLength=userGroupList.length
+              //console.log(groupLength)
+              
+              for(groupIndex=0;groupIndex<groupLength;groupIndex++)
               {
-                  //console.log("Document data:", doc.data());
-                  docData=doc.data()
-                  userGroupList=docData["groupList"]
-                  groupLength=userGroupList.length
-                  //console.log(groupLength)
-                  
-                  for(groupIndex=0;groupIndex<groupLength;groupIndex++)
+
+                stepID=userGroupList[groupIndex]["stepID"];
+                users=userGroupList[groupIndex]["users"];
+               // console.log(stepID)
+                //console.log(users)
+                if("email" in creatorMeta)
+                {
+                  //console.log("email present")
+                  creatorEmail=creatorMeta["email"]
+                  //Replace the #creator with the email of the
+                  //creator
+                  for(userIndex=0;userIndex<users.length;userIndex++)
                   {
-
-                    stepID=userGroupList[groupIndex]["stepID"];
-                    users=userGroupList[groupIndex]["users"];
-                   // console.log(stepID)
-                    //console.log(users)
-                    if("email" in creatorMeta)
+                    if(users[userIndex]==="#creator")
                     {
-                      //console.log("email present")
-                      creatorEmail=creatorMeta["email"]
-                      //Replace the #creator with the email of the
-                      //creator
-                      for(userIndex=0;userIndex<users.length;userIndex++)
-                      {
-                        if(users[userIndex]==="#creator")
-                        {
-                          users[userIndex]=creatorEmail
-                        }
-                      }
-                      
+                      users[userIndex]=creatorEmail
                     }
-                    //console.log(users)
-
-                    userListObject=admin
-                                  .firestore
-                                  .FieldValue
-                                  .arrayUnion
-                                  .apply(null, users)
-
-                   b1=db.collection("Workflows")
-                      .doc(flowID)
-                      .collection("steps")
-                      .doc(stepID)
-                      //.update({"users":userListObject})
-                      batch.update(b1, {"users":userListObject})
-                     
-                     
-                   
-
                   }
                   
-         
+                }
+                //console.log(users)
+
+                userListObject=admin
+                              .firestore
+                              .FieldValue
+                              .arrayUnion
+                              .apply(null, users)
+
+               b1=db.collection("Workflows")
+                  .doc(flowID)
+                  .collection("steps")
+                  .doc(stepID)
+                  //.update({"users":userListObject})
+               batch.update(b1, {"users":userListObject})
+                 
+                 
+               
+
               }
-              return batch.commit().then(function () {
-               //console.log("batch committed")
-               return 0
-              });
-            })
-      }
+              
      
-     return 0
+          
+          return batch.commit().then(function () {
+           //console.log("batch committed")
+           return 0
+          });
+        })
+    
+   
+   return 0
       
    
   }
@@ -518,7 +546,7 @@ function appendSearchTerms(fields,fieldValues, existingSearchTerms)
       updatedData["action"]=null
       actionerEmail=newValue.by.email
       updatedData["users"]=admin.firestore.FieldValue.arrayUnion(actionerEmail)
-      updatedData["by"]=null
+      /*updatedData["by"]=null*/
       
 
       stepUpdate=await db.collection("Workflows")
