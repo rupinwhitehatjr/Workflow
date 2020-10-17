@@ -25,6 +25,7 @@ db = firestore.Client(project="test", credentials=credentials)
 
 step={}	
 step["index"]=10
+step["isFirst"]=True
 step["activestep"]=True
 step["visible"]=True
 step["nextStep"]=20

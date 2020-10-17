@@ -22,7 +22,7 @@ sgMail.setApiKey(apikey)
 exports.sendNotification = functions
   .region('asia-east2')
   .firestore
-  .document('NotificationQueue/{notificationid}')
+  .document('NotificationQueue1/{notificationid}')
   .onCreate((snapshot, context) => 
   { 
 
@@ -119,7 +119,7 @@ function sendEmail(notificationData)
   subject=subject+" "+emailSubjectPart
   msgObject.subject=subject
   flowID=notificationData.flowID 
-
+  commentText=notificationData.comment 
   msgObject.to=notificationData.notify
   //console.log(msgObject)
   //return 0
@@ -130,6 +130,14 @@ function sendEmail(notificationData)
     htmltemplate=htmltemplate.replace("@actioner", actionerName)
     htmltemplate=htmltemplate.replace("@action", action)
     htmltemplate=htmltemplate.replace("@flowid", flowID)
+    if(commentText.length>0)
+    {
+      htmltemplate=htmltemplate.replace("@commentdisplayflag", "block")
+    }
+    else
+    {
+      htmltemplate=htmltemplate.replace("@commentdisplayflag", "none")
+    }
     msgObject.html=htmltemplate
 
     //console.log(notificationData)

@@ -7,7 +7,7 @@ let db = admin.firestore();
  exports.processSubmission = functions
   .region('asia-east2')
   .firestore
-  .document('Workflows/{flowID}/steps/{stepId}')
+  .document('Workflows1/{flowID}/steps/{stepId}')
   .onUpdate((change, context) => {
 
     
