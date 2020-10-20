@@ -132,11 +132,12 @@ function sendEmail(notificationData)
     htmltemplate=htmltemplate.replace("@flowid", flowID)
     if(commentText.length>0)
     {
-      htmltemplate=htmltemplate.replace("@commentdisplayflag", "block")
+      htmltemplate=htmltemplate.replace("/@commentdisplayflag/g", "block")
+      htmltemplate=htmltemplate.replace("@comment", commentText)
     }
     else
     {
-      htmltemplate=htmltemplate.replace("@commentdisplayflag", "none")
+      htmltemplate=htmltemplate.replace("/@commentdisplayflag/g", "none")
     }
     msgObject.html=htmltemplate
 
