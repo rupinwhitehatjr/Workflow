@@ -205,6 +205,13 @@ function addSearchTermsToFlow(flowID,searchTerms)
 {
   meta={}
   meta["searchTerms"]=searchTerms
+  for(index=0;index<searchTerms.length;index++)
+  {
+    term=searchTerms[index]
+    key=term["label"]
+    value=term["value"]
+    meta[key]=value
+  }
   db.collection("Workflows").doc(flowID).update(meta);
 }
 
