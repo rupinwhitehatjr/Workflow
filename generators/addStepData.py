@@ -44,9 +44,16 @@ if args.flowID:
 # creationData["name"]="Rupin Chheda"
 # creationData["ready"]=False
 
-stepDoc=db.collection(u'Workflows').document(flowID).collection("steps").document(stepID)
+commentMeta={}
+commentMeta["by"]={"email":"rupin@whitehatjr.com", "name":"Rupin Chheda"}
+commentMeta["timestamp"]=time.time()
+commentMeta["comment"]="This is the comment text"
 formData={}
-formData["fieldValues"]=["BEG","V1","C8",4,5]
+
+formData["fieldValues"]=["BEG","V87","C84",4,5]
+formData["flowID"]=flowID
+formData["stepID"]=stepID
+
 formData["action"]="approved"
 userDetail={}
 userDetail["uid"]="abcd"
@@ -56,6 +63,9 @@ userDetail["name"]="Anjali Kanitkar"
 formData["timestamp"]=time.time()
 
 formData["by"]=userDetail
-stepDoc.update(formData)
+formData["commentMeta"]=commentMeta
+cacheDoc=db.collection(u'Cache').document().set(formData)
+
+#stepDoc.update(formData)
 
 
