@@ -189,7 +189,7 @@ exports.setRoles = functions
                   .collection("steps")
                   .doc(stepID)
                   //.update({"users":userListObject})
-               batch.update(b1, {"users":userListObject})
+               batch.update(b1, {"users":userListObject, "rolesSet":true})
                  
                  
                

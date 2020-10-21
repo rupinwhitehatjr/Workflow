@@ -17,7 +17,8 @@ exports.updateFacade = functions
 
     flowID=userData["flowID"]
     stepID=userData["stepID"]
-    user_name=userData["by"]["name"]
+    user_name=userData.by.name
+    user_email=userData.by.email
     commentText=""
     if("commentMeta" in userData)
     {
@@ -118,7 +119,10 @@ exports.updateFacade = functions
 
           // We can create the Notification Object Here
             notificationObject={}
-            notificationObject["actioner"]=user_name
+            actioner={}
+            actioner["name"]=user_name
+            actioner["email"]=user_email
+            notificationObject["actioner"]=actioner
             notificationObject["notify"]=[]
             notificationObject["action"]=action
             notificationObject["flowID"]=flowID
@@ -130,8 +134,6 @@ exports.updateFacade = functions
             notificationObject["comment"]=commentText
             console.log(notificationObject)
             db.collection("NotificationQueue").doc().set(notificationObject);
-
-          
 
         })
 

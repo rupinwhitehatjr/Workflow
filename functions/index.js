@@ -23,6 +23,6 @@ exports.onReject = onReject.onReject;
 exports.updateFacade = updateFacade.updateFacade;
 
 
-//exports.sendNotification = notification.sendNotification;
+exports.sendNotification = notification.sendNotification;
 
 
