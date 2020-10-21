@@ -184,10 +184,14 @@ stepsDocument.then(function(querySnapshot) {
         doesUserHaveEditAccess=false
         userEmail=firebase.auth().currentUser.email
         usersWhoHaveAccess=step["users"]
-        if(usersWhoHaveAccess.indexOf(userEmail)!==-1)
-        {
-          doesUserHaveEditAccess=true  
-        }
+        if(usersWhoHaveAccess)
+           {
+                if(usersWhoHaveAccess.indexOf(userEmail)!==-1)
+                {
+                  doesUserHaveEditAccess=true  
+                }
+           } 
+         
 
        // console.log(doesUserHaveEditAccess)
 
@@ -447,6 +451,8 @@ function createField(stepid, fieldMeta, index, fieldData)
                 .attr("class", "grid_4 fieldlabel")
                 .append(label)
             )
+
+    
     if(type=="dropdown")
     {
         
@@ -469,6 +475,46 @@ function createField(stepid, fieldMeta, index, fieldData)
         {
             option=$("<option/>").val(options[index]).text(options[index])
             if(options[index]===fieldData)
+            {
+                $(option).prop("selected", true);
+            }
+            $(dd).append($(option))
+        }
+        $("#"+stepid).append($(div).append($(dd)))
+
+        //Create a div to go to next line.
+        
+
+    }
+
+    if(type==="range")
+    {
+        
+        div=$('<div/>').attr("class", "grid_6 field")
+
+        options=fieldMeta["options"];
+       
+        
+        dd=$("<select/>")
+                .attr("data-stepid",stepid)
+                .attr("data-index", index)
+                .attr("id", index)
+                .attr("name", index)
+        if(mandatory)
+        {
+            $(dd).attr("required", true)
+        }        
+        $(dd).append($("<option/>"))
+        min=fieldMeta["min"];
+        max=fieldMeta["max"];
+        console.log(min)
+        console.log(max)
+        for(index=min;index<max+1;index++)
+        {
+            
+            console.log(index)
+            option=$("<option/>").val(index).text(index)
+            if(index===fieldData)
             {
                 $(option).prop("selected", true);
             }

@@ -67,8 +67,8 @@ function userAction(action)
 	//console.log(fieldData)
 	params=getParams(window.location.href)
 	flowID=params.id
-	//console.log(flowID)
-	//console.log(stepID)
+	console.log(flowID)
+	console.log(stepID)
 
 	//Save the Data to the Specific Step
 	approvedData={}
@@ -106,7 +106,7 @@ function userAction(action)
 	}
 
 	flowMeta={}
-	flowMeta["ready"]=false
+	flowMeta["ready"]=true
 
 	db.collection("Workflows")
 		.doc(flowID)
@@ -117,6 +117,7 @@ function userAction(action)
 		.collection("steps")
 		.doc(stepID)
 
+	console.log(approvedData)	
 	stepdDocument.update(approvedData)
 
 	//

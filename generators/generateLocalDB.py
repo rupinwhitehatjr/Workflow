@@ -32,7 +32,7 @@ step["previousStep"]=None
 fields=[]
 levelObj={"label":"Curriculum","mandatory":True,"isSearchTerm":True, "userGroupKey":True,"type":"dropdown", "options":["BEG", "INT", "ADV", "PRO", "APT"]}
 versionObject={"label":"Version", "mandatory":True, "isSearchTerm":True,"type":"dropdown", "options":["V1", "V2"]}
-classObject={"label":"Class","mandatory":True,"isSearchTerm":True, "type":"text"}
+classObject={"label":"Class","mandatory":True,"isSearchTerm":True, "type":"range", "min":0, "max":300}
 documentType={"label":"Asset Type","mandatory":True, "type":"dropdown","options":["Class Document", "Summary"]}
 documentURL={"label":"Document URL","mandatory":True, "type":"text"}
 fields.append(levelObj)

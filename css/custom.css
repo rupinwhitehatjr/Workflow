@@ -491,6 +491,39 @@ a:visited {
   width:16px;
 }
 
+/* Dashboard Table */
+
+table.resultstable
+{
+  width:100%;
+  table-layout: fixed ;
+  border-collapse: collapse ;
+  border: 1px black solid ;
+}
+
+table.resultstable >tbody> tr
+{
+  
+}
+
+
+table.resultstable >tbody> tr > th
+{
+  font-size: 20px;
+  background-color: #00adb5;
+  padding:10px;
+  border: 1px black solid ;
+
+
+}
+
+table.resultstable >tbody> tr >td
+{
+  font-size: 20px;
+  padding:10px;
+  border: 1px black solid ;
+}
+
 
 
 

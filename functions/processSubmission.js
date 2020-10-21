@@ -148,6 +148,13 @@ let db = admin.firestore();
               flowMeta["ready"]=true
               flowMeta["active_step_name"]=targetStepData.name
               flowMeta["active_step_id"]=querySnapshot.id
+              users=[]
+              if("users" in targetStepData)
+              {
+                users=targetStepData.users
+                
+              }
+              flowMeta["step_owners"]=users
               flowMeta["closed"]=false
               
               updateFlowFacade(flowID, flowMeta)              
@@ -212,6 +219,13 @@ let db = admin.firestore();
               flowMeta["active_step_name"]=targetStepData.name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
+              users=[]
+              if("users" in targetStepData)
+              {
+                users=targetStepData.users
+                
+              }
+              flowMeta["step_owners"]=users
               
               updateFlowFacade(flowID, flowMeta)
               //updateNotificationQueue(sourceStepData, targetStepID,flowID)           
@@ -273,6 +287,13 @@ function addSearchTermsToFlow(flowID,searchTerms)
 {
   meta={}
   meta["searchTerms"]=searchTerms
+  for(index=0;index<searchTerms.length;index++)
+  {
+    term=searchTerms[index]
+    key=term["label"]
+    value=term["value"]
+    meta[key]=value
+  }
   db.collection("Workflows").doc(flowID).update(meta);
 }
 
@@ -319,7 +340,7 @@ async function updateNotificationQueue(sourceStepData,
       notificationObject["timestamp"]=Date.now();
       
       notificationObject["searchTerms"]=searchTermsArray
-      //console.log(notificationObject)
+      console.log(notificationObject)
       db.collection("NotificationQueue").doc().set(notificationObject);
       return 0
 
@@ -340,6 +361,7 @@ return 0
 function appendSearchTerms(fields,fieldValues, existingSearchTerms)
 {
   newSearchTerms=existingSearchTerms;
+  //newSearchTerms=[]
   //console.log(newSearchTerms)
   for(fieldIndex=0;fieldIndex<fields.length;fieldIndex++)
   {
@@ -445,7 +467,7 @@ function appendSearchTerms(fields,fieldValues, existingSearchTerms)
 
               userGroups.forEach((doc)=>{
               //console.log(doc.data())
-              batch=db.batch()
+             // batch=db.batch()
               if (doc.exists) 
               {
                   //console.log("Document data:", doc.data());
@@ -488,8 +510,8 @@ function appendSearchTerms(fields,fieldValues, existingSearchTerms)
                       .doc(flowID)
                       .collection("steps")
                       .doc(stepID)
-                      //.update({"users":userListObject})
-                      batch.update(b1, {"users":userListObject})
+                      .update({"users":userListObject})
+                      //batch.update(b1, {"users":userListObject})
                      
                      
                    
@@ -498,10 +520,10 @@ function appendSearchTerms(fields,fieldValues, existingSearchTerms)
                   
          
               }
-              return batch.commit().then(function () {
+             /* return batch.commit().then(function () {
                //console.log("batch committed")
                return 0
-              });
+              });*/
             })
       }
      

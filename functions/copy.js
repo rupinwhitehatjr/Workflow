@@ -27,6 +27,11 @@ exports.copyLayout = functions
               flowMeta["active_step_name"]=querySnapshot.data().name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
+              step_owners=[]
+              step_owners.push(email)
+
+              flowMeta["step_owners"]=step_owners
+              //console.log(flowMeta)
               setFlowAsActive(flowID, flowMeta)
            
               return 0
