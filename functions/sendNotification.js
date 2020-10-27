@@ -97,6 +97,7 @@ function sendEmail(notificationData)
   msgObject.from="rupin@whitehatjr.com"
   actionerName=notificationData.actioner.name
   action = notificationData.action
+  stepName = notificationData.stepName
   emailSubjectPart=""
   if("searchTerms" in notificationData )
   {
@@ -130,6 +131,8 @@ function sendEmail(notificationData)
     htmltemplate=htmltemplate.replace("@actioner", actionerName)
     htmltemplate=htmltemplate.replace("@action", action)
     htmltemplate=htmltemplate.replace("@flowid", flowID)
+    htmltemplate=htmltemplate.replace("@stepname", stepName)
+    
     if(commentText.length>0)
     {
       htmltemplate=htmltemplate.replace(/@commentdisplayflag/g, "block")
