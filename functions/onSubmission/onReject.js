@@ -29,6 +29,7 @@ exports.onReject = functions
 
       //console.log(snapshot.data())
       stepStructure=snapshot.data()
+      return 0 
 
     }).catch((error)=>{console.error(error.message)})
 
@@ -45,7 +46,7 @@ exports.onReject = functions
       }
       
 
-    })
+    }).catch((error)=>{console.error(error.message)})
 
 
 
@@ -111,8 +112,17 @@ exports.onReject = functions
 
               // Once the Active Step has been set, we can update the flow Facade 
               flowMeta={}
-              flowMeta["active_step_name"]=doc.data().name
+              activeStepData=doc.data()
+              flowMeta["active_step_name"]=activeStepData.name
               flowMeta["active_step_id"]=doc.id
+              if("users" in activeStepData)
+              {
+                flowMeta["step_owners"]=activeStepData.users
+              }
+              else
+              {
+                flowMeta["step_owners"]=[]
+              }  
               db.collection("Workflows").doc(flowID).update(flowMeta)
 
               activestep=doc
@@ -129,6 +139,10 @@ exports.onReject = functions
       updatedData={}
       updatedData["activestep"]=false
       updatedData["action"]=null
+      if("fieldValues" in newValue)
+      {
+        updatedData["fieldValues"]=newValue.fieldValues
+      }
       actionerEmail=newValue.by.email
       updatedData["users"]=admin.firestore
                                 .FieldValue

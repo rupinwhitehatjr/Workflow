@@ -11,6 +11,7 @@ const onApprove = require('./onSubmission/onApprove');
 const onReject = require('./onSubmission/onReject');
 
 const updateFacade = require('./onSubmission/updateFacade');
+const copyRole = require('./onSubmission/copyRoles');
 
 
 
@@ -24,5 +25,5 @@ exports.updateFacade = updateFacade.updateFacade;
 
 
 exports.sendNotification = notification.sendNotification;
-
+exports.copyRoleForActiveStep=copyRole.copyRoleForActiveStep
 

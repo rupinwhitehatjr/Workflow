@@ -51,97 +51,111 @@ exports.updateFacade = functions
 
       currentStepName=stepStructure["name"]
 
-
+      stepData={}
+      
+      
       if(!("fields" in stepStructure))
       {
         //There are no fields in the step
-        return 0;
+        stepData["fields"]=[]
+      }
+      else
+      {
+        fields=stepStructure["fields"]
+        stepData["fields"]=fields
       }
       
 
-      fields=stepStructure["fields"]
-      if(fields.length===0)
-      {
-        //The fields array is empty
-        return 0;
-      } 
+      
+      
 
       if(!("fieldValues" in userData))
       {
         //There are no fieldValues in the userData
-        return 0;
+        stepData["fieldValues"]=[]
+      }
+      else
+      {
+        fieldValues=userData["fieldValues"]
+        stepData["fieldValues"]=fieldValues
       }
       
 
-      fieldValues=userData["fieldValues"]
-      if(fieldValues.length===0)
+      
+      /*if(fieldValues.length===0)
       {
         //The fieldValues array is empty
         return 0;
-      } 
+      } */
       
       newSearchTerms=[]
       
       
-      stepData={}
-      stepData["fields"]=fields
-      stepData["fieldValues"]=fieldValues
+      //stepData={}
+      //stepData["fields"]=fields
+      //stepData["fieldValues"]=fieldValues
       newSearchTerms=getNewSearchTerms(stepData)
       //console.log(newSearchTerms)
-      if(newSearchTerms.length>0)
-      {
-        //There are some new search terms
-        //Get the existing ones, they may not exist
-        //Or it is possible the same labels have different values
-        flowMetaPromise=getFlowMeta(flowID)
-        flowMeta=null
-        flowMetaPromise.then((doc)=>{
-          flowMeta=doc.data()
+    
+      //There are some new search terms
+      //Get the existing ones, they may not exist
+      //Or it is possible the same labels have different values
+      flowMetaPromise=getFlowMeta(flowID)
+      flowMeta=null
+      flowMetaPromise.then((doc)=>{
+        flowMeta=doc.data()
 
-          return 0
-        }).catch((error)=>{console.error(error.message)})
+        return 0
+      }).catch((error)=>{console.error(error.message)})
 
-        flowMetaPromise.finally(()=>{
+      flowMetaPromise.finally(()=>{
 
-          existingSearchTerms=[]
-          if(("searchTerms" in flowMeta))
-          {
-            existingSearchTerms=flowMeta["searchTerms"]
+        existingSearchTerms=[]
+        if(("searchTerms" in flowMeta))
+        {
+          existingSearchTerms=flowMeta["searchTerms"]
 
-          }
-          //console.log(existingSearchTerms)
-          uSearchTerms=appendSearchTerms(newSearchTerms, existingSearchTerms)
-          newflowMeta={}
-          //console.log(uSearchTerms)
-          newflowMeta["ready"]=true
-          newflowMeta["searchTerms"]=uSearchTerms
-          db.collection("Workflows").doc(flowID).update(newflowMeta)
+        }
+        //console.log(existingSearchTerms)
+        uSearchTerms=appendSearchTerms(newSearchTerms, existingSearchTerms)
+        newflowMeta={}
+        //console.log(uSearchTerms)
+        newflowMeta["ready"]=true
+        newflowMeta["searchTerms"]=uSearchTerms
+        for(index=0;index<uSearchTerms.length;index++)
+        {
+              term=uSearchTerms[index]
+              key=term["label"]
+              value=term["value"]
+              newflowMeta[key]=value
+        }
+        db.collection("Workflows").doc(flowID).update(newflowMeta)
 
-          // We can create the Notification Object Here
-            notificationObject={}
-            actioner={}
-            actioner["name"]=user_name
-            actioner["email"]=user_email
-            notificationObject["actioner"]=actioner
-            notificationObject["notify"]=[]
-            notificationObject["action"]=action
-            notificationObject["flowID"]=flowID
-            notificationObject["targetStepIndex"]=targetStepIndex
-            notificationObject["stepName"]=currentStepName
-            notificationObject["timestamp"]=Date.now();
+        // We can create the Notification Object Here
+          notificationObject={}
+          actioner={}
+          actioner["name"]=user_name
+          actioner["email"]=user_email
+          notificationObject["actioner"]=actioner
+          notificationObject["notify"]=[]
+          notificationObject["action"]=action
+          notificationObject["flowID"]=flowID
+          notificationObject["targetStepIndex"]=targetStepIndex
+          notificationObject["stepName"]=currentStepName
+          notificationObject["timestamp"]=Date.now();
 
-            notificationObject["searchTerms"]=uSearchTerms
-            notificationObject["comment"]=commentText
-            console.log(notificationObject)
-            db.collection("NotificationQueue").doc().set(notificationObject);
+          notificationObject["searchTerms"]=uSearchTerms
+          notificationObject["comment"]=commentText
+          //console.log(notificationObject)
+          db.collection("NotificationQueue").doc().set(notificationObject);
 
-        })
-
-      }
+      }).catch((error)=>{console.error(error.message)})
 
       
 
-    })
+      
+
+    }).catch((error)=>{console.error(error.message)})
 
 
 

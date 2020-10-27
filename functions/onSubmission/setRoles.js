@@ -21,6 +21,7 @@ exports.setRoles = functions
 
       //console.log(snapshot.data())
       stepStructure=snapshot.data()
+      return 0
 
     }).catch((error)=>{console.error(error.message)})
 
@@ -65,7 +66,7 @@ exports.setRoles = functions
       //console.log(creatorMeta)
       return setRoles(flowID, stepData, creatorMeta)
 
-    })
+    }).catch((error)=>{console.error(error.message)})
 
 
 
@@ -97,6 +98,7 @@ exports.setRoles = functions
     userGroupKey=null
     //for this function to work, we need both the fieldValues and the fields key
     //in the data
+    filterTerms=[]
     if("fields" in stepData && "fieldValues" in stepData)
     {
       fields=stepData.fields
@@ -107,7 +109,11 @@ exports.setRoles = functions
       {
         if(fields[i].userGroupKey)// Does this field determine the users group?
         {
-          keyArray.push(fieldValues[i])
+          filterTerm={}
+          filterTerm["label"]=fields[i].label
+          filterTerm["value"]=fieldValues[i]
+          //keyArray.push(fieldValues[i])
+          filterTerms.push(filterTerm)
         }
       }
       if(keyArray.length>0)
@@ -117,7 +123,7 @@ exports.setRoles = functions
 
       
     }
-    return userGroupKey;
+    return filterTerms;
   }
 
 
@@ -126,18 +132,34 @@ exports.setRoles = functions
     
     
         // fetch the correct data from the UserGroups Collection
-        userGroupKey=getGroupKey(stepData);
+        userGroupKeyList=getGroupKey(stepData);
         //console.log(userGroupKey)
-        if(!userGroupKey)
+        groupKeyCount=userGroupKeyList.length
+        if(groupKeyCount===0)
         {
           return 0
         }
 
         
-       
-        userGroups= await db.collection("UserGroups")
+       query=db.collection("UserGroups")
+       executeQuery=false;
+       for(index=0;index<groupKeyCount;index++)
+       {
+          key=userGroupKeyList[index]["label"]
+          value=userGroupKeyList[index]["value"]
+          query = query.where(key, '==', value); 
+          executeQuery=true
+       }
+
+       if(!executeQuery)
+       {
+        return 0
+       }
+
+        userGroups=await query.get()
+        /*userGroups= await 
                     .where("groupKey", "==", userGroupKey)
-                    .get()
+                    .get()*/
         
 
             userGroups.forEach((doc)=>{

@@ -20,13 +20,16 @@ exports.copyLayout = functions
   	var copydone=makeCopy(flowType,flowID,email)
   	var logdone=addLogOnCreate(flowID,userName)
     // Only update the Flow Facade when the copy is done
-    copydone.then((querySnapshot)=> {
+    copydone.then((returnVal)=> {
           //console.log(querySnapshot.data().index)
+              querySnapshot=returnVal["activestep"]
+              allSteps=returnVal["allSteps"]
               flowMeta={}
               flowMeta["ready"]=true
               flowMeta["active_step_name"]=querySnapshot.data().name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
+              flowMeta["allSteps"]=allSteps
               step_owners=[]
               step_owners.push(email)
 
@@ -73,13 +76,14 @@ exports.copyLayout = functions
 
     //console.log(createdBy)
     flowSteps=[]
+    //stepArray=[]
     let activestep=null
     steps.forEach( (doc)=> {
         //console.log("copying")
         stepData=doc.data()
         
         
-
+        //stepArray.push(doc)
         if(doc.data().activestep)
         {
           usersObject=userListObject=admin
@@ -101,11 +105,15 @@ exports.copyLayout = functions
         flowSteps.push(flowDetail)
 
     })
+    //await Promise.all(stepArray.map((data) => flowDocument.collection("steps").add(data)));
 
-    flowDocument.update({'allSteps':flowSteps})
+    //flowDocument.update({'allSteps':flowSteps})
+    returnVal={}
+    returnVal["activestep"]=activestep
+    returnVal["allSteps"]=flowSteps
 
 
-    return activestep
+    return returnVal
   }
 
   async function setFlowAsActive(flowID,flowMeta)

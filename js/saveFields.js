@@ -67,8 +67,8 @@ function userAction(action)
 	//console.log(fieldData)
 	params=getParams(window.location.href)
 	flowID=params.id
-	console.log(flowID)
-	console.log(stepID)
+	//console.log(flowID)
+	//console.log(stepID)
 
 	//Save the Data to the Specific Step
 	approvedData={}
@@ -78,7 +78,9 @@ function userAction(action)
 	approvedData["by"]=getLoggedInUserObject()// common.js
 	//approvedData["notify"]=getLoggedInUserObject()// common.js
 	approvedData["timestamp"]=Date.now();
+	approvedData["flowID"]=flowID
 	
+	console.log(stepID)
 	if(stepID===null)
 	{
 		stepID=$("#activestepid").val()
@@ -87,9 +89,10 @@ function userAction(action)
 	//console.log($("form").attr("data-stepid"))
 	//console.log($("form"))
 	//return
+	approvedData["stepID"]=stepID
 	commenttext=$("#new_comment_input").val()
 	commenttext=commenttext.trim()
-	console.log(commenttext)
+	//console.log(commenttext)
 	if(commenttext!=="")
 	{
 		console.log("adding a comment")
@@ -102,27 +105,43 @@ function userAction(action)
 		.collection("comments")
 		.doc()
 		.set(commentmeta)
+	approvedData["commentMeta"]=commentmeta
 
 	}
 
-	flowMeta={}
-	flowMeta["ready"]=true
-
-	db.collection("Workflows")
-		.doc(flowID)
-		.update(flowMeta)
 	
-	stepdDocument=db.collection("Workflows")
+	
+	
+	
+	
+
+	cacheDocRef=db.collection("Cache").doc()	
+	cacheDocument=db.collection("Cache").doc(cacheDocRef.id)	
+	cacheDocument.set(approvedData)
+	console.log(cacheDocRef.id)
+	//console.log(approvedData)
+
+	
+	
+		
+	
+	/*stepdDocument=db.collection("Workflows")
 		.doc(flowID)
 		.collection("steps")
 		.doc(stepID)
+		*/
 
-	console.log(approvedData)	
-	stepdDocument.update(approvedData)
+	//console.log(approvedData)	
+	//stepdDocument.update(approvedData)
+
+	
 
 	//
+	
 
-	unsubscribe=stepdDocument.onSnapshot(function(doc) {
+	facade=db.collection("Workflows").doc(flowID)
+	
+	unsubscribe=facade.onSnapshot(function(doc) {
         //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
         //console.log(source, " data: ", doc.data());
         console.log(doc.metadata.hasPendingWrites)
@@ -138,8 +157,14 @@ function userAction(action)
                 
         }
 });
+	flowMeta={}
+	flowMeta["ready"]=false
+	flowMeta["updated_on"]=Date.now()
+	facade.update(flowMeta)
 		
 }
+
+
 
 
 

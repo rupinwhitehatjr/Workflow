@@ -68,11 +68,11 @@ $(document).on('change', '#stepList', function() {
 });
 
 
-//Create Empoty Notify Lists, to be updated when the group key gets generated
+//Create Empty Notify Lists, to be updated when the group key gets generated
 function createEmptyNotifyLists(processSteps)
 {
 	numberofsteps=processSteps.length
-	
+	console.log($(".notifylistdiv"))
 	$(".notifylistdiv").remove()
 	$("#buttonsection").hide();
 	for(stepIndex=0;stepIndex<numberofsteps;stepIndex++)
@@ -99,12 +99,14 @@ function createEmptyNotifyLists(processSteps)
 	}
 }
 
+groupKeyLabels=[]
 function createGroupKeyChoices(selectedStep)
 {
 	numberofsteps=processSteps.length
 	//groupKeysDiv=$("<div/>").attr("class","grid_12").text("No Group Key");
 	//$("#p_container").append(groupKeysDiv)
 	$(".dynamic").remove();
+	groupKeyLabels=[]
 	for(stepIndex=0;stepIndex<numberofsteps;stepIndex++)
 	{
 		
@@ -158,8 +160,9 @@ function createGroupKeyChoices(selectedStep)
 				labelDiv=$("<div/>")
 				selectElement=createDropdownElement(fieldValues, keySequence)
 				*/
-				console.log(field["label"])
+				//console.log(field["label"])
 				createFieldRow(field,keySequence)
+				groupKeyLabels.push(field.label)
 				keySequence++
 				
 
@@ -172,6 +175,7 @@ function createGroupKeyChoices(selectedStep)
 		
 			
 	}
+	//console.log(groupKeyLabels)
 }
 
 function createFieldRow(fieldMeta, sequence)
@@ -206,22 +210,33 @@ function createFieldRow(fieldMeta, sequence)
 
 
 selectedUserGroupKey=null;
+userGroupKeyMeta=[]
 $(document).on('change', 'select.groupKey', function() {
     
     groupKeyFields=$("select.groupKey")
     groupKeyFieldCount=groupKeyFields.length
     keyList=[]
+    userGroupKeyMeta=[]
+    
     for(index=0;index<groupKeyFieldCount;index++)
     {
     	//console.log($("select#"+index).val())
+
     	groupKeyValue=$("select#"+index).val()
+    	groupKeyObject={}
+    	label=groupKeyLabels[index]
+    	groupKeyObject["label"]=label
+    	
+    	groupKeyObject["value"]=groupKeyValue
     	keyList.push(groupKeyValue)
+    	userGroupKeyMeta.push(groupKeyObject)
     }
+   // userGroupKeyMeta
     groupKey=keyList.join("-")
     selectedUserGroupKey=groupKey
     $("#keyname").text("Grouping: "+selectedUserGroupKey).show()
-
-    displayNotifyList(selectedUserGroupKey)
+    //console.log(userGroupKeyMeta)
+    displayNotifyList(userGroupKeyMeta)
 
 
 
@@ -229,19 +244,55 @@ $(document).on('change', 'select.groupKey', function() {
 
 userGroupDocumentID=null;
 
-async function displayNotifyList(groupKey)
+async function displayNotifyList(userGroupKeyMeta)
 {
 	userGroupDocumentID=null;
 	$("#buttonsection").show()
-	notifyData= await db.collection("UserGroups")
+	/*notifyData= await db.collection("UserGroups")
 						.where("groupKey", "==", groupKey)
 						.limit(1)
-						.get()
+						.get()*/
+
+	
 	//console.log(notifyList)
-	notifyList=[]
-	notifyData.forEach((doc)=>{
-		notifyList.push(doc)
-	})
+	var executeQuery=false
+	let query = db.collection("UserGroups")
+   	searchTermsLength=userGroupKeyMeta.length
+   	//console.log(userGroupKeyMeta)
+    for(index=0;index<searchTermsLength;index++)
+    {
+    	searchObject=userGroupKeyMeta[index]
+        key=searchObject["label"]
+       	value=searchObject["value"]
+       	//console.log(key)
+       	//console.log(value)
+        query = query.where(key, '==', value); 
+        executeQuery=true 
+        
+        
+    }
+
+      notifyList=[]
+	
+      if(executeQuery)
+      {
+      	results=await query.get()
+        searchResultsCount=results.size
+        //console.log(searchResultsCount)
+        results.forEach((doc)=>{
+        	notifyList.push(doc)
+        	//console.log(doc.data())
+        })
+        
+      }
+        
+        
+
+    
+    
+
+
+	//$(".userdiv").remove();
 	notifyListLength=notifyList.length;
 	if(notifyListLength===1)
 	{
@@ -352,6 +403,14 @@ function saveRoles()
 	}
 		userGroupObject={}
 		userGroupObject["groupKey"]=selectedUserGroupKey;
+		groupKeyMetaLength=userGroupKeyMeta.length
+		for(index=0;index<groupKeyMetaLength;index++)
+		{
+			key=userGroupKeyMeta[index]["label"]
+			value=userGroupKeyMeta[index]["value"]
+			userGroupObject[key]=value
+		}
+		userGroupObject["keyList"]=userGroupKeyMeta
 		userGroupObject["groupList"]=stepGroupList;
 		userGroupDocumentID=updateUserGroup(userGroupDocumentID,userGroupObject)
 		

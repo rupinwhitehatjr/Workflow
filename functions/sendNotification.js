@@ -121,8 +121,8 @@ function sendEmail(notificationData)
   flowID=notificationData.flowID 
   commentText=notificationData.comment 
   msgObject.to=notificationData.notify
-  console.log(msgObject)
-  return 0
+  //console.log(msgObject)
+  //return 0
 
   htmlBody=getHTMLBody(notificationData)
  
@@ -132,22 +132,22 @@ function sendEmail(notificationData)
     htmltemplate=htmltemplate.replace("@flowid", flowID)
     if(commentText.length>0)
     {
-      htmltemplate=htmltemplate.replace("/@commentdisplayflag/g", "block")
+      htmltemplate=htmltemplate.replace(/@commentdisplayflag/g, "block")
       htmltemplate=htmltemplate.replace("@comment", commentText)
     }
     else
     {
-      htmltemplate=htmltemplate.replace("/@commentdisplayflag/g", "none")
+      htmltemplate=htmltemplate.replace(/@commentdisplayflag/g, "none")
     }
     msgObject.html=htmltemplate
-
+    //console.log(htmltemplate)
     //console.log(msgObject)
-    /*sgMail.send(msgObject).then(() => {
+    sgMail.send(msgObject).then(() => {
       console.log('Email sent')
       return 0
   }).catch((error) => {
     console.error(error)
-  })*/
+  })
 
   return 0
 
@@ -178,6 +178,7 @@ async function getHTMLBody(notificationData)
     } 
     catch(e) 
     {
+        //console.log("Error")
         console.error('Error:', e.stack);
     }
 

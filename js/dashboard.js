@@ -149,15 +149,46 @@ function addRow(doc)
     version=doc_data["Version"]
     classnumber=doc_data["Class"]
     asset=doc_data["Asset Type"]
-    currentstep=doc_data["active_step_name"]
-
+    currentstep=doc_data.active_step_name
+    actioners=doc_data.step_owners
+    closed_status=doc_data.closed
+    //console.log(closed_status)
+    
+    if(closed_status)
+    {
+        //console.log("adding Class")
+        $(row).addClass("closed")
+        currentstep="Closed"
+    }
+    viewFlowButton=$("<a/>").attr("class", "button")
+                            .attr("onclick", "javascript:openFlow('"+doc.id+"')")
+                            .text("Open")
     dataKey=curriculum+"-"+version+"-"+classnumber
     $(row).append($("<td/>").text(dataKey))
     $(row).append($("<td/>").text(asset))
     $(row).append($("<td/>").text(currentstep))
+    actioncell=$("<td/>").attr("class","actioner")
+                        
+    for(index=0;index<actioners.length;index++)
+    {
+        actioner=$("<span/>").text(actioners[index])
+                             .attr("class", "userdiv")
+        $(actioncell).append($(actioner))
+        $(actioncell).append($("<br/>"))
+    }
+    //actioners=actioners.join("</br>")
+    
+    $(row).append($(actioncell))
+    $(row).append($(viewFlowButton))
 
-    console.log(dataKey)
+   // console.log(dataKey)
     $("#resultstable").append($(row))
+}
+
+function openFlow(flowId)
+{
+    URL="viewFlow.html?id="+flowId
+    window.open(URL)
 }
 
 

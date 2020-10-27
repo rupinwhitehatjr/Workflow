@@ -22,6 +22,7 @@ exports.onApprove = functions
     flowID=userData["flowID"]
     stepID=userData["stepID"]
     user_name=userData["by"]["name"]
+    fieldValues=userData["fieldValues"]
 
   	stepInfoPromise=getStepInfo(flowID,stepID)
     stepStructure=null
@@ -29,6 +30,7 @@ exports.onApprove = functions
 
       //console.log(snapshot.data())
       stepStructure=snapshot.data()
+      return 0
 
     }).catch((error)=>{console.error(error.message)})
 
@@ -56,7 +58,7 @@ exports.onApprove = functions
 
       }
 
-    })
+    }).catch((error)=>{console.error(error.message)})
 
 
 
@@ -149,8 +151,18 @@ exports.onApprove = functions
                 
               // Once the Active Step has been set, we can update the flow Facade 
               flowMeta={}
-              flowMeta["active_step_name"]=doc.data().name
+              activeStepData=doc.data()
+              flowMeta["active_step_name"]=activeStepData.name
               flowMeta["active_step_id"]=doc.id
+                if("users" in activeStepData)
+                {
+                  flowMeta["step_owners"]=activeStepData.users
+                }
+                else
+                {
+                  flowMeta["step_owners"]=[]
+                }  
+              
               db.collection("Workflows").doc(flowID).update(flowMeta)
 
                 
@@ -169,6 +181,11 @@ exports.onApprove = functions
       updatedData={}
       updatedData["activestep"]=false
       updatedData["action"]=null
+      if("fieldValues" in newValue)
+      {
+        updatedData["fieldValues"]=newValue.fieldValues
+      }
+      
       actionerEmail=newValue.by.email
       updatedData["users"]=admin.firestore
                                 .FieldValue

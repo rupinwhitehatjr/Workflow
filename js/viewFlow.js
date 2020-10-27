@@ -1,7 +1,7 @@
 $(document).ready(function(){
 
 
-openWaitingModal();
+
 params=getParams(window.location.href)
 flow_id=params.id
 //window.setInterval(checkResultReady, 3000);
@@ -27,6 +27,13 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
 
     
 
+});
+
+$(document).on("authready", function(event){
+
+    openWaitingModal();
+    
+    
 });
 
 $(document).on("dataready", function(event, doc){
@@ -474,7 +481,7 @@ function createField(stepid, fieldMeta, index, fieldData)
         for(index=0;index<options.length;index++)
         {
             option=$("<option/>").val(options[index]).text(options[index])
-            if(options[index]===fieldData)
+            if(options[index]==fieldData)
             {
                 $(option).prop("selected", true);
             }
@@ -507,14 +514,14 @@ function createField(stepid, fieldMeta, index, fieldData)
         $(dd).append($("<option/>"))
         min=fieldMeta["min"];
         max=fieldMeta["max"];
-        console.log(min)
-        console.log(max)
+        //console.log(min)
+        //console.log(max)
         for(index=min;index<max+1;index++)
         {
             
-            console.log(index)
+           // console.log(index)
             option=$("<option/>").val(index).text(index)
-            if(index===fieldData)
+            if(index===parseInt(fieldData))
             {
                 $(option).prop("selected", true);
             }

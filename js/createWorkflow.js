@@ -40,6 +40,8 @@ function createNewWorkFlow(flow_type)
         creationData["email"]=user.email
         creationData["name"]=user.displayName
         creationData["ready"]=false
+        creationData["created_on"]=Date.now()
+        creationData["updated_on"]=Date.now()
         
         newFlowID=db.collection("Workflows").doc(doc_ref.id).set(creationData)
         newFlowID.then(snapshot=>{           
