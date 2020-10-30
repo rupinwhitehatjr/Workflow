@@ -18,28 +18,43 @@ apikey=functions.config().sendgrid.apikey
 
 sgMail.setApiKey(apikey)
 
+class NoRecipientsError extends Error {
+  constructor(message) {
+    super(message); 
+    this.name = 'NoRecipientsError';
+  }
+}
+
 
 exports.sendNotification = functions
   .region('asia-east2')
   .firestore
   .document('NotificationQueue/{notificationid}')
-  .onCreate((snapshot, context) => 
+  .onWrite((change, context) =>
   { 
 
 
 
-  notificationData=snapshot.data()
+  notificationData=change.after.data();
   //htmlbody=getHTMLBody(notificationData)  
   
  
 
-
+  retries=notificationData["retries"]
+  flowID=notificationData.flowID 
+  if(retries===0)
+  {
+    console.log("Ok "+flowID+ ", I give up!!!")
+    return 0
+  }
+    
   //msgObject={}
+  notificationid=context.params.notificationid
   targetStepIndex=notificationData.targetStepIndex
   recipients=notificationData.notify
-  flowID=notificationData.flowID 
+  //flowID=notificationData.flowID 
 
-
+  var errorFlag=false;
   if(recipients.length===0)
   {
     /* fetch the recipients list from the step */
@@ -49,12 +64,28 @@ exports.sendNotification = functions
         //console.log(msgObject)
         if(querySnapshot!==0)
         {
-          notificationData.notify=querySnapshot.users
-          sendEmail(notificationData)
+          userList=querySnapshot.users
+          if(userList.length===0)
+          {
+            errorFlag=true;
+            updateRetries(retries, notificationid)
+            return 0
+            //throw new NoRecipientsError("There are no recipients")
+          }
+          else
+          {
+            notificationData.notify=userList
+            sendEmail(notificationData)
+          }
+          
         }
         return 0
 
-    }).catch((error)=>{console.error(error.message)})
+    }).catch((error)=>{
+      errorFlag=true;      
+      console.error(error.message)
+      //throw error
+    })
 
 
   }
@@ -64,11 +95,23 @@ exports.sendNotification = functions
     sendEmail(notificationData)
   }
   
-
   return 0
+  
   
   });
 
+function updateRetries(retries, id)
+{
+  meta={}
+  if(retries===0)
+  {
+    return 0
+  }
+
+  meta["retries"]=retries-1
+  db.collection("NotificationQueue").doc(id).update(meta)
+  return 0
+}
 
 async function getRecipientsList(flowID, stepIndex)
 {
@@ -135,12 +178,12 @@ function sendEmail(notificationData)
     
     if(commentText.length>0)
     {
-      htmltemplate=htmltemplate.replace(/@commentdisplayflag/g, "block")
+      htmltemplate=htmltemplate.replace(/@commentdisplayflag/g, "")
       htmltemplate=htmltemplate.replace("@comment", commentText)
     }
     else
     {
-      htmltemplate=htmltemplate.replace(/@commentdisplayflag/g, "none")
+      htmltemplate=htmltemplate.replace(/@commentdisplayflag/g, "display:none")
     }
     msgObject.html=htmltemplate
     //console.log(htmltemplate)
@@ -150,12 +193,16 @@ function sendEmail(notificationData)
       return 0
   }).catch((error) => {
     console.error(error)
+    //throw error
   })
 
   return 0
 
 
-  }).catch((error)=>(console.error(error.message)))
+  }).catch((error) => {
+    console.error(error)
+    //throw error
+  })
   
 
 

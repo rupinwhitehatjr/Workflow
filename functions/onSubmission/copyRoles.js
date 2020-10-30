@@ -40,8 +40,7 @@ let db = admin.firestore();
     flowMeta={}
     flowMeta["ready"]=true
     flowMeta["step_owners"]=users
-    db.collection("Workflows").doc(flowID).update(flowMeta)
-     
+    db.collection("Workflows").doc(flowID).update(flowMeta)     
     return 0
     
   });

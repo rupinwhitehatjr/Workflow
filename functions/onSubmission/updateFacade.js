@@ -143,7 +143,7 @@ exports.updateFacade = functions
           notificationObject["targetStepIndex"]=targetStepIndex
           notificationObject["stepName"]=currentStepName
           notificationObject["timestamp"]=Date.now();
-
+          notificationObject["retries"]=3
           notificationObject["searchTerms"]=uSearchTerms
           notificationObject["comment"]=commentText
           //console.log(notificationObject)

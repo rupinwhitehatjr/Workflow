@@ -55,13 +55,15 @@ async function fetchDataForProcess(processName)
 
 }
 
-
+stepNameArray=[]
 function collectSearchFields(processStep)
 {
     //filterFields=[]
     //console.log(processSteps)
    // stepCount=processSteps.length
     
+    stepName=processStep["name"]
+    stepNameArray.push(stepName)
     if(!("fields" in processStep))
     {
         return;
@@ -95,6 +97,7 @@ function createFilterUI(fieldList)
     {
         createField(fieldList[index], index)
     }
+    createStepField();
     $("#buttonsection").removeClass("invisible")
 }
 
@@ -120,6 +123,14 @@ async function searchWorkflows()
         }
         
     }
+    selectedStepName=$("#stepListDD").val()
+    if(selectedStepName!="")
+    {
+        query = query.where("active_step_name", '==', selectedStepName); 
+        executeQuery=true       
+    }
+
+    //query = query.where(fieldLabel, '==', fieldValue);
 
     if(executeQuery)
     {
@@ -270,6 +281,45 @@ function createField(fieldMeta, index)
         
 
     }
+    
+     $("#filterFields").append($('<div/>').attr("class", "clear"))
+}
+
+function createStepField()
+{
+    
+    
+    $("#filterFields").append(
+                $('<div/>')
+                .attr("class", "grid_4 fieldlabel")
+                .append("Step Name")
+            )
+
+    
+    
+        
+        div=$('<div/>').attr("class", "grid_6 field")
+
+        options=stepNameArray
+       
+        
+        dd=$("<select/>").attr("id", "stepListDD")
+                //.attr("id", index)
+                //.attr("name", index)
+              
+        $(dd).append($("<option/>")) //Add a blank option
+        for(index=0;index<options.length;index++)
+        {
+            option=$("<option/>").val(options[index]).text(options[index])
+            
+            $(dd).append($(option))
+        }
+        $("#filterFields").append($(div).append($(dd)))
+
+        //Create a div to go to next line.
+        
+
+    
     
      $("#filterFields").append($('<div/>').attr("class", "clear"))
 }

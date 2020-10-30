@@ -152,7 +152,9 @@ function userAction(action)
             unsubscribe()
             //console.log("we are ready");
             //console.log(doc_ref.id)
-            location.reload(); 	
+            //location.reload(); 
+            URL="dummyPage.html"
+    		window.location.replace(URL)	
                     
                 
         }
