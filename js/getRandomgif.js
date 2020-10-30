@@ -12,14 +12,14 @@ function getGIF() {
 
         xhr.done(function(response) { 
         var jiffs = response.data;
-            console.log(jiffs)
+            //console.log(jiffs)
             numberofGifs=jiffs.length
             if(numberofGifs===0)
             {
                 return 0
             }
             index=Math.floor(Math.random() * numberofGifs);
-            console.log(jiffs[index].images.original.url)  
+            //console.log(jiffs[index].images.original.url)  
             $('#gifholder').append("<img src='"+jiffs[index].images.original.url+"' class='gif'/>");
         });
        
