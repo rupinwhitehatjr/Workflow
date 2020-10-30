@@ -7,7 +7,7 @@ function getGIF() {
        keywordLength=keywordList.length
        randomKeywordIndex=Math.floor(Math.random() * keywordLength);  
        searchInput=keywordList[randomKeywordIndex]
-        var xhr = $.get("https://api.giphy.com/v1/gifs/search?q='" + searchInput + "'&api_key=lGCVXIjnlS5aLwupl2Sjv005dNle3svM&limit=50");
+        var xhr = $.get("https://api.giphy.com/v1/gifs/search?rating=g&q='" + searchInput + "'&api_key=lGCVXIjnlS5aLwupl2Sjv005dNle3svM&limit=50");
         // var xhr = $.get("http://api.giphy.com/v1/gifs/search?q=ironman&api_key=lGCVXIjnlS5aLwupl2Sjv005dNle3svM&limit=30");
 
         xhr.done(function(response) { 
