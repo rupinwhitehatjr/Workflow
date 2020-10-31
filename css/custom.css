@@ -497,7 +497,7 @@ a:visited {
 table.resultstable
 {
   width:100%;
-  table-layout: fixed ;
+  
   border-collapse: collapse ;
   border: 1px black solid ;
 }

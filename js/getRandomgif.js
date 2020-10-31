@@ -1,7 +1,7 @@
 $(document).ready(function(){
     getGIF()
 });
-keywordList=["success", "FTW", "elation"]
+keywordList=["success", "FTW", "Good Job"]
 
 function getGIF() {
        keywordLength=keywordList.length
