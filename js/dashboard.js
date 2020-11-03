@@ -98,6 +98,7 @@ function createFilterUI(fieldList)
         createField(fieldList[index], index)
     }
     createStepField();
+    $(".showExtraFilters").removeClass("showExtraFilters")
     $("#buttonsection").removeClass("invisible")
 }
 
@@ -130,8 +131,20 @@ async function searchWorkflows()
         executeQuery=true       
     }
 
+    myactioncheckbox=$("#myactioncheckbox").is(":checked")
+    console.log(myactioncheckbox)
+    if(myactioncheckbox)
+    {
+        user=firebase.auth().currentUser 
+        
+        query = query.where("step_owners", "array-contains", user.email)
+        executeQuery=true
+    }
+    
+    
     //query = query.where(fieldLabel, '==', fieldValue);
 
+    console.log(query)
     if(executeQuery)
     {
         console.log("executing")
@@ -217,11 +230,10 @@ function createField(fieldMeta, index)
     type=fieldMeta["type"]
     label=fieldMeta["label"]
     
-    $("#filterFields").append(
-                $('<div/>')
+    fieldLabel=$('<div/>')
                 .attr("class", "grid_4 fieldlabel")
                 .append(label)
-            )
+    $(fieldLabel).insertBefore("#myaction")
 
     
     if(type=="dropdown")
@@ -244,7 +256,8 @@ function createField(fieldMeta, index)
             
             $(dd).append($(option))
         }
-        $("#filterFields").append($(div).append($(dd)))
+        $(div).append($(dd))
+        $(div).insertBefore("#myaction")
 
         //Create a div to go to next line.
         
@@ -275,27 +288,27 @@ function createField(fieldMeta, index)
            
             $(dd).append($(option))
         }
-        $("#filterFields").append($(div).append($(dd)))
+        $(div).append($(dd))
+        $(div).insertBefore("#myaction")
 
         //Create a div to go to next line.
         
 
     }
-    
-     $("#filterFields").append($('<div/>').attr("class", "clear"))
+    emptyDiv=$('<div/>').attr("class", "clear")
+    $(emptyDiv).insertBefore("#myaction")
+     //$("#filterFields").append()
 }
 
 function createStepField()
 {
     
     
-    $("#filterFields").append(
-                $('<div/>')
+
+    fieldLabel=$('<div/>')
                 .attr("class", "grid_4 fieldlabel")
                 .append("Step Name")
-            )
-
-    
+    $(fieldLabel).insertBefore("#myaction")
     
         
         div=$('<div/>').attr("class", "grid_6 field")
@@ -314,13 +327,13 @@ function createStepField()
             
             $(dd).append($(option))
         }
-        $("#filterFields").append($(div).append($(dd)))
-
-        //Create a div to go to next line.
+        $(div).append($(dd))
+        $(div).insertBefore("#myaction")
         
 
     
     
-     $("#filterFields").append($('<div/>').attr("class", "clear"))
+    emptyDiv=$('<div/>').attr("class", "clear")
+    $(emptyDiv).insertBefore("#myaction")
 }
 

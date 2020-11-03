@@ -525,6 +525,11 @@ table.resultstable >tbody> tr >td
   border: 1px black solid ;
 }
 
+.showExtraFilters
+{
+  display:none;
+}
+
 
 
 
