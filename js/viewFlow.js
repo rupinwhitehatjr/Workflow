@@ -193,7 +193,10 @@ stepsDocument.then(function(querySnapshot) {
         usersWhoHaveAccess=step["users"]
         if(usersWhoHaveAccess)
            {
-                if(usersWhoHaveAccess.indexOf(userEmail)!==-1)
+                /* Only the first user in the list should have access
+                to edit the workflow in any way
+                */
+                if(usersWhoHaveAccess.indexOf(userEmail)===0)
                 {
                   doesUserHaveEditAccess=true  
                 }

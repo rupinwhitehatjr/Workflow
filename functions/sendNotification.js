@@ -164,7 +164,18 @@ function sendEmail(notificationData)
   msgObject.subject=subject
   flowID=notificationData.flowID 
   commentText=notificationData.comment 
-  msgObject.to=notificationData.notify
+  /*The first user in the list will be in the
+  to list of the email
+  */
+  msgObject.to=notificationData.notify.shift()
+  /* After shifting, are there any more users?
+
+  They all will be in the CC list */
+  if(notificationData.notify.length>0)
+  {
+    msgObject.cc=notificationData.notify
+  }
+
   //console.log(msgObject)
   //return 0
 

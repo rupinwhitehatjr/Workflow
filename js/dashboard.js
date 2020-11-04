@@ -102,7 +102,7 @@ function createFilterUI(fieldList)
     $("#buttonsection").removeClass("invisible")
 }
 
-
+resultsList=[]
 async function searchWorkflows()
 {
     fieldList=filterFields;
@@ -132,7 +132,7 @@ async function searchWorkflows()
     }
 
     myactioncheckbox=$("#myactioncheckbox").is(":checked")
-    console.log(myactioncheckbox)
+   // console.log(myactioncheckbox)
     if(myactioncheckbox)
     {
         user=firebase.auth().currentUser 
@@ -144,10 +144,11 @@ async function searchWorkflows()
     
     //query = query.where(fieldLabel, '==', fieldValue);
 
-    console.log(query)
+    //console.log(query)
     if(executeQuery)
     {
-        console.log("executing")
+        //console.log("executing")
+       // query=query.orderBy("updated_on", "asc")
         results=await query.get()
         searchResultsCount=results.size
         //console.log(results[0])
@@ -156,18 +157,41 @@ async function searchWorkflows()
         {
             
         }
+        resultsList=[]
         results.forEach((doc)=>{
-            addRow(doc)
+            //addRow(doc)
+            resultsList.push(doc)
 
         })
+        //sortResultsList(resultsList)
+        resultsList.sort( compare );
+
+        for(resultIndex=0;resultIndex<searchResultsCount;resultIndex++)
+        {
+            addRow(resultsList[resultIndex])
+        }
         
     }
 }
 
+function compare( a, b ) {
+  AdocData=a.data()
+  BdocData=b.data()  
+  if ( AdocData.updated_on < BdocData.updated_on ){
+    return -1;
+  }
+  if ( AdocData.updated_on > BdocData.updated_on ){
+    return 1;
+  }
+  return 0;
+}
+
+
+
 function addRow(doc)
 {
     doc_data=doc.data()
-    console.log(doc_data)
+    //console.log(doc_data)
     row=$("<tr/>").attr("class", "row-data");
     curriculum=doc_data["Curriculum"]
     version=doc_data["Version"]
@@ -176,21 +200,41 @@ function addRow(doc)
     currentstep=doc_data.active_step_name
     actioners=doc_data.step_owners
     closed_status=doc_data.closed
-    //console.log(closed_status)
-    
+    lastUpdatedDate=doc_data["updated_on"]
+    //time_since_last_update=Date.now()-lastUpdatedDate
+    time_since_last_update=humanized_time_span(lastUpdatedDate)
+    //console.log(time_since_last_update)
     if(closed_status)
     {
         //console.log("adding Class")
         $(row).addClass("closed")
         currentstep="Closed"
     }
-    viewFlowButton=$("<a/>").attr("class", "button")
-                            .attr("onclick", "javascript:openFlow('"+doc.id+"')")
-                            .text("Open")
+    
+    /*goButton=$("<img/>").attr("class", "imgButton")
+                        .attr("src", "img/go.png")*/
+
+    /*$(viewFlowLink).append($(goButton)) */                   
+
+
+    logLink= $("<a/>").attr("onclick", "javascript:viewLog('"+doc.id+"')")                      
+
+    
+    logButton=$("<img/>").attr("class", "imgButton")
+                        .attr("src", "img/log.png")                    
+    $(logLink).append($(logButton))  
+
+
     dataKey=curriculum+"-"+version+"-"+classnumber
-    $(row).append($("<td/>").text(dataKey))
+
+    viewFlowLink=$("<a/>").attr("onclick", "javascript:openFlow('"+doc.id+"')")
+                          .attr("class", "buttonsm")
+                          .text(dataKey)
+    $(row).append($("<td/>").append($(viewFlowLink)))
+
     $(row).append($("<td/>").text(asset))
     $(row).append($("<td/>").text(currentstep))
+    $(row).append($("<td/>").text(time_since_last_update))
     actioncell=$("<td/>").attr("class","actioner")
                         
     for(index=0;index<actioners.length;index++)
@@ -203,7 +247,12 @@ function addRow(doc)
     //actioners=actioners.join("</br>")
     
     $(row).append($(actioncell))
-    $(row).append($(viewFlowButton))
+
+    actionButtonCell=$("<td/>")
+    //$(actionButtonCell).append($(viewFlowLink))
+    $(actionButtonCell).append($(logLink))
+    $(row).append($(actionButtonCell))
+    
 
    // console.log(dataKey)
     $("#resultstable").append($(row))

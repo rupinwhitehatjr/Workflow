@@ -312,14 +312,19 @@ async function displayNotifyList(userGroupKeyMeta)
 			userCount=users.length
 			divID="users_"+stepID
 			$("#"+divID).find("span.userdiv").remove()
+			$("#"+divID).find("input").remove()
+			//$()
 			for(userIndex=0;userIndex<userCount;userIndex++)
 			{
 
 				userdiv=createUserDiv(users[userIndex])			
-				$("#"+divID).prepend($(userdiv))
+				$("#"+divID).append($(userdiv))
 				
 							
 			}
+			newInput=addNewUserInput();
+
+			$("#"+divID).append($(newInput))
 			
 			
 		}
