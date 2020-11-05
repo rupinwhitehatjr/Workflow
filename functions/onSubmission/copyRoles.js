@@ -31,6 +31,8 @@ let db = admin.firestore();
      users=[]
      if("users" in updatedValue)
      {
+      /* we should not only keep the first user here, because search will break
+      */
         users=updatedValue["users"]
      }
 

@@ -221,8 +221,7 @@ select
 }
 .logtext
 {
-  font-size: 20px;
-  
+  font-size: 15px;  
   margin-bottom:10px;
   padding-left:10px;
   color: #222831
@@ -369,8 +368,22 @@ select:focus {
 }
 .commenttext
 {
-  font-size:20px;
-  padding-bottom: 20px;
+  font-size:15px;
+  /*padding-bottom: 20px;*/
+}
+
+.commentmeta
+{
+  font-size:15px; 
+  font-weight: bold; 
+}
+.dateItalic
+{
+  font-size:12px; 
+  margin-left: 0px;
+  text-decoration: underline;
+  cursor:pointer;
+  
 }
 
 a:link {
@@ -524,7 +537,7 @@ table.resultstable >tbody> tr > th
   background-color: #00adb5;
   padding:10px;
   border: 1px black solid ;
-
+  vertical-align: middle;
 
 }
 
@@ -533,6 +546,7 @@ table.resultstable >tbody> tr >td
   font-size: 15px;
   padding:10px;
   border: 1px black solid ;
+  vertical-align: middle;
 }
 
 .showExtraFilters
@@ -540,10 +554,21 @@ table.resultstable >tbody> tr >td
   display:none;
 }
 
-.imgButton
+.profilephoto
 {
-  width:32px;
-  cursor: pointer;
+  width:48px;
+  border:1px solid #cccccc;
+  
+}
+.profilephotocontainer
+{
+  text-align: center;
+}
+
+.seperator
+{
+  
+  margin-bottom: 20px;
 }
 
 

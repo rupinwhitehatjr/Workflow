@@ -19,6 +19,7 @@ function getLoggedInUserObject()
         userData["uid"]=user.uid
         userData["email"]=user.email
         userData["name"]=user.displayName
+        userData["photo"]=user.photoURL;
         return userData;
 }
 

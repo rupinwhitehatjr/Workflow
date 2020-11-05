@@ -314,21 +314,71 @@ function appendComments(flow_id)
                 .collection("comments")
                 .orderBy("timestamp")
                 .get()
-
+    
     commentDocument.then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
             // doc.data() is never undefined for query doc snapshots
             comment=doc.data();
             comment_text=comment["comment"]
-            creatorName=comment["name"]
+            creator=comment["by"]
+            creatorName=creator["name"]
+            if("photo" in creator)
+            {
+                creatorImagePath=creator["photo"]
+            }
+            else
+            {
+                creatorImagePath="img/profileicons/"+creatorName.charAt(0).toUpperCase()+".png"
+            }
+            
+            creatorPhoto=creator["photo"]
+            //console.log(creatorPhoto)
             timestamp=comment["timestamp"]
 
-            hrts=new Date(parseInt(timestamp));
+            hrts=humanized_time_span(timestamp);
+            humanTime=new Date(parseInt(timestamp));
+            commentIcon=$("<img/>").attr("src", creatorImagePath)
+                                    .attr("class", 'profilephoto')
 
-            commentdiv=$("<div/>").attr("class", "grid_12 commenttext").text(comment_text)
-            blankdiv=$("<div/>").attr("class", "clear")
-            $(commentdiv).insertBefore("#commentsep")
+            creatorNameText=creatorName//+ " commented"
+            nameDiv=$("<div/>").attr("class", "commentmeta")
+                                  .text(creatorNameText)
+            timeDiv=$("<div/>").attr("class", "grid_2 dateItalic")
+                                  .text(hrts)
+                                  .attr("title", humanTime)
+            
+
+            commentImageDiv=$("<div/>").attr("class", "grid_1 commenttext")                                  
+            commenttextdiv=$("<div/>").attr("class", "commenttext")
+                                  .text(comment_text)
+            blankdiv=$("<div/>").attr("class", "clear seperator")
+
+
+            profileImageDiv=$("<div/>").attr("class", "grid_1 profilephotocontainer")
+            commentContentDiv=$("<div/>").attr("class", "grid_10")                 
+            //$(nameDiv).insertBefore("#commentsep")
+            //$(timeDiv).insertBefore("#commentsep")
+            //$(blankdiv).insertBefore("#commentsep")
+
+            
+            //$(commentImageDiv).append($(commentIcon))
+            //$(commentImageDiv).insertBefore("#commentsep")
+            //$(commenttextdiv).insertBefore("#commentsep")
+
+            $(profileImageDiv).append($(commentIcon))    
+            $(profileImageDiv).insertBefore("#commentsep")
+
+
+            
+            $(commentContentDiv).append($(nameDiv)) 
+            $(commentContentDiv).append($(commenttextdiv)) 
+            $(commentContentDiv).append($(timeDiv)) 
+
+              
+
+            $(commentContentDiv).insertBefore("#commentsep")
             $(blankdiv).insertBefore("#commentsep")
+            //$(blankdiv).insertBefore("#commentsep")
         
 
        

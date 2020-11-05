@@ -386,3 +386,8 @@ function createStepField()
     $(emptyDiv).insertBefore("#myaction")
 }
 
+
+function viewLog(flowID)
+{
+    
+}
