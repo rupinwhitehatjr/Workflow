@@ -123,7 +123,8 @@ function displayBreadCrumbs(doc_data)
     if(closedState)
     {
        // console.log("removing section")
-        $("#buttonsection").remove()
+        $(document).trigger("removealleditfeatures")
+       // $("#buttonsection").remove()
     }
     else
     {

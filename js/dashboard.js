@@ -197,9 +197,9 @@ function addRow(doc)
     version=doc_data["Version"]
     classnumber=doc_data["Class"]
     asset=doc_data["Asset Type"]
-    currentstep=doc_data.active_step_name
-    actioners=doc_data.step_owners
-    closed_status=doc_data.closed
+    currentstep=doc_data["active_step_name"]
+    actioners=doc_data["step_owners"]
+    closed_status=doc_data["closed"]
     lastUpdatedDate=doc_data["updated_on"]
     //time_since_last_update=Date.now()-lastUpdatedDate
     time_since_last_update=humanized_time_span(lastUpdatedDate)

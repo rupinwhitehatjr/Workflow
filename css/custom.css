@@ -571,6 +571,12 @@ table.resultstable >tbody> tr >td
   margin-bottom: 20px;
 }
 
+.notready
+{
+  border:1px solid #F00 !important;
+  background-color: #FFCCCB
+}
+
 
 
 

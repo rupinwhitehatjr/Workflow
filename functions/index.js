@@ -12,6 +12,7 @@ const onReject = require('./onSubmission/onReject');
 
 const updateFacade = require('./onSubmission/updateFacade');
 const copyRole = require('./onSubmission/copyRoles');
+const escalation = require('./scheduled/escalation');
 
 
 
@@ -26,4 +27,6 @@ exports.updateFacade = updateFacade.updateFacade;
 
 exports.sendNotification = notification.sendNotification;
 exports.copyRoleForActiveStep=copyRole.copyRoleForActiveStep
+
+//exports.escalation=escalation.escalate
 
