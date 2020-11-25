@@ -10,9 +10,10 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
         //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
         //console.log(source, " data: ", doc.data());
         //console.log(doc.metadata.hasPendingWrites)
-        if(!doc.metadata.hasPendingWrites)
+        if(!doc.metadata.hasPendingWrites && doc.data())
         {
-            if(doc.data().ready)
+                
+                if(doc.data().ready)
 
                 {
                     //console.log("we are ready");

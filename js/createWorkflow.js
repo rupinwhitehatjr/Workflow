@@ -45,6 +45,7 @@ function createNewWorkFlow(flow_type)
         creationData["updated_on"]=Date.now()
         
         newFlowID=db.collection("Workflows").doc(doc_ref.id).set(creationData)
+        console.log(doc_ref.id)
         newFlowID.then(snapshot=>{           
            
 
@@ -59,8 +60,8 @@ function createNewWorkFlow(flow_type)
         
         unsubscribe=db.collection("Workflows").doc(doc_ref.id)
     .onSnapshot(function(doc) {
-        //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-        //console.log(source, " data: ", doc.data());
+        var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+        console.log(source, " data: ", doc.data());
         console.log(doc.metadata.hasPendingWrites)
         if(!doc.metadata.hasPendingWrites)
         {
