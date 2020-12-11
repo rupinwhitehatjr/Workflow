@@ -30,12 +30,6 @@ exports.onApprove = functions
 
       //console.log(snapshot.data())
       stepStructure=snapshot.data()
-      return 0
-
-    }).catch((error)=>{console.error(error.message)})
-
-    
-    stepInfoPromise.finally(()=>{
 
       stepName=stepStructure["name"]
       nextStepIndex=stepStructure["nextStep"]
@@ -57,6 +51,17 @@ exports.onApprove = functions
        let activeStepPromise=setStepAsActive(flowID,nextStepIndex)
 
       }
+
+
+
+      return 0
+
+    }).catch((error)=>{console.error(error.message)})
+
+    
+    stepInfoPromise.finally(()=>{
+
+      return 0
 
     }).catch((error)=>{console.error(error.message)})
 

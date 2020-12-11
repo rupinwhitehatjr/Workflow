@@ -29,12 +29,6 @@ exports.onReject = functions
 
       //console.log(snapshot.data())
       stepStructure=snapshot.data()
-      return 0 
-
-    }).catch((error)=>{console.error(error.message)})
-
-    
-    stepInfoPromise.finally(()=>{
       stepName=stepStructure["name"]
       previousStepIndex=stepStructure["previousStep"]      
       //console.log(previousStepIndex)
@@ -44,7 +38,15 @@ exports.onReject = functions
         setStepAsActive(flowID,previousStepIndex)
         updateCurrentstep(flowID,stepID,userData)
       }
+
+      return 0 
+
+    }).catch((error)=>{console.error(error.message)})
+
+    
+    stepInfoPromise.finally(()=>{
       
+      return 0
 
     }).catch((error)=>{console.error(error.message)})
 

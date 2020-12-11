@@ -12,6 +12,14 @@ exports.updateFacade = functions
   .onCreate((snapshot, context) => 
 
   { 
+      //dont do anything on the facade of the workflow has been reopened
+
+      if(action==="reopen")
+      {
+        return 0
+      }
+
+
     userData=snapshot.data()
     action=userData["action"]    
 

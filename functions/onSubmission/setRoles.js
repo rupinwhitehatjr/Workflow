@@ -12,6 +12,17 @@ exports.setRoles = functions
   .onCreate((snapshot, context) => 
 
   { 
+
+    userData=snapshot.data()
+    action=userData["action"]
+    //dont do anything on the roles if the workflow has been reopened
+
+    if(action==="reopen")
+    {
+      return 0
+    }
+
+
     userData=snapshot.data()
     flowID=userData["flowID"]
     stepID=userData["stepID"]
@@ -21,12 +32,7 @@ exports.setRoles = functions
 
       //console.log(snapshot.data())
       stepStructure=snapshot.data()
-      return 0
 
-    }).catch((error)=>{console.error(error.message)})
-
-    
-    stepInfoPromise.finally(()=>{
       creatorMeta={}
       isStepTheFirstOne=false;
 
@@ -64,9 +70,16 @@ exports.setRoles = functions
       stepData["fieldValues"]=fieldValues
       
       //console.log(creatorMeta)
-      return setRoles(flowID, stepData, creatorMeta)
+      setRoles(flowID, stepData, creatorMeta)
+
+      return 0
+
+      
 
     }).catch((error)=>{console.error(error.message)})
+
+    
+    
 
 
 
