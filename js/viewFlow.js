@@ -193,6 +193,8 @@ stepsDocument.then(function(querySnapshot) {
         doesUserHaveEditAccess=false
         userEmail=firebase.auth().currentUser.email
         usersWhoHaveAccess=step["users"]
+        var usersWhoHaveAccess = usersWhoHaveAccess.map(x =>x.trim());
+
         if(usersWhoHaveAccess)
            {
                 /* Only the first user in the list should have access
