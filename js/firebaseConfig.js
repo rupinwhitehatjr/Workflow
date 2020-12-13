@@ -16,5 +16,5 @@ var firebaseConfig = {
   //console.log(isPresentInLH)
   if (isPresentInLH!=-1) {
     console.log("localhost")
-    db.useEmulator(location.hostname, 8081);
+    //db.useEmulator(location.hostname, 8081);
   }

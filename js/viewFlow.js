@@ -192,7 +192,12 @@ stepsDocument.then(function(querySnapshot) {
         //console.log("isReviewOnly: "+isReviewOnly)
         doesUserHaveEditAccess=false
         userEmail=firebase.auth().currentUser.email
-        usersWhoHaveAccess=step["users"]
+        usersWhoHaveAccess=[]
+        if("users" in step)
+        {
+           usersWhoHaveAccess=step["users"] 
+        }
+        
         var usersWhoHaveAccess = usersWhoHaveAccess.map(x =>x.trim());
 
         if(usersWhoHaveAccess)

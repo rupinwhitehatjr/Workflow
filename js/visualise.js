@@ -15,7 +15,7 @@ $(document).on("authready", function(event){
 
     //openWaitingModal()
 
-    displayWorkflow("CurriculumWorkflow");
+    displayWorkflow("CurriculumWorkFlow1to2");
    
     
 });
@@ -60,7 +60,7 @@ async function displayWorkflow(workflowType)
             nodeObject["id"]=stepData.index
             nodeObject["label"]=stepData.name
             nodeObject["x"]=startx
-            nodeObject["y"]=500
+            nodeObject["y"]=500 + Math.floor(Math.random() * 50);
             nodeObject["fixed"]=true
             nodes.push(nodeObject)            
             

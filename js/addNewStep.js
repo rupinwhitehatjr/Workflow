@@ -44,7 +44,7 @@ fields.push(
 $(document).on("authready", function(event){
 
    
-    status=fetchStepDetail("CurriculumWorkflow")
+    status=fetchStepDetail("CurriculumWorkFlow1to2")
    // console.log(status)
     
       
@@ -178,7 +178,7 @@ function addStep()
 
    }
    console.log(dbObject)
-   db.collection("CurriculumWorkflow").doc().set(dbObject)
+   db.collection("CurriculumWorkFlow1to2").doc().set(dbObject)
                     
 
 }
