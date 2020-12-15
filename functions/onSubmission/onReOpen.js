@@ -28,28 +28,26 @@ exports.onReOpen = functions
   	addLogOnReOpen(flowID,user_name)
 
     flowMetaPromise=getFlowMeta(flowID)
-      flowMeta=null
-      flowMetaPromise.then((doc)=>{
-        flowMeta=doc.data()
-        return 0
-      }).catch((error)=>{console.error(error.message)})
+    flowMeta=null
+    flowMetaPromise.then((doc)=>{
+      flowMeta=doc.data()
+      console.log(flowMeta)
+      let activeStepPromise=setFirstStepAsActive(flowID)
 
-    flowMetaPromise.finally(()=>{  
+      activeStepPromise.then((snapshot)=>{
 
-        let activeStepPromise=setFirstStepAsActive(flowID)
-
-         activeStepPromise.then((snapshot)=>{
-
-          //console.log(snapshot.data())
+    //console.log(snapshot.data())
           stepData=snapshot.data()
-          addReOpenNotification(flowID,flowIDuserData,stepData,flowMeta)
+          addReOpenNotification(flowID,userData,stepData,flowMeta)
           return 0
 
-        }).catch((error)=>{console.error(error.message)})
+      }).catch((error)=>{console.error(error.message)})
 
     }).catch((error)=>{console.error(error.message)})
-    
 
+   
+    
+  return 0
 
   	
   });
@@ -77,8 +75,7 @@ exports.onReOpen = functions
     
     
     flowDocument=await db.collection("Workflows").doc(flowID).get()
-
-
+    return flowDocument
  
     
   }
@@ -96,7 +93,7 @@ exports.onReOpen = functions
     step=await db.collection("Workflows")
                 .doc(flowID)
                 .collection("steps")
-                .where("reOpenHere", "==", true)
+                .where("reopenhere", "==", true)
                 .limit(1)
                 .get()
     let activestep= null
@@ -112,22 +109,15 @@ exports.onReOpen = functions
                 .update(nextStepData)
                 
               // Once the Active Step has been set, we can update the flow Facade 
-              flowMeta={}
+              flowMetaData={}
               activeStepData=doc.data()
-              flowMeta["active_step_name"]=activeStepData.name
-              flowMeta["active_step_id"]=doc.id
-              flowMeta["closed"]=false
-              flowMeta["ready"]=true
-              if("users" in activeStepData)
-              {
-                flowMeta["step_owners"]=activeStepData.users
-              }
-              else
-              {
-                flowMeta["step_owners"]=[]
-              }  
+              flowMetaData["active_step_name"]=activeStepData.name
+              flowMetaData["active_step_id"]=doc.id
+              flowMetaData["closed"]=false
+              flowMetaData["ready"]=true
               
-              db.collection("Workflows").doc(flowID).update(flowMeta)               
+              
+              db.collection("Workflows").doc(flowID).update(flowMetaData)               
 
               activestep=doc
 
@@ -152,7 +142,7 @@ exports.onReOpen = functions
           notificationObject["stepName"]=""
           notificationObject["timestamp"]=Date.now();
           notificationObject["retries"]=3
-          notificationObject["searchTerms"]=flowMeta["searchTerms"]
+         // notificationObject["searchTerms"]=flowMeta["searchTerms"]
           notificationObject["comment"]=""
           //console.log(notificationObject)
           db.collection("NotificationQueue").doc().set(notificationObject);

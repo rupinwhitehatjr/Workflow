@@ -20,6 +20,7 @@ $(document).on('change', '#process_selector', function() {
     {
     	return 0
     }
+    //console.log(selectedProcess)
     fetchDataForProcess(selectedProcess)
 
 
@@ -137,7 +138,7 @@ function createGroupKeyChoices(selectedStep)
 			type=field["type"]
 
 			// Only Dropdown fields can be user group keys
-			if(type!="dropdown") 
+			if(type!="dropdown" ) 
 			{
 				continue
 			}

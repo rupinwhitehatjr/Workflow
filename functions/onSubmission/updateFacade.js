@@ -13,7 +13,8 @@ exports.updateFacade = functions
 
   { 
       //dont do anything on the facade of the workflow has been reopened
-
+      userData=snapshot.data()
+      action=userData["action"]
       if(action==="reopen")
       {
         return 0
@@ -21,7 +22,7 @@ exports.updateFacade = functions
 
 
     userData=snapshot.data()
-    action=userData["action"]    
+        
 
     flowID=userData["flowID"]
     stepID=userData["stepID"]

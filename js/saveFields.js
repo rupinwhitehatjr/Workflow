@@ -86,6 +86,11 @@ function userAction(action)
 		stepID=$("#activestepid").val()
 		//console.log(stepID)
 	}
+
+	if(stepID===undefined)
+	{
+		stepID=null
+	}
 	//console.log($("form").attr("data-stepid"))
 	//console.log($("form"))
 	//return
@@ -114,7 +119,7 @@ function userAction(action)
 	
 	
 	
-
+	console.log(approvedData)
 	cacheDocRef=db.collection("Cache").doc()	
 	cacheDocument=db.collection("Cache").doc(cacheDocRef.id)	
 	cacheDocument.set(approvedData)

@@ -36,7 +36,7 @@ $(document).on("authready", function(event){
     
     
 });
-
+var workFlowClosedState=false;
 $(document).on("dataready", function(event, doc){
 
     //console.log(doc.data())
@@ -45,6 +45,15 @@ $(document).on("dataready", function(event, doc){
     //$( document ).tooltip();
   //  addHiddenFieldForStepID(workflowMeta["active_step_id"])
     displayWorkflow();
+    workFlowClosedState=workflowMeta["closed"]
+    if(workFlowClosedState)
+    {
+        $("#reopenbuttonsection").removeClass("invisible")
+    }
+    else
+    {
+        $("#reopenbuttonsection").remove()
+    }
     
     
 });
@@ -160,12 +169,32 @@ function createBreadCrumb(stepName,id,isActive)
 
 $(document).on("removealleditfeatures", function(event){
 
-   $("#commentinputsec").remove()
-   $("#commentinputholder").remove()
+  
    $("#buttonsection").remove()
+  // $("#reopenbuttonsection").remove()
      
     
 });
+
+$(document).on("hidecomments", function(event){
+
+  
+   $("#commentinputsec").hide()
+   $("#commentinputholder").hide()
+     
+    
+});
+
+$(document).on("showcomments", function(event){
+
+  
+   $("#commentinputsec").show()
+   $("#commentinputholder").show()
+     
+    
+});
+
+
 
 function populateSteps(flow_id)
 {
@@ -200,7 +229,7 @@ stepsDocument.then(function(querySnapshot) {
         
         var usersWhoHaveAccess = usersWhoHaveAccess.map(x =>x.trim());
 
-        if(usersWhoHaveAccess)
+         if(usersWhoHaveAccess)
            {
                 /* Only the first user in the list should have access
                 to edit the workflow in any way
@@ -219,8 +248,17 @@ stepsDocument.then(function(querySnapshot) {
             //The step is active, but the user does not have access
             //to edit this step.
             $(document).trigger("removealleditfeatures")
+             $(document).trigger("hidecomments")
 
         }
+
+        if(workFlowClosedState)
+        {
+             $(document).trigger("showcomments")
+        }
+        
+
+
         if(!isReviewOnly)
         {
             if(stepState && doesUserHaveEditAccess)
@@ -304,6 +342,14 @@ function populateLogs(flow_id)
         }
 
         if(action==="Closed")
+        {
+           
+            logText=creatorName +" "+ action.toLowerCase() +" the  workflow at "+hrts
+            //console.log(logText)
+            appendLogHTML(logText)
+        }
+
+        if(action==="Re-Opened")
         {
            
             logText=creatorName +" "+ action.toLowerCase() +" the  workflow at "+hrts

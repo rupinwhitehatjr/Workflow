@@ -16,6 +16,7 @@ $(document).ready(function(){
 $(document).on("authready", function(event){
 
    $("#createWorkflowButtonsContainer").show()
+   $("#createWorkflowButtonsContainer").show()
     
     
 });
