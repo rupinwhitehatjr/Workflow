@@ -52,7 +52,7 @@ function getLinkFromBasePath(path)
 	pathName=window.location.pathname
 	pathNameList=pathName.split("/")
 	newPathRef=pathNameList[1]
-	console.log(newPathRef)
+	//console.log(newPathRef)
 	if(newPathRef)
 	{
 		newPath=originPath+"/"+newPathRef+path
@@ -62,6 +62,6 @@ function getLinkFromBasePath(path)
 		newPath=originPath+path
 	}
 	
-	console.log(newPath)
+	//console.log(newPath)
 	return newPath
 }
