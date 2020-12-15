@@ -102,8 +102,8 @@ async function searchWorkflows()
         if(fieldValue && fieldValue!=="")
         {
             executeQuery=true
-            console.log(fieldLabel)
-            console.log(fieldValue)
+           // console.log(fieldLabel)
+           // console.log(fieldValue)
           query = query.where(fieldLabel, '==', fieldValue);  
         }
         
@@ -188,14 +188,14 @@ function addRow(doc)
 
     dataKeyList=[]
 
-    console.log(doc_data)
+    //console.log(doc_data)
     for(dindex=0;dindex<displaykey.length;dindex++)
     {
         displayKeyItem=displaykey[dindex]
         //cons
         if(displayKeyItem in doc_data)
         {
-            console.log(displayKeyItem)
+            //console.log(displayKeyItem)
             dataKeyList.push(doc_data[displayKeyItem])
         }
     }
