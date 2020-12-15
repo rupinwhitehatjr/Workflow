@@ -45,3 +45,22 @@ function getFormattedLink(path)
 	return newPath
 }
 
+
+function getLinkFromBasePath(path)
+{
+	originPath=window.location.origin
+	pathName=window.location.pathname
+	pathNameList=pathName.split("/")
+	newPathRef=pathNameList[0]
+	console.log(newPathRef)
+	if(newPathRef)
+	{
+		newPath=originPath+newPathRef+"/"+path
+	}
+	else
+	{
+		newPath=originPath+path
+	}
+	
+	return newPath
+}
