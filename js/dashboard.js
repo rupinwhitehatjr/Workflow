@@ -5,25 +5,10 @@ $(document).ready(function(){
 });
 
 
-/*
-$(document).on('change', '#process_selector', function() {
-    selectedProcess=$(this).val()
-    if (selectedProcess==="-1")
-    {
-        return 0
-    }
-    
-    
-    
- 
 
 
-});*/
 
-$(document).on("authready", function(){
-
-    fetchDataForProcess("CurriculumWorkflow")
-})
+gprocessName=null;
 
 $(document).on("fieldsready", function(event){
 
@@ -34,6 +19,7 @@ $(document).on("fieldsready", function(event){
 filterFields=[]
 async function fetchDataForProcess(processName)
 {
+    gprocessName=processName
     filterFields=[]
     $("#stepList").removeClass("standout");
     $("#stepList").empty()
@@ -50,8 +36,6 @@ async function fetchDataForProcess(processName)
 
     $(document).trigger("fieldsready")
 
-   
-    
 
 }
 
@@ -107,7 +91,7 @@ async function searchWorkflows()
 {
     fieldList=filterFields;
     fieldCount=fieldList.length 
-    executeQuery=false
+    executeQuery=true
     let query = db.collection("Workflows");
    
     for(index=0;index<fieldCount;index++)
@@ -117,9 +101,9 @@ async function searchWorkflows()
         fieldValue=$("#"+index).val()
         if(fieldValue && fieldValue!=="")
         {
-          executeQuery=true
-         // console.log(fieldLabel)
-         // console.log(fieldValue)
+            executeQuery=true
+            console.log(fieldLabel)
+            console.log(fieldValue)
           query = query.where(fieldLabel, '==', fieldValue);  
         }
         
@@ -140,7 +124,11 @@ async function searchWorkflows()
         query = query.where("step_owners", "array-contains", user.email)
         executeQuery=true
     }
-    
+     
+
+    //processname=$("#process_selector").val()
+    console.log(gprocessName)
+    query = query.where("flowType", "==", gprocessName)
     
     //query = query.where(fieldLabel, '==', fieldValue);
 
@@ -202,6 +190,11 @@ function addRow(doc)
     closed_status=doc_data["closed"]
     lastUpdatedDate=doc_data["updated_on"]
     //time_since_last_update=Date.now()-lastUpdatedDate
+
+    if(!actioners)
+    {
+        actioners=[]
+    }
     time_since_last_update=humanized_time_span(lastUpdatedDate)
     //console.log(time_since_last_update)
     if(closed_status)
@@ -221,7 +214,7 @@ function addRow(doc)
 
     
     logButton=$("<img/>").attr("class", "imgButton")
-                        .attr("src", "img/log.png")                    
+                        .attr("src", "../img/log.png")                    
     $(logLink).append($(logButton))  
 
 
