@@ -262,8 +262,10 @@ function addRow(doc)
 
 function openFlow(flowId)
 {
-    URL="viewFlow.html?id="+flowId
-    window.open(URL)
+    URL="/viewFlow.html?id="+flowId
+    flowURL=getFormattedLink(URL)
+    
+    window.open(flowURL)
 }
 
 

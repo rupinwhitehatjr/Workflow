@@ -37,3 +37,11 @@ function gotoLink(path)
     window.location.replace(newPath);
   }
 
+function getFormattedLink(path)
+{
+oldPath=window.location.href
+oldPathArray=oldPath.split("/")
+newPath=oldPathArray.slice(0, oldPathArray.length-1).join("/")+path
+return newPath
+}
+
