@@ -126,17 +126,12 @@ async function searchWorkflows()
     }
      
 
-    //processname=$("#process_selector").val()
-    console.log(gprocessName)
-    query = query.where("flowType", "==", gprocessName)
     
-    //query = query.where(fieldLabel, '==', fieldValue);
-
-    //console.log(query)
     if(executeQuery)
     {
         //console.log("executing")
        // query=query.orderBy("updated_on", "asc")
+        query = query.where("flowType", "==", gprocessName)
         results=await query.get()
         searchResultsCount=results.size
         //console.log(results[0])
