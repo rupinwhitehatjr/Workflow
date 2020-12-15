@@ -55,7 +55,7 @@ function getLinkFromBasePath(path)
 	console.log(newPathRef)
 	if(newPathRef)
 	{
-		newPath=originPath+newPathRef+"/"+path
+		newPath=originPath+newPathRef+path
 	}
 	else
 	{
