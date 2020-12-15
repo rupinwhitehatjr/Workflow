@@ -29,3 +29,11 @@ function closeAllModals()
     $.modal.close();
 }
 
+function gotoLink(path)
+  {
+    oldPath=window.location.href
+    oldPathArray=oldPath.split("/")
+    newPath=oldPathArray.slice(0, oldPathArray.length-1).join("/")+"/"+path
+    window.location.replace(newPath);
+  }
+
