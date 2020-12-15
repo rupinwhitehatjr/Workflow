@@ -62,5 +62,6 @@ function getLinkFromBasePath(path)
 		newPath=originPath+path
 	}
 	
+	console.log(newPath)
 	return newPath
 }

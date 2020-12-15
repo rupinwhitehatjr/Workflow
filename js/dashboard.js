@@ -265,7 +265,7 @@ function openFlow(flowId)
     URL="/viewFlow.html?id="+flowId
     flowURL=getLinkFromBasePath(URL)
     
-    window.open(flowURL)
+   // window.open(flowURL)
 }
 
 
