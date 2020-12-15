@@ -181,15 +181,29 @@ function addRow(doc)
     doc_data=doc.data()
     //console.log(doc_data)
     row=$("<tr/>").attr("class", "row-data");
-    curriculum=doc_data["Curriculum"]
-    version=doc_data["Version"]
-    classnumber=doc_data["Class"]
+    //curriculum=doc_data["Curriculum"]
+    //version=doc_data["Version"]
+    //classnumber=doc_data["Class"]
     asset=doc_data["Asset Type"]
     currentstep=doc_data["active_step_name"]
     actioners=doc_data["step_owners"]
     closed_status=doc_data["closed"]
     lastUpdatedDate=doc_data["updated_on"]
     //time_since_last_update=Date.now()-lastUpdatedDate
+
+    dataKeyList=[]
+
+    console.log(doc_data)
+    for(dindex=0;dindex<displaykey.length;dindex++)
+    {
+        displayKeyItem=displaykey[dindex]
+        //cons
+        if(displayKeyItem in doc_data)
+        {
+            console.log(displayKeyItem)
+            dataKeyList.push(doc_data[displayKeyItem])
+        }
+    }
 
     if(!actioners)
     {
@@ -218,7 +232,7 @@ function addRow(doc)
     $(logLink).append($(logButton))  
 
 
-    dataKey=curriculum+"-"+version+"-"+classnumber
+    dataKey=dataKeyList.join("-")
 
     viewFlowLink=$("<a/>").attr("onclick", "javascript:openFlow('"+doc.id+"')")
                           .attr("class", "buttonsm")

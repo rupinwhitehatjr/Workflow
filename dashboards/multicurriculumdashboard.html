@@ -47,10 +47,19 @@
 <script type="text/javascript" src="../js/humanizedTime.js"></script>
 
 <script language="javascript">
+  displaykey=["Curriculum", "Class Number", "Product"]
+
   $(document).on("authready", function(){
 
    fetchDataForProcess("CurriculumWorkFlow1to2")
+
   })
+  $(document).ready(function(){
+
+    console.log(displaykey.join("-"))
+    $("#dataKeyHeader").text(displaykey.join("-"))
+  })
+
 </script>
 
     
@@ -150,8 +159,8 @@
   <div class="grid_12">
     <table style="width:100%" id="resultstable" class="resultstable">     
       <tr class="row-header">
-          <th>
-              Level-Version-Class
+          <th id="dataKeyHeader">
+              &nbsp;
            </th>
            
            <th>

@@ -48,11 +48,20 @@
 
 <script language="javascript">
 
+displaykey=["Curriculum", "Version", "Class"]
+
 $(document).on("authready", function(){
 
    //console.log("Auth is Ready")
    fetchDataForProcess("CurriculumWorkflow")
 })
+  
+  $(document).ready(function(){
+
+    console.log(displaykey.join("-"))
+    $("#dataKeyHeader").text(displaykey.join("-"))
+  })
+
 
 
 </script>
@@ -153,8 +162,8 @@ $(document).on("authready", function(){
   <div class="grid_12">
     <table style="width:100%" id="resultstable" class="resultstable">     
       <tr class="row-header">
-          <th>
-              Level-Version-Class
+          <th id="dataKeyHeader">
+              &nbsp;
            </th>
            
            <th>
