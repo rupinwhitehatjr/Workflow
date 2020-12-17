@@ -51,7 +51,13 @@ exports.sendNotification = functions
   //msgObject={}
   notificationid=context.params.notificationid
   targetStepIndex=notificationData.targetStepIndex
-  recipients=notificationData.notify
+  recipients=[]
+
+  if("notify" in notificationData)
+  {
+
+    recipients=notificationData["notify"]
+  }
   //flowID=notificationData.flowID 
 
   var errorFlag=false;
