@@ -16,11 +16,14 @@ $(document).on("authready", function(event){
 
 $(document).on('change', '#process_selector', function() {
     selectedProcess=$(this).val()
+     $(".dynamic").remove();
+     $(".notifylistdiv").remove()
     if (selectedProcess==="-1")
     {
     	return 0
     }
     //console.log(selectedProcess)
+   
     fetchDataForProcess(selectedProcess)
 
 
@@ -40,6 +43,7 @@ async function fetchDataForProcess(processName)
 	//console.log(processSteps[0].id)
 	numberofsteps=processSteps.length
 	firstOption=$("<option/>").attr("value", "-1")
+	$("#stepList").empty()
 	$("#stepList").append($(firstOption))
 	for(stepIndex=0;stepIndex<numberofsteps;stepIndex++)
 	{
@@ -63,6 +67,7 @@ $(document).on('change', '#stepList', function() {
     {
     	return 0
     }
+
     createGroupKeyChoices(selectedStep);
 
 
@@ -237,6 +242,7 @@ $(document).on('change', 'select.groupKey', function() {
     selectedUserGroupKey=groupKey
     $("#keyname").text("Grouping: "+selectedUserGroupKey).show()
     //console.log(userGroupKeyMeta)
+    $(".userdiv").remove()
     displayNotifyList(userGroupKeyMeta)
 
 
@@ -376,6 +382,11 @@ function saveRoles()
 	
 	//$(".notifylistdiv").remove()
 	//$("#buttonsection").hide();
+	$("#savingmodal").modal({
+          escapeClose: false,
+          clickClose: false,
+          showClose: false
+     });
 	stepGroupList=[]
 	for(stepIndex=0;stepIndex<numberofsteps;stepIndex++)
 	{
@@ -430,8 +441,13 @@ function updateUserGroup(documentID, userGroupData)
 		documentID=documentRef.id
 		
 	}
+	//console.log(userGroupData)
 	db.collection("UserGroups").doc(documentID).set(userGroupData)
-	
+	//setInterval(, 3000);
+	setTimeout(closeAllModals, 3000)
+
+
+	//closeAllModals()
 	return documentID
 }
 
