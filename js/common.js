@@ -53,15 +53,16 @@ function getLinkFromBasePath(path)
 	pathNameList=pathName.split("/")
 	newPathRef=pathNameList[1]
 	//console.log(newPathRef)
-	if(newPathRef)
+	/*if(newPathRef)
 	{
 		newPath=originPath+"/"+newPathRef+path
 	}
 	else
 	{
-		newPath=originPath+path
+		
 	}
-	
+	*/
+	newPath=originPath+path
 	//console.log(newPath)
 	return newPath
 }
