@@ -402,6 +402,7 @@ function saveRoles()
 		for(userIndex=0;userIndex<divCount;userIndex++)
 		{
 			userEmail=$(userdivs[userIndex]).text().trim()
+			
 			//console.log(userEmail)
 			userEmails.push(userEmail)
 		}
