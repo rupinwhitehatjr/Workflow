@@ -2,7 +2,7 @@ firebase functions:config:get > .runtimeconfig.json
 
 firebase emulators:start --project test --import=./data --export-on-exit
 
-firebase deploy --only functions
+firebase deploy --only functions:funcname
 
 
 firebase emulators:start --import=./data --export-on-exit

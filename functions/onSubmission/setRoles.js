@@ -146,7 +146,7 @@ exports.setRoles = functions
     
         // fetch the correct data from the UserGroups Collection
         userGroupKeyList=getGroupKey(stepData);
-        //console.log(userGroupKey)
+        console.log(userGroupKeyList)
         groupKeyCount=userGroupKeyList.length
         if(groupKeyCount===0)
         {
@@ -183,7 +183,7 @@ exports.setRoles = functions
               return 0
             }
             
-              //console.log("Document data:", doc.data());
+              console.log("Group Key Document data:", doc.data());
               docData=doc.data()
               userGroupList=docData["groupList"]
               groupLength=userGroupList.length

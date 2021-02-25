@@ -15,7 +15,7 @@ $(document).on("authready", function(event){
 
     //openWaitingModal()
 
-    displayWorkflow("CurriculumWorkFlow1to2");
+    displayWorkflow("VisualAids");
    
     
 });
@@ -55,12 +55,12 @@ async function displayWorkflow(workflowType)
         startx=5;
         steps.forEach((doc)=>{
             stepData=doc.data() 
-            startx=startx+250  
+            startx=startx+200  
             nodeObject={}
             nodeObject["id"]=stepData.index
             nodeObject["label"]=stepData.name
             nodeObject["x"]=startx
-            nodeObject["y"]=500 + Math.floor(Math.random() * 50);
+            nodeObject["y"]=500 + Math.floor(Math.random() * 200);
             nodeObject["fixed"]=true
             nodes.push(nodeObject)            
             

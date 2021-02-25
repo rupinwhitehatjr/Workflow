@@ -167,6 +167,17 @@ function createBreadCrumb(stepName,id,isActive)
     $("#breadcrumb").append(stepcrumb)
 }
 
+function showStepOwner(stepOwnerList)
+{
+    $("#stepowner").html(stepOwnerList["0"])
+    $("#newOwner").val(stepOwnerList["0"])
+}
+
+function updateStepOwner()
+{
+
+}
+
 $(document).on("removealleditfeatures", function(event){
 
   
@@ -248,7 +259,7 @@ stepsDocument.then(function(querySnapshot) {
             //The step is active, but the user does not have access
             //to edit this step.
             $(document).trigger("removealleditfeatures")
-             $(document).trigger("hidecomments")
+            $(document).trigger("hidecomments")
 
         }
 
@@ -295,6 +306,8 @@ stepsDocument.then(function(querySnapshot) {
             }
             
         }
+
+        showStepOwner(stepOwners);
 
         
     });

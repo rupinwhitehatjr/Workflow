@@ -181,6 +181,7 @@ function addRow(doc)
     //classnumber=doc_data["Class"]
     asset=doc_data["Asset Type"]
     currentstep=doc_data["active_step_name"]
+    currentstepid=doc_data["active_step_id"]
     actioners=doc_data["step_owners"]
     closed_status=doc_data["closed"]
     lastUpdatedDate=doc_data["updated_on"]
@@ -223,6 +224,8 @@ function addRow(doc)
 
     
     logButton=$("<img/>").attr("class", "imgButton")
+                         .attr("data-flow-id", doc.id)
+                         .attr("data-step-id", currentstepid)
                         .attr("src", "../img/log.png")                    
     $(logLink).append($(logButton))  
 
