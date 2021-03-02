@@ -330,6 +330,7 @@ function populateLogs(flow_id)
         creatorName=log["creatorName"]
         timestamp=log["timestamp"]
 
+
         hrts=new Date(parseInt(timestamp));
         if(action==="Created")
         {
@@ -366,6 +367,15 @@ function populateLogs(flow_id)
         {
            
             logText=creatorName +" "+ action.toLowerCase() +" the  workflow at "+hrts
+            //console.log(logText)
+            appendLogHTML(logText)
+        }
+
+        if(action==="ownershipchange")
+        {
+            stepName=log["stepName"]
+            newUser=log["newOwner"]
+            logText=creatorName +" "+ "transferred ownership" +" of the "+stepName+" step to "+ newUser+" on "+hrts
             //console.log(logText)
             appendLogHTML(logText)
         }
