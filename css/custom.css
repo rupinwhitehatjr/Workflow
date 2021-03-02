@@ -19,6 +19,13 @@ p
   transition-duration: 0.4s;
 
 }
+.actionbuttons
+{
+  padding: 2px;
+  width:32px; 
+  margin-left: 10px;
+  cursor:pointer;
+}
 
 .buttonsm{
   background-color: #4CAF50; /* Green */
@@ -506,12 +513,9 @@ a:visited {
   width: max-content;
   margin-left: 2px;
 }
-.deletebutton
+.deletebutton, .pencilbutton
 {
- 
-  
-  
-  
+   
   padding: 2px;
   width:max-content;
   height: max-content; 
@@ -524,7 +528,7 @@ a:visited {
 {
   margin-left:3px;
 }
-.deleteimg
+.deleteimg, .pencilimg
 {
   width:16px;
 }

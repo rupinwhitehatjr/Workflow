@@ -16,6 +16,8 @@ const copyRole = require('./onSubmission/copyRoles');
 const escalation = require('./scheduled/escalation');
 
 
+const ownershipChange=require("./OnOwnershipChange/OwnershipChange")
+
 
 //exports.processSubmission = ps.processSubmission;
 exports.makeCopy = copy.copyLayout;
@@ -25,6 +27,8 @@ exports.onApprove = onApprove.onApprove;
 exports.onReject = onReject.onReject;
 exports.onReOpen = onReOpen.onReOpen;
 exports.updateFacade = updateFacade.updateFacade;
+
+exports.OwnershipChange = ownershipChange.OwnershipChange;
 
 
 exports.sendNotification = notification.sendNotification;

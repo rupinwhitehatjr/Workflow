@@ -131,6 +131,7 @@ exports.updateFacade = functions
         //console.log(uSearchTerms)
         newflowMeta["ready"]=true
         newflowMeta["searchTerms"]=uSearchTerms
+        newflowMeta["updated_on"]=Date.now();
         for(index=0;index<uSearchTerms.length;index++)
         {
               term=uSearchTerms[index]

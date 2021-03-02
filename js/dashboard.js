@@ -224,8 +224,7 @@ function addRow(doc)
 
     
     logButton=$("<img/>").attr("class", "imgButton")
-                         .attr("data-flow-id", doc.id)
-                         .attr("data-step-id", currentstepid)
+                        
                         .attr("src", "../img/log.png")                    
     $(logLink).append($(logButton))  
 
@@ -241,11 +240,29 @@ function addRow(doc)
     $(row).append($("<td/>").text(currentstep))
     $(row).append($("<td/>").text(time_since_last_update))
     actioncell=$("<td/>").attr("class","actioner")
-                        
+    user=firebase.auth().currentUser                    
     for(index=0;index<actioners.length;index++)
     {
         actioner=$("<span/>").text(actioners[index])
                              .attr("class", "userdiv")
+        
+
+        if(index==0 &&  actioners[index].trim()===user.email && !closed_status)
+        {
+            editImg=$("<img/>").attr("src", "../img/pencil.png").attr("class","pencilimg")
+            editspan=$("<span/>").attr("class", "pencilbutton")
+                                 .attr("data-flow-id", doc.id)
+                                 .attr("data-step-id", currentstepid)
+                                 .attr("data-actioner", actioners[index])
+                                 .attr("data-step-name", currentstep)
+
+            $(editspan).append($(editImg))
+            
+            $(actioner).append($(editspan))
+            $(actioner).addClass("stepowner")
+        }
+       
+        //$(actioner).append('<span class="deletebutton"></span>')    
         $(actioncell).append($(actioner))
         $(actioncell).append($("<br/>"))
     }
@@ -269,6 +286,88 @@ function openFlow(flowId)
     flowURL=getLinkFromBasePath(URL)
     //console.log(flowURL)
    window.open(flowURL)
+}
+
+$(document).on("click", ".pencilbutton", function(){
+    
+    userEmail=$(this).attr("data-actioner")
+    flowID=$(this).attr("data-flow-id")
+    stepID=$(this).attr("data-step-id")
+    stepName=$(this).attr("data-step-name")
+    inputHolder=createEditableInput(flowID,stepID,userEmail,stepName)    
+    $(this).parent().hide()
+    $(this).parent().after($(inputHolder))
+
+})
+
+$(document).on("click", ".crossimage", function(){
+    
+    $(this).parent().siblings(".userdiv").show()   
+    $(this).parent().remove();
+    
+    //$(this).parent().after($(inputHolder))
+
+})
+
+$(document).on("click", ".saveimage", function(){
+    
+    stepID=$(this).attr("data-step-id");  
+    flowID=$(this).attr("data-flow-id"); 
+    newUserEmail=$(this).siblings("input").val()
+    stepName=$(this).siblings("input").attr("data-step-name")
+    OwnershipChangeData={}
+    
+    OwnershipChangeData["by"]=getLoggedInUserObject()// common.js
+    OwnershipChangeData["timestamp"]=Date.now();
+    OwnershipChangeData["stepID"]=stepID;
+    OwnershipChangeData["flowID"]=flowID;
+    OwnershipChangeData["newOwner"]=newUserEmail;
+    OwnershipChangeData["stepName"]=stepName;
+    
+
+    //Update Ownership Change Document
+    OwnershipChangeDocRef=db.collection("OwnershipChange").doc()    
+    OwnershipChangeDoc=db.collection("OwnershipChange").doc(OwnershipChangeDocRef.id)    
+    OwnershipChangeDoc.set(OwnershipChangeData)
+
+    $(this).parent().siblings(".userdiv").show() 
+    $(this).parent().siblings(".stepowner").html(newUserEmail)  
+    $(this).parent().remove();
+    
+    
+    
+    //$(this).parent().after($(inputHolder))
+
+})
+
+function createEditableInput(flowID, stepID, user, stepName)
+{
+    holder=$("<span/>")
+    userInput=$("<input/>").attr("placeholder", "Add New User") 
+                                    .attr("class", "newuserinput")
+                                    .val(user)
+
+    crossImage=$("<img/>").attr("src", "../img/cross.png")
+                          .attr("class", "actionbuttons crossimage")
+
+    checkImage=$("<img/>").attr("src", "../img/save.png")
+                          .attr("class", "actionbuttons saveimage")
+    
+    $(userInput).attr("data-step-id", stepID)
+    $(userInput).attr("data-flow-id", flowID)
+    $(userInput).attr("data-step-name", stepName)
+    
+
+    $(crossImage).attr("data-step-id", stepID)
+    $(crossImage).attr("data-flow-id", flowID)
+
+    $(checkImage).attr("data-step-id", stepID)
+    $(checkImage).attr("data-flow-id", flowID)
+
+    $(holder).append(userInput)
+    $(holder).append(checkImage)    
+    $(holder).append(crossImage)                                
+    return holder; 
 }
 
 

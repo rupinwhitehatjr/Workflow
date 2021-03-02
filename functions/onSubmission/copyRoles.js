@@ -42,6 +42,7 @@ let db = admin.firestore();
     flowMeta={}
     flowMeta["ready"]=true
     flowMeta["step_owners"]=users
+    flowMeta["updated_on"]=Date.now();
     db.collection("Workflows").doc(flowID).update(flowMeta)     
     return 0
     
