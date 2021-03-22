@@ -14,8 +14,7 @@ const onReOpen = require('./onSubmission/onReOpen');
 const updateFacade = require('./onSubmission/updateFacade');
 const copyRole = require('./onSubmission/copyRoles');
 const escalation = require('./scheduled/escalation');
-const sendResponse = require('./sendResponse')
-const sendEmail = require('./sendEmail')
+
 const sendEmailDeployed = require('./sendEmailDeployed')
 
 
@@ -36,8 +35,7 @@ exports.OwnershipChange = ownershipChange.OwnershipChange;
 
 exports.sendNotification = notification.sendNotification;
 exports.copyRoleForActiveStep=copyRole.copyRoleForActiveStep
-exports.sendResponse = sendResponse.sendResponse;
-exports.sendEmail = sendEmail.sendEmail
+
 exports.sendEmailDeployed = sendEmailDeployed.sendEmailDeployed
 
 //exports.escalation=escalation.escalate

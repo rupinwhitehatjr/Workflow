@@ -17,11 +17,11 @@ creationData={}
 creationData["reopenhere"]=True
 
 
-docs = db.collection(u'Workflows').where(u'flowType', u'==', u'CurriculumWorkFlow1to2').stream()
+docs = db.collection(u'Workflows').where(u'flowType', u'==', u'CurriculumWorkflow').stream()
 
 for doc in docs:
 	try:
-		a=db.collection(u'Workflows').document(doc.id).collection("steps").document(u"Y6vzjAdkQn5LkL5FO6wW").update(creationData)
+		a=db.collection(u'Workflows').document(doc.id).collection("steps").document(u"1ODa6DD776hkTOCdUj08").update(creationData)
 		print(doc.id)
 	except:
 		continue	

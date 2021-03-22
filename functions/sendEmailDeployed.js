@@ -30,7 +30,7 @@ class NoRecipientsError extends Error {
 exports.sendEmailDeployed = functions
   .region('asia-east2')
   .firestore
-  .document('TestIntegratedEmail/{notificationid}')
+  .document('NotificationQueue/{notificationid}')
   .onWrite((change, context) =>
   {
   notificationData=change.after.data();

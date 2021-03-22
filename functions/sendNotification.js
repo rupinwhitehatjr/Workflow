@@ -29,7 +29,7 @@ class NoRecipientsError extends Error {
 exports.sendNotification = functions
   .region('asia-east2')
   .firestore
-  .document('NotificationQueue/{notificationid}')
+  .document('NotificationQueue1/{notificationid}')
   .onWrite((change, context) =>
   { 
 
