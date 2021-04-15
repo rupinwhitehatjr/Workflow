@@ -105,7 +105,7 @@ function displayWorkflow()
     $(document).trigger("formloaded");
 }
 
-function displayBreadCrumbs(doc_data)
+async function displayBreadCrumbs(doc_data)
 {
     stepMeta=doc_data["allSteps"]
     stepCount=stepMeta.length
@@ -140,6 +140,14 @@ function displayBreadCrumbs(doc_data)
     {
         $("#buttonsection").removeClass("invisible")
     }
+
+    var collectionRef = db.collection('Workflows');
+      var query = await collectionRef.where(firebase.firestore.FieldPath.documentId(), '==', flow_id).limit(1).get()
+      var createdBy = query.docs[0].data().email
+      var loggedInEmail = getLoggedInUserObject().email
+      console.log(createdBy, loggedInEmail)
+      if((createdBy).trim() === (loggedInEmail).trim())
+          $('#deleteButton').removeClass('invisible')
 }
 
 function addHiddenField(id, value)
@@ -169,7 +177,9 @@ function createBreadCrumb(stepName,id,isActive)
 
 function showStepOwner(stepOwnerList)
 {
-    $("#stepowner").html(stepOwnerList["0"])
+    if(stepOwnerList && stepOwnerList.length > 0) {
+        $("#stepowner").html(`Step Owner:- ${stepOwnerList["0"]}`)
+    }
     $("#newOwner").val(stepOwnerList["0"])
 }
 
