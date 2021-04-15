@@ -104,7 +104,7 @@ async function searchWorkflows()
             executeQuery=true
            // console.log(fieldLabel)
            // console.log(fieldValue)
-          query = query.where(fieldLabel, '==', fieldValue);  
+          query = query.where(fieldLabel, '==', fieldValue); 
         }
         
     }
@@ -152,6 +152,9 @@ async function searchWorkflows()
         for(resultIndex=0;resultIndex<searchResultsCount;resultIndex++)
         {
             addRow(resultsList[resultIndex])
+            // if(!resultsList[resultIndex]['isDeleted']) {
+            //     addRow(resultsList[resultIndex])
+            // }
         }
         
     }
@@ -174,6 +177,10 @@ function compare( a, b ) {
 function addRow(doc)
 {
     doc_data=doc.data()
+    console.log(doc_data['isDeleted'])
+    if(doc_data['isDeleted']) {
+        return
+    }
     //console.log(doc_data)
     row=$("<tr/>").attr("class", "row-data");
     //curriculum=doc_data["Curriculum"]
@@ -185,6 +192,7 @@ function addRow(doc)
     actioners=doc_data["step_owners"]
     closed_status=doc_data["closed"]
     lastUpdatedDate=doc_data["updated_on"]
+    email = doc_data['email']
     //time_since_last_update=Date.now()-lastUpdatedDate
 
     dataKeyList=[]
@@ -217,16 +225,12 @@ function addRow(doc)
     /*goButton=$("<img/>").attr("class", "imgButton")
                         .attr("src", "img/go.png")*/
 
-    /*$(viewFlowLink).append($(goButton)) */                   
-
-
-    logLink= $("<a/>").attr("onclick", "javascript:viewLog('"+doc.id+"')")                      
-
+    /*$(viewFlowLink).append($(goButton)) */
     
-    logButton=$("<img/>").attr("class", "imgButton")
+    // logButton=$("<img/>").attr("class", "imgButton")
                         
-                        .attr("src", "../img/log.png")                    
-    $(logLink).append($(logButton))  
+    //                     .attr("src", "../img/log.png")                    
+    // $(logLink).append($(logButton))  
 
 
     dataKey=dataKeyList.join("-")
@@ -272,7 +276,15 @@ function addRow(doc)
 
     actionButtonCell=$("<td/>")
     //$(actionButtonCell).append($(viewFlowLink))
-    $(actionButtonCell).append($(logLink))
+    var loggedInEmail = getLoggedInUserObject().email                     
+    if((email).trim() === (loggedInEmail).trim()) {
+        logLink= $("<a/>").attr("onclick", "javascript:deleteId('"+doc.id+"')") 
+        var deleteButton = `<button type="button" class="close" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>`                  
+        $(logLink).append($(deleteButton))
+        $(actionButtonCell).append($(logLink))
+    }
     $(row).append($(actionButtonCell))
     
 
@@ -493,7 +505,37 @@ function createStepField()
 }
 
 
-function viewLog(flowID)
-{
-    
+async function deleteId(flowID) {
+    console.log(flowID)
+    swal({
+        buttons: {
+          cancel: true,
+          confirm: true,
+        },
+        title: 'Are you sure?',
+        text: "You won't be able to revert this file!",
+        icon: 'warning',
+      }).then( async (res) => {
+          if(res) {
+            await db.collection('Workflows').doc(flowID).update({ isDeleted: true })
+            await swal({
+                title: 'Delete',
+                text: 'File has been deleted',
+                icon: 'success',
+                timer: 1500
+            })
+            deleteLogCreate(flowID)
+            searchWorkflows()
+          }
+      })
+}
+
+async function deleteLogCreate(flowID) {
+    let documentLog = {
+        action: 'Delete',
+        creatorName: '',
+        stepName: null,
+        timestamp: +new Date
+    }
+    await db.collection('Workflows').doc(flowID).collection('log').add(documentLog)
 }
