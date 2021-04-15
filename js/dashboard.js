@@ -104,7 +104,8 @@ async function searchWorkflows()
             executeQuery=true
            // console.log(fieldLabel)
            // console.log(fieldValue)
-          query = query.where(fieldLabel, '==', fieldValue); 
+          query = query.where(fieldLabel, '==', fieldValue);
+          query = query.where('isDeleted', '==', false);
         }
         
     }
@@ -177,10 +178,10 @@ function compare( a, b ) {
 function addRow(doc)
 {
     doc_data=doc.data()
-    console.log(doc_data['isDeleted'])
-    if(doc_data['isDeleted']) {
-        return
-    }
+    // console.log(doc_data['isDeleted'])
+    // if(doc_data['isDeleted']) {
+    //     return
+    // }
     //console.log(doc_data)
     row=$("<tr/>").attr("class", "row-data");
     //curriculum=doc_data["Curriculum"]
@@ -271,7 +272,7 @@ function addRow(doc)
         $(actioncell).append($("<br/>"))
     }
     //actioners=actioners.join("</br>")
-    
+    row.attr('id', doc.id)
     $(row).append($(actioncell))
 
     actionButtonCell=$("<td/>")
@@ -513,19 +514,22 @@ async function deleteId(flowID) {
           confirm: true,
         },
         title: 'Are you sure?',
-        text: "You won't be able to revert this file!",
+        text: "You won't be able to revert this workflow!",
         icon: 'warning',
       }).then( async (res) => {
           if(res) {
+            //   Delete flag true in document
             await db.collection('Workflows').doc(flowID).update({ isDeleted: true })
             await swal({
                 title: 'Delete',
-                text: 'File has been deleted',
+                text: 'Workflow has been deleted',
                 icon: 'success',
                 timer: 1500
             })
+            // Delete log create
             deleteLogCreate(flowID)
-            searchWorkflows()
+            // Row delete
+            $(`#${flowID}`).remove()
           }
       })
 }
