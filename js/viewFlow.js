@@ -169,8 +169,9 @@ function createBreadCrumb(stepName,id,isActive)
 
 function showStepOwner(stepOwnerList)
 {
+    console.log(stepOwnerList)
     if(stepOwnerList && stepOwnerList.length > 0) {
-        $("#stepowner").html(`Step Owner:- ${stepOwnerList["0"]}`)
+        $("#stepowner").html(`Current Owner:- ${stepOwnerList["0"]}`)
     }
     $("#newOwner").val(stepOwnerList["0"])
 }
