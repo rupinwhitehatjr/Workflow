@@ -93,6 +93,7 @@ async function searchWorkflows()
     fieldCount=fieldList.length 
     executeQuery=true
     let query = db.collection("Workflows");
+    query = query.where('isDeleted', '==', false);
    
     for(index=0;index<fieldCount;index++)
     {
@@ -105,7 +106,6 @@ async function searchWorkflows()
            // console.log(fieldLabel)
            // console.log(fieldValue)
           query = query.where(fieldLabel, '==', fieldValue);
-          query = query.where('isDeleted', '==', false);
         }
         
     }
@@ -272,14 +272,14 @@ function addRow(doc)
         $(actioncell).append($("<br/>"))
     }
     //actioners=actioners.join("</br>")
-    row.attr('id', doc.id)
+    row.attr('id', `table_row_${doc.id}`)
     $(row).append($(actioncell))
 
     actionButtonCell=$("<td/>")
     //$(actionButtonCell).append($(viewFlowLink))
     var loggedInEmail = getLoggedInUserObject().email                     
     if((email).trim() === (loggedInEmail).trim()) {
-        logLink= $("<a/>").attr("onclick", "javascript:deleteId('"+doc.id+"')") 
+        logLink= $("<a/>").attr("onclick", "javascript:deleteWorkflow('"+doc.id+"')")
         var deleteButton = `<button type="button" class="close" aria-label="Close">
         <span aria-hidden="true">&times;</span>
         </button>`                  
@@ -506,7 +506,7 @@ function createStepField()
 }
 
 
-async function deleteId(flowID) {
+async function deleteWorkflow(flowID) {
     console.log(flowID)
     swal({
         buttons: {
@@ -527,14 +527,14 @@ async function deleteId(flowID) {
                 timer: 1500
             })
             // Delete log create
-            deleteLogCreate(flowID)
+            deleteWorkflowLog(flowID)
             // Row delete
-            $(`#${flowID}`).remove()
+            $(`#table_row_${flowID}`).remove()
           }
       })
 }
 
-async function deleteLogCreate(flowID) {
+async function deleteWorkflowLog(flowID) {
     let documentLog = {
         action: 'Delete',
         creatorName: '',
