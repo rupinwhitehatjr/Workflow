@@ -597,6 +597,11 @@ table.resultstable >tbody> tr >td
   background-color: #FFCCCB
 }
 
+.step-owner {
+  float: right; 
+  margin-right: 2%;
+}
+
 
 
 

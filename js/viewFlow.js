@@ -105,7 +105,7 @@ function displayWorkflow()
     $(document).trigger("formloaded");
 }
 
-function displayBreadCrumbs(doc_data)
+async function displayBreadCrumbs(doc_data)
 {
     stepMeta=doc_data["allSteps"]
     stepCount=stepMeta.length
@@ -169,7 +169,10 @@ function createBreadCrumb(stepName,id,isActive)
 
 function showStepOwner(stepOwnerList)
 {
-    $("#stepowner").html(stepOwnerList["0"])
+    console.log(stepOwnerList)
+    if(stepOwnerList && stepOwnerList.length > 0) {
+        $("#stepowner").html(`Current Owner:- ${stepOwnerList["0"]}`)
+    }
     $("#newOwner").val(stepOwnerList["0"])
 }
 
