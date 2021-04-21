@@ -16,8 +16,7 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
                 if(doc.data().ready)
 
                 {
-
-                    if(doc.data().isDeleted) {
+                    if(doc.data().isDeleted === undefined || doc.data().isDeleted === null || doc.data().isDeleted) {
                         window.location = 'https://workflow.whjr.org/404'
                     }
                     //console.log("we are ready");
@@ -561,6 +560,7 @@ function createViewableStep(stepDoc)
         }
         for (i=0;i<numberOfFields;i++)
         {
+            console.log('NUMBER FIELDS ------->', fieldData[i])
             viewField(stepID,fieldList[i], fieldData[i])
         }
 
