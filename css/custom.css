@@ -232,6 +232,8 @@ select
   border-bottom-left-radius: 10px;
   
 }
+
+
 .inputbox
 {
   width:50%;
@@ -593,6 +595,16 @@ table.resultstable >tbody> tr >td
 {
   border:1px solid #F00 !important;
   background-color: #FFCCCB
+}
+
+.step-owner {
+  float: right; 
+  margin-right: 2%;
+}
+
+.cross-img {
+  display: block; 
+  max-width:23px;
 }
 
 

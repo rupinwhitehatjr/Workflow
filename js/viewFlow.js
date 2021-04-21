@@ -16,6 +16,9 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
                 if(doc.data().ready)
 
                 {
+                    if(doc.data().isDeleted === undefined || doc.data().isDeleted === null || doc.data().isDeleted) {
+                        window.location = 'https://workflow.whjr.org/404'
+                    }
                     //console.log("we are ready");
                     
                     $(document).trigger("dataready", doc);
@@ -105,7 +108,7 @@ function displayWorkflow()
     $(document).trigger("formloaded");
 }
 
-function displayBreadCrumbs(doc_data)
+async function displayBreadCrumbs(doc_data)
 {
     stepMeta=doc_data["allSteps"]
     stepCount=stepMeta.length
@@ -169,7 +172,10 @@ function createBreadCrumb(stepName,id,isActive)
 
 function showStepOwner(stepOwnerList)
 {
-    $("#stepowner").html(stepOwnerList["0"])
+    console.log(stepOwnerList)
+    if(stepOwnerList && stepOwnerList.length > 0) {
+        $("#stepowner").html(`Current Owner:- ${stepOwnerList["0"]}`)
+    }
     $("#newOwner").val(stepOwnerList["0"])
 }
 
@@ -554,6 +560,7 @@ function createViewableStep(stepDoc)
         }
         for (i=0;i<numberOfFields;i++)
         {
+            console.log('NUMBER FIELDS ------->', fieldData[i])
             viewField(stepID,fieldList[i], fieldData[i])
         }
 
