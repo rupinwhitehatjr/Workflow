@@ -29,6 +29,7 @@ exports.copyLayout = functions
               flowMeta["active_step_name"]=querySnapshot.data().name
               flowMeta["active_step_id"]=querySnapshot.id
               flowMeta["closed"]=false
+              flowMeta["isDeleted"] = false
               flowMeta["allSteps"]=allSteps
               step_owners=[]
               step_owners.push(email)

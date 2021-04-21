@@ -16,6 +16,10 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
                 if(doc.data().ready)
 
                 {
+
+                    if(doc.data().isDeleted) {
+                        window.location = 'https://workflow.whjr.org/404'
+                    }
                     //console.log("we are ready");
                     
                     $(document).trigger("dataready", doc);

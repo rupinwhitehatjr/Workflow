@@ -281,7 +281,7 @@ function addRow(doc)
     if((email).trim() === (loggedInEmail).trim()) {
         logLink= $("<a/>").attr("onclick", "javascript:deleteWorkflow('"+doc.id+"')")
         var deleteButton = `<button type="button" class="close" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true"><img class="cross-img" src="../img/cross.png" alt="Delete Workflow Icon" title="Delete-Workflow" /></span>
         </button>`                  
         $(logLink).append($(deleteButton))
         $(actionButtonCell).append($(logLink))

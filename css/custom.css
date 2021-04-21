@@ -602,6 +602,11 @@ table.resultstable >tbody> tr >td
   margin-right: 2%;
 }
 
+.cross-img {
+  display: block; 
+  max-width:23px;
+}
+
 
 
 
