@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link not found</title>
+    <link rel="icon" href="./img/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/404.css" />
+</head>
+<body>
+    <section class="wrapper">
+
+        <div class="container">
+
+            <div id="scene" class="scene" data-hover-only="false">
+
+
+                <div class="circle" data-depth="1.2"></div>
+
+                <div class="one" data-depth="0.9">
+                    <div class="content">
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                    </div>
+                </div>
+
+                <div class="two" data-depth="0.60">
+                    <div class="content">
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                    </div>
+                </div>
+
+                <div class="three" data-depth="0.40">
+                    <div class="content">
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                    </div>
+                </div>
+
+                <p class="p404" data-depth="0.50">404</p>
+                <p class="p404" data-depth="0.10">404</p>
+
+            </div>
+
+            <div class="text">
+                <article>
+                    <p>Uh oh! Looks page not found <br>Go back to the homepage</p>
+                    <button onclick="homepage()">Homepage</button>
+                </article>
+            </div>
+
+        </div>
+    </section>
+</body>
+<script>
+    // Parallax Code
+    var scene = document.getElementById('scene');
+    var parallax = new Parallax(scene);
+
+    function homepage() {
+        window.location = 'https://workflow.whjr.org/'
+    }
+</script>
+</html>

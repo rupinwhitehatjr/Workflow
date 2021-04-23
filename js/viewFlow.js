@@ -17,7 +17,7 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
 
                 {
                     if(doc.data().isDeleted === undefined || doc.data().isDeleted === null || doc.data().isDeleted) {
-                        window.location = 'https://workflow.whjr.org/404'
+                        window.location.href = '../404.html';
                     }
                     //console.log("we are ready");
                     
