@@ -560,7 +560,7 @@ function createViewableStep(stepDoc)
         }
         for (i=0;i<numberOfFields;i++)
         {
-            console.log('NUMBER FIELDS ------->', fieldData[i])
+            // console.log('NUMBER FIELDS ------->', fieldData[i])
             viewField(stepID,fieldList[i], fieldData[i])
         }
 
@@ -723,14 +723,31 @@ function viewField(stepID,fieldsList, fieldData)
         {
             fieldDisplay=fieldsList["displayAs"]
         }
-
         fieldValue=value;
-        if(fieldDisplay==="url")
+        if(fieldDisplay==="url" && value)
         {
-            fieldValue=$("<a>")
-                        .attr("href", value)
-                        .attr("class", "fieldlink")
-                        .append(value)
+            // fieldValue=$("<a>")
+            //             .attr("href", value)
+            //             .attr("class", "fieldlink")
+            //             .append(value)
+
+            fileId = value
+            fieldValue = `<a href=${value} class='fieldlink col-6'>${value}</a>
+                        <button onclick="downloadPdf(fileId)" class='buttonsm buttongray col-6'>Download</button>`
+
+            div = $('<div/>').attr("class", "grid_6 field row mr-auto").append(fieldValue)
+
+
+            //console.log($(inputBox))        
+
+            $("#" + stepID).append($(div))
+
+            //Create a div to go to next line.
+
+
+
+            $("#" + stepID).append($('<div/>').attr("class", "clear"))
+            return 0
         }
 
         
@@ -748,4 +765,41 @@ function viewField(stepID,fieldsList, fieldData)
 
     
      $("#"+stepID).append($('<div/>').attr("class", "clear"))
+}
+
+const downloadPdf = async (url) => {
+    try {
+        await axios.post('https://us-central1-renamingfilesforquiz.cloudfunctions.net/app/api/pdfDownload', {
+            "docUrl": url,
+            "downloadedByDetails": getLoggedInUserObject()
+        }).then((res) => {
+            if (res && res.data && res.data.success && res.data.data && res.data.data.url) {
+                window.open(
+                    res.data.data.url,
+                    '_blank' // <- it open in a new window.
+                );
+            }
+            else {
+                swal({
+                    title: 'Error',
+                    icon: 'error',
+                    text: res.data.data.message
+                })
+            }
+        }).catch((err) => {
+            console.log(err)
+            swal({
+                title: 'Error',
+                icon: 'error',
+                text: err.message
+            })
+        })
+    }
+    catch (err) {
+        swal({
+            title: 'Error',
+            icon: 'error',
+            text: err.message
+        })
+    }
 }
