@@ -14,26 +14,6 @@ const { degrees, PDFDocument, rgb, StandardFonts } = require('pdf-lib')
 const fetch = require('node-fetch'); 
 let onFileName = +new Date
 
-const CLIENT_ID = '770560109780-ij4miir6j47rrb3ttl4dgjdldfkve2ai.apps.googleusercontent.com'
-const CLIENT_SECRET = 'fEC-qXXn7XDyEQ9wXS8V2-vW'
-const REDIRECT_URI = 'https://developers.google.com/oauthplayground'
-
-const REFRESH_TOKEN = '1//04v55XhcjSDaZCgYIARAAGAQSNwF-L9Irknow6QVqSOTDCCTpTvs10V1vAqeG5kTcnw14WxMZEu9r_HstjwL8ozrW92ahpM4eM9Q'
-
-
-const oauth2Client = new google.auth.OAuth2(
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URI
-);
-
-oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN })
-
-const drive = google.drive({
-  version: 'v3',
-  auth: oauth2Client
-})
-
 // async function getFile(auth, fileId) {
 //   try {
 //     const file = bucket.file(`Files/sample${onFileName}.pdf`);
