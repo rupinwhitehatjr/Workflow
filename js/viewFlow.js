@@ -730,10 +730,12 @@ function viewField(stepID,fieldsList, fieldData)
             //             .attr("href", value)
             //             .attr("class", "fieldlink")
             //             .append(value)
+            
 
+            // Button visible for valid doc url
             fileId = value
             fieldValue = `<a href=${value} class='fieldlink col-6'>${value}</a>
-                        <button onclick="downloadPdf(fileId)" class='buttonsm buttongray col-6'>Download</button>`
+            ${isValidDocUrl(fileId) ? `<button id="urlButtonValue" value=${value} onclick="downloadPdf(fileId)" class='buttonsm buttongray col-6'>Download</button>` : ''}`
 
             div = $('<div/>').attr("class", "grid_6 field row mr-auto").append(fieldValue)
 
@@ -767,8 +769,13 @@ function viewField(stepID,fieldsList, fieldData)
      $("#"+stepID).append($('<div/>').attr("class", "clear"))
 }
 
-const downloadPdf = async (url) => {
+const downloadPdf = async () => {
     try {
+
+        // Value of clicked button
+        var url = $('#urlButtonValue').val()
+
+        //    HTTP Request
         await axios.post('https://us-central1-renamingfilesforquiz.cloudfunctions.net/app/api/pdfDownload', {
             "docUrl": url,
             "downloadedByDetails": getLoggedInUserObject()
@@ -802,4 +809,10 @@ const downloadPdf = async (url) => {
             text: err.message
         })
     }
+}
+
+const isValidDocUrl = (url) => {
+    // doc url validate
+    var urlRegx = new RegExp('(docs.google.com/document/d)(://[A-Za-z])?', 'i');
+    return urlRegx.test(url)
 }

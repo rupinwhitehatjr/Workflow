@@ -1,5 +1,7 @@
 const admin = require('firebase-admin');
 let db = admin.firestore();
+const { google } = require('googleapis')
+const oAuthGoogle = require('../../oAuthGoogle').oAuthGoogle
 
 async function pdfDownload(req, res) {
     try {
@@ -11,12 +13,23 @@ async function pdfDownload(req, res) {
         logDocument.email = downloadedByDetails.email
         logDocument.uid = downloadedByDetails.uid
         if (filenameId && filenameId.success) {
-            const url = `http://docs.google.com/document/d/${filenameId.data}/export?format=pdf`
-            res.status(200).send({
-                success: true,
-                message: 'PDF generated',
-                data: {
-                    url: url
+
+            // oAuthGogle auth token
+            oAuthGoogle('drive', async function (auth) {
+                if (auth) {
+                    const response = await getFile(auth, filenameId.data)
+                    if(response && response.data && response.success && response.data && response.data.url) {
+                        res.status(200).send({
+                            success: true,
+                            message: 'PDF generated',
+                            data: {
+                                url: response.data.url
+                            }
+                        })
+                    }
+                    else {
+                        res.status(500).send(response)
+                    }
                 }
             })
         }
@@ -38,6 +51,8 @@ async function pdfDownload(req, res) {
     }
 }
 
+
+// Extract file Id from google doc url
 function getIdFrom(url) {
     try {
         var id;
@@ -62,6 +77,30 @@ function getIdFrom(url) {
         }
     }
 }
+
+// Access from g-drive
+async function getFile(auth, fileId) {
+    try {
+        const drive = google.drive({ version: 'v3', auth });
+        const responseFiles = await drive.files.get({ fileId: fileId, fields: '*' });
+        if (responseFiles && responseFiles.data && responseFiles.data.exportLinks && responseFiles.data.exportLinks['application/pdf']) {
+            return {
+                success: true,
+                message: 'PDF Url',
+                data: {
+                    url: responseFiles.data.exportLinks['application/pdf']
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            success: false,
+            message: error.message,
+        }
+    }
+}
+
 
 async function logCreate(logDocument) {
     var batch = db.batch
