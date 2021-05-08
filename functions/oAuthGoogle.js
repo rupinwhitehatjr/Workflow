@@ -27,7 +27,7 @@ async function oAuthGoogle(permisionType, callback) {
         oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[1])
         if(TokenJson && permisionType && TokenJson[permisionType]) {
             oAuth2Client.setCredentials(TokenJson[permisionType])
-            callback(oAuth2Client)
+            callback(null, oAuth2Client)
         } else if(TokenJson && permisionType && !TokenJson[permisionType]) {
             return getNewToken(oAuth2Client)
         }
@@ -47,7 +47,7 @@ async function oAuthGoogle(permisionType, callback) {
             rl.close();
             oauth2Client.getToken(code, function (err, token) {
                 oauth2Client.setCredentials(token)
-                callback(oauth2Client)
+                callback(err, oauth2Client)
                 if(TokenJson) {
                     TokenJson[permisionType] = token
                 }

@@ -771,20 +771,35 @@ function viewField(stepID,fieldsList, fieldData)
 
 const downloadPdf = async () => {
     try {
-
+        
+        window.swal({
+            title: "Please wait",
+            text: "Creating Download Link",
+            icon: "https://firebasestorage.googleapis.com/v0/b/renamingfilesforquiz.appspot.com/o/watermark-logo%2Fcom-gif-maker-unscreen.gif?alt=media&token=218dfb23-7f00-4517-b23c-75e139a28b66",  
+            button: false,
+            closeOnClickOutside: false,
+          });
+          
         // Value of clicked button
         var url = $('#urlButtonValue').val()
 
-        //    HTTP Request
-        await axios.post('https://us-central1-renamingfilesforquiz.cloudfunctions.net/app/api/pdfDownload', {
+        // HTTP Request 
+        await axios.post('https://us-central1-renamingfilesforquiz.cloudfunctions.net/app/api/pdfConvert', {
             "docUrl": url,
-            "downloadedByDetails": getLoggedInUserObject()
         }).then((res) => {
-            if (res && res.data && res.data.success && res.data.data && res.data.data.url) {
+            if (res && res.data && res.data.success && res.data.data) {
                 window.open(
-                    res.data.data.url,
-                    '_blank' // <- it open in a new window.
+                    res.data.data,
+                    '_blank', // <- it open in a new window.
+                    'toolbar=0,location=0,directories=0,status=1,menubar=0,titlebar=0,scrollbars=1,resizable=1,width='+1000+',height='+500
                 );
+
+                window.swal({
+                    title: "File has been created, Successfully!",
+                    text: "Please allow pop up, If ask your browser.",
+                    icon: "success",  
+                    button: true,
+                  });
             }
             else {
                 swal({
