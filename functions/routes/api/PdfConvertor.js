@@ -76,11 +76,6 @@ function getIdFrom(url) {
 
 async function saveBucket(path, buffer, contentType, token) {
   try {
-
-    console.log("PATH ------>", path)
-    console.log("BUFFER ------>", buffer)
-    console.log("CONTENT TYPE ------>", contentType)
-    console.log("TOKEN ------>", token)
     await bucket.file(path)
       .save(buffer, {
         gzip: true,
@@ -241,9 +236,12 @@ async function PdfConvertor(req, res) {
                     }
                   })
 
-
+                  drive.files.get({
+                    fileId: fileId,
+                    fields: '*'
+                }).then(async function(success){
                   // Save PDF
-                  let savePdf = await saveBucket(`Files/${fileId}.pdf`, await pdfDoc.save(), 'application/pdf', token)
+                  let savePdf = await saveBucket(`Files/${success.data.name}.pdf`, await pdfDoc.save(), 'application/pdf', token)
 
                   if (savePdf && savePdf.success) {
                     res.status(200).send({
@@ -258,6 +256,10 @@ async function PdfConvertor(req, res) {
                       message: savePdf.message
                     })
                   }
+                }, function(fail){
+                    console.log(fail);
+                    console.log('Error '+ fail.result.error.message);
+                })                  
                 } catch (err) {
                   res.status(500).send({
                     success: false,

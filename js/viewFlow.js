@@ -20,7 +20,7 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
                         window.location.href = '../404.html';
                     }
                     //console.log("we are ready");
-                    
+                    workflowData = doc.data()
                     $(document).trigger("dataready", doc);
                     unsubscribe()
                 }
@@ -96,12 +96,14 @@ function checkResultReady()
 }
 
 
-function displayWorkflow()
+async function displayWorkflow()
 {
     params=getParams(window.location.href)
     flow_id=params.id
+    // Download button visibility
+    isValidDownloadPDF = await isValidStepForDownload()
     //displayBreadCrumbs(flow_id)
-    populateSteps(flow_id)
+    populateSteps(flow_id, isValidDownloadPDF)
     populateLogs(flow_id)
     appendComments(flow_id)
 
@@ -172,7 +174,6 @@ function createBreadCrumb(stepName,id,isActive)
 
 function showStepOwner(stepOwnerList)
 {
-    console.log(stepOwnerList)
     if(stepOwnerList && stepOwnerList.length > 0) {
         $("#stepowner").html(`Current Owner:- ${stepOwnerList["0"]}`)
     }
@@ -213,7 +214,7 @@ $(document).on("showcomments", function(event){
 
 
 
-function populateSteps(flow_id)
+function populateSteps(flow_id, isValidDownloadPDF)
 {
     
     stepsDocument=db.collection("Workflows")
@@ -275,7 +276,6 @@ stepsDocument.then(function(querySnapshot) {
         }
         
 
-
         if(!isReviewOnly)
         {
             if(stepState && doesUserHaveEditAccess)
@@ -287,7 +287,7 @@ stepsDocument.then(function(querySnapshot) {
             else
             {
                 //console.log("Viewable step")
-                createViewableStep(doc)
+                createViewableStep(doc, isValidDownloadPDF)
             }
         }
         //Step is a review step and is active
@@ -524,12 +524,11 @@ function createEditableStep(stepDoc)
         
 }
 
-function createViewableStep(stepDoc)
+function createViewableStep(stepDoc, isValidDownloadPDF)
 {
 
         stepID=stepDoc.id
         stepContent=stepDoc.data()
-        isDownloadVisible = stepContent['isDownloadPdf']
         //create a Dynamic Div for every Step
         var stepholder=$("<div/>")
                     .attr("class", 'step container_12')
@@ -562,7 +561,7 @@ function createViewableStep(stepDoc)
         for (i=0;i<numberOfFields;i++)
         {
             // console.log('NUMBER FIELDS ------->', fieldData[i])
-            viewField(stepID,fieldList[i], fieldData[i], isDownloadVisible)
+            viewField(stepID,fieldList[i], fieldData[i], isValidDownloadPDF)
         }
 
 }
@@ -704,7 +703,7 @@ function createField(stepid, fieldMeta, index, fieldData)
 
 
 
-function viewField(stepID,fieldsList, fieldData, isDownloadVisible)
+function viewField(stepID,fieldsList, fieldData, isValidDownloadPDF)
 {
     
     label=fieldsList["label"]
@@ -735,7 +734,11 @@ function viewField(stepID,fieldsList, fieldData, isDownloadVisible)
 
             // Button visible for valid doc url
             fieldValue = `<a href=${value} class='fieldlink col-6'>${value}</a>
-            ${isValidDocUrl(value) && isDownloadVisible ? `<button id="urlButtonValue" value=${value} onclick="downloadPdf(value)" class='buttonsm buttongray col-6'>Download</button>` : ''}`
+                ${
+                isValidDocUrl(value) && isValidDownloadPDF
+                    ? `<button id="urlButtonValue" value=${value} onclick="downloadPdf(value)" class='buttonsm buttongray col-6'>Download</button>`
+                    : ''
+                }`
 
             div = $('<div/>').attr("class", "grid_6 field row mr-auto").append(fieldValue)
 
@@ -771,20 +774,11 @@ function viewField(stepID,fieldsList, fieldData, isDownloadVisible)
 
 const getWatermark = async (done) => {
     try {
-        await db.collection("Workflows").doc(flow_id)
-            .get()
-            .then(async function (doc) {
-                if (doc.exists) {
-                    var watermarkImage = await db.collection("Watermarks").where('workflowType', '==', doc.data().flowType)
-                        .get()
-                    done(watermarkImage.docs[0].data())
-                        
-                } else {
-                    console.log("No such document!");
-                }
-            }).catch(function (error) {
-                console.log("Error getting document:", error);
-            });
+        if (workflowData && workflowData['flowType']) {
+            var watermarkImage = await db.collection("Watermarks").where('workflowType', '==', workflowData['flowType'])
+                .get()
+            done(watermarkImage.docs[0].data())
+        }
     } catch(err) {
         console.log(err)
     }
@@ -895,4 +889,18 @@ const isValidDocUrl = (url) => {
     // doc url validate
     var urlRegx = new RegExp('(docs.google.com|(drive.google.com))(://[A-Za-z]+-my.sharepoint.com)?', 'i');
     return urlRegx.test(url)
+}
+
+const isValidStepForDownload = async () => {
+    try {
+        if (workflowData && workflowData['active_step_id']) {
+            var activeStep = await db.collection("Workflows").doc(flow_id).collection('steps').doc(workflowData['active_step_id']).get()
+            if (activeStep && activeStep.exists) {
+                return activeStep.data()['isDownloadPDF']
+            }
+        }
+        return 0
+    } catch(err) {
+        console.log(err)
+    }
 }
