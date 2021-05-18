@@ -733,19 +733,36 @@ function viewField(stepID,fieldsList, fieldData, isValidDownloadPDF)
             
 
             // Button visible for valid doc url
-            fieldValue = `<a href=${value} class='fieldlink col-6'>${value}</a>
-                ${
-                isValidDocUrl(value) && isValidDownloadPDF
-                    ? `<button id="urlButtonValue" value=${value} onclick="downloadPdf(value)" class='buttonsm buttongray col-6'>Download</button>`
-                    : ''
-                }`
+            fieldValue = `<a href=${value} class='fieldlink col-6'>${value}</a>`
 
-            div = $('<div/>').attr("class", "grid_6 field row mr-auto").append(fieldValue)
+            if(isValidDocUrl(value) && isValidDownloadPDF)
+            {
+
+               downloadButton=$("<img/>")
+               $(downloadButton).attr("id", "urlButtonValue")
+               $(downloadButton).addClass("col-6")               
+               $(downloadButton).attr("onclick", "downloadPdf(value)")
+               
+               $(downloadButton).attr("value", value)
+               $(downloadButton).attr("src", "img/pdf-download.png")
+               $(downloadButton).attr("width", "48")
+               
+               //$(downloadButton).attr("id", "urlButtonValue")
+                
+               //fieldValue=fieldValue+ `<button id="urlButtonValue" value=${value} onclick="downloadPdf(value)" class=''>Download</button>`
+
+            }
+                
+
+            divURL = $('<div/>').attr("class", "grid_5 field row mr-auto").append(fieldValue)
+            divButton=$('<div/>').attr("class", "grid_1 field row mr-auto").append($(downloadButton))
+           
 
 
             //console.log($(inputBox))        
 
-            $("#" + stepID).append($(div))
+            $("#" + stepID).append($(divURL))
+            $("#" + stepID).append($(divButton))
 
             //Create a div to go to next line.
 
