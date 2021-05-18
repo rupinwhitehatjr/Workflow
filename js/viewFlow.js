@@ -529,6 +529,7 @@ function createViewableStep(stepDoc)
 
         stepID=stepDoc.id
         stepContent=stepDoc.data()
+        isDownloadVisible = stepContent['isDownloadPdf']
         //create a Dynamic Div for every Step
         var stepholder=$("<div/>")
                     .attr("class", 'step container_12')
@@ -561,7 +562,7 @@ function createViewableStep(stepDoc)
         for (i=0;i<numberOfFields;i++)
         {
             // console.log('NUMBER FIELDS ------->', fieldData[i])
-            viewField(stepID,fieldList[i], fieldData[i])
+            viewField(stepID,fieldList[i], fieldData[i], isDownloadVisible)
         }
 
 }
@@ -703,7 +704,7 @@ function createField(stepid, fieldMeta, index, fieldData)
 
 
 
-function viewField(stepID,fieldsList, fieldData)
+function viewField(stepID,fieldsList, fieldData, isDownloadVisible)
 {
     
     label=fieldsList["label"]
@@ -733,9 +734,8 @@ function viewField(stepID,fieldsList, fieldData)
             
 
             // Button visible for valid doc url
-            fileId = value
             fieldValue = `<a href=${value} class='fieldlink col-6'>${value}</a>
-            ${isValidDocUrl(fileId) ? `<button id="urlButtonValue" value=${value} onclick="downloadPdf(fileId)" class='buttonsm buttongray col-6'>Download</button>` : ''}`
+            ${isValidDocUrl(value) && isDownloadVisible ? `<button id="urlButtonValue" value=${value} onclick="downloadPdf(value)" class='buttonsm buttongray col-6'>Download</button>` : ''}`
 
             div = $('<div/>').attr("class", "grid_6 field row mr-auto").append(fieldValue)
 
@@ -769,52 +769,117 @@ function viewField(stepID,fieldsList, fieldData)
      $("#"+stepID).append($('<div/>').attr("class", "clear"))
 }
 
-const downloadPdf = async () => {
+const getWatermark = async (done) => {
     try {
-        
-        window.swal({
-            title: "Please wait",
-            text: "Creating Download Link",
-            icon: "https://firebasestorage.googleapis.com/v0/b/renamingfilesforquiz.appspot.com/o/watermark-logo%2Fcom-gif-maker-unscreen.gif?alt=media&token=218dfb23-7f00-4517-b23c-75e139a28b66",  
-            button: false,
-            closeOnClickOutside: false,
-          });
-          
-        // Value of clicked button
-        var url = $('#urlButtonValue').val()
+        await db.collection("Workflows").doc(flow_id)
+            .get()
+            .then(async function (doc) {
+                if (doc.exists) {
+                    var watermarkImage = await db.collection("Watermarks").where('workflowType', '==', doc.data().flowType)
+                        .get()
+                    done(watermarkImage.docs[0].data())
+                        
+                } else {
+                    console.log("No such document!");
+                }
+            }).catch(function (error) {
+                console.log("Error getting document:", error);
+            });
+    } catch(err) {
+        console.log(err)
+    }
+}
 
-        // HTTP Request 
-        await axios.post('https://us-central1-renamingfilesforquiz.cloudfunctions.net/app/api/pdfConvert', {
-            "docUrl": url,
-        }).then((res) => {
-            if (res && res.data && res.data.success && res.data.data) {
-                window.open(
-                    res.data.data,
-                    '_blank', // <- it open in a new window.
-                    'toolbar=0,location=0,directories=0,status=1,menubar=0,titlebar=0,scrollbars=1,resizable=1,width='+1000+',height='+500
-                );
+const downloadPdf = async (url) => {
+    try {
+        let workflowImages;
 
-                window.swal({
-                    title: "File has been created, Successfully!",
-                    text: "Please allow pop up, If ask your browser.",
-                    icon: "success",  
-                    button: true,
-                  });
-            }
-            else {
-                swal({
-                    title: 'Error',
-                    icon: 'error',
-                    text: res.data.data.message
-                })
-            }
-        }).catch((err) => {
-            console.log(err)
-            swal({
-                title: 'Error',
-                icon: 'error',
-                text: err.message
+        await getWatermark(async function (image) {
+            workflowImages = image.imageChoices
+            console.log(workflowImages)
+            var imageTemplate = ''
+            workflowImages.map(doc => {
+                imageTemplate += `<label>
+                <input type="radio" name="imageButton" value=${doc.path} ${doc.isDefault ? 'checked' : ''}>
+                <img src=${doc.path}>
+              </label>`
             })
+            var radioButton = `<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+                <link rel="stylesheet" href="css/radioImages.css" />
+            </head>
+            <body>
+            ${imageTemplate}
+            </body>
+            </html>`
+            Swal.queue([{
+                title: `<i>Choose Watermark</i>`,
+                confirmButtonText: 'Generate PDF',
+                html: radioButton,
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    var imgUrl = $('input[name=imageButton]:checked').val()
+
+                    let userDetails = getLoggedInUserObject()
+                    let userData = {
+                        "name": userDetails["name"],
+                        "email": userDetails["email"],
+                        "photo": userDetails["photo"]
+                    }
+                    let params = {
+                        "docUrl": url,
+                        "watermarkUrl": imgUrl,
+                        "flowId": flow_id,
+                        "userData": userData
+                    }
+                    // HTTP Request 
+                    await axios.post('https://us-central1-renamingfilesforquiz.cloudfunctions.net/app/api/pdfConvert',
+                        params
+                    ).then((res) => {
+                        if (res && res.data && res.data.success && res.data.data) {
+                            var popUp = window.open(
+                                res.data.data,
+                                '_blank', // <- it open in a new window.
+                                'toolbar=0,location=0,directories=0,status=1,menubar=0,titlebar=0,scrollbars=1,resizable=1,width=' + 1000 + ',height=' + 500
+                            );
+                            try {
+                                popUp.focus()
+                                swal({
+                                    title: "File has been created, Successfully!",
+                                    icon: "success",
+                                    button: true,
+                                });
+                            }
+                            catch {
+                                swal({
+                                    title: "File has been created, Successfully!",
+                                    text: "Note- Pop-up Blocker is enabled! Please add this site to your exception list.",
+                                    icon: "success",
+                                    button: true,
+                                });
+                            }
+                        }
+                        else {
+                            swal({
+                                title: 'Error',
+                                icon: 'error',
+                                text: res.data.data.message
+                            })
+                        }
+                    }).catch((err) => {
+                        swal({
+                            title: 'Error',
+                            icon: 'error',
+                            text: err.message
+                        })
+                    })
+                }
+            }])
         })
     }
     catch (err) {
@@ -828,6 +893,6 @@ const downloadPdf = async () => {
 
 const isValidDocUrl = (url) => {
     // doc url validate
-    var urlRegx = new RegExp('(docs.google.com/document/d)(://[A-Za-z])?', 'i');
+    var urlRegx = new RegExp('(docs.google.com|(drive.google.com))(://[A-Za-z]+-my.sharepoint.com)?', 'i');
     return urlRegx.test(url)
 }

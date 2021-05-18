@@ -1,0 +1,31 @@
+input[type=radio] {
+    display: flex;
+    flex-direction: column;
+    margin: 1.5%;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.input-hidden {
+    position: absolute;
+    left: -9999px;
+  }
+  
+  input[type=radio]:checked + img {
+    border: 3px solid #fff;
+    box-shadow: 0 0 3px 3px #090;
+  }
+  
+  input[type=radio] + img {
+    border: 2px dashed #444;
+    max-width: 150px;
+    height: auto;
+    /* transition: 500ms all; */
+  }
+  
+  /* input[type=radio]:checked + img {
+    transform: 
+      rotateZ(-10deg) 
+      rotateX(10deg);
+  } */
