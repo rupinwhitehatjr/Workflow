@@ -313,11 +313,14 @@ stepsDocument.then(function(querySnapshot) {
             
         }
 
-        showStepOwner(stepOwners);
+        // showStepOwner(stepOwners);
 
         
     });
 });
+
+let currentStepOwner = workflowData.step_owners
+showStepOwner(currentStepOwner);
     
 }
 
@@ -738,23 +741,27 @@ function viewField(stepID,fieldsList, fieldData, isValidDownloadPDF)
             if(isValidDocUrl(value) && isValidDownloadPDF)
             {
 
-               downloadButton=$("<img/>")
+               downloadButton=$("<button/>")
                $(downloadButton).attr("id", "urlButtonValue")
-               $(downloadButton).addClass("col-6")               
+               imgButton=$("<img/>")
+               $(imgButton).attr("width", "48")
+               $(imgButton).attr("src", "img/pdf-download.png")
+               $(downloadButton).append(imgButton)
+               $(downloadButton).addClass("col-6, button-img")               
                $(downloadButton).attr("onclick", "downloadPdf(value)")
                
                $(downloadButton).attr("value", value)
-               $(downloadButton).attr("src", "img/pdf-download.png")
-               $(downloadButton).attr("width", "48")
+            //    $(downloadButton).attr("src", "img/pdf-download.png")
+            //    $(downloadButton).attr("width", "48")
                
                //$(downloadButton).attr("id", "urlButtonValue")
                 
                //fieldValue=fieldValue+ `<button id="urlButtonValue" value=${value} onclick="downloadPdf(value)" class=''>Download</button>`
 
-            }
+            
                 
 
-            divURL = $('<div/>').attr("class", "grid_5 field row mr-auto").append(fieldValue)
+            divURL = $('<div/>').attr("class", "grid_5 field row mr-auto text-overflow").append(fieldValue)
             divButton=$('<div/>').attr("class", "grid_1 field row mr-auto").append($(downloadButton))
            
 
@@ -771,6 +778,7 @@ function viewField(stepID,fieldsList, fieldData, isValidDownloadPDF)
             $("#" + stepID).append($('<div/>').attr("class", "clear"))
             return 0
         }
+    }
 
         
     
@@ -803,6 +811,7 @@ const getWatermark = async (done) => {
 
 const downloadPdf = async (url) => {
     try {
+        console.log(url)
         let workflowImages;
 
         await getWatermark(async function (image) {
