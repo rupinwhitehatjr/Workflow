@@ -607,6 +607,16 @@ table.resultstable >tbody> tr >td
   max-width:23px;
 }
 
+.button-img {
+  border: none;
+  padding: 0;
+  background: none;   
+}
+
+.text-overflow {
+  overflow-wrap: break-word
+}
+
 
 
 

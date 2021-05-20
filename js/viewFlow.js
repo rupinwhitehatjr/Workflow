@@ -20,7 +20,7 @@ unsubscribe=db.collection("Workflows").doc(flow_id)
                         window.location.href = '../404.html';
                     }
                     //console.log("we are ready");
-                    
+                    workflowData = doc.data()
                     $(document).trigger("dataready", doc);
                     unsubscribe()
                 }
@@ -96,12 +96,14 @@ function checkResultReady()
 }
 
 
-function displayWorkflow()
+async function displayWorkflow()
 {
     params=getParams(window.location.href)
     flow_id=params.id
+    // Download button visibility
+    isValidDownloadPDF = await isValidStepForDownload()
     //displayBreadCrumbs(flow_id)
-    populateSteps(flow_id)
+    populateSteps(flow_id, isValidDownloadPDF)
     populateLogs(flow_id)
     appendComments(flow_id)
 
@@ -172,7 +174,6 @@ function createBreadCrumb(stepName,id,isActive)
 
 function showStepOwner(stepOwnerList)
 {
-    console.log(stepOwnerList)
     if(stepOwnerList && stepOwnerList.length > 0) {
         $("#stepowner").html(`Current Owner:- ${stepOwnerList["0"]}`)
     }
@@ -213,7 +214,7 @@ $(document).on("showcomments", function(event){
 
 
 
-function populateSteps(flow_id)
+function populateSteps(flow_id, isValidDownloadPDF)
 {
     
     stepsDocument=db.collection("Workflows")
@@ -275,7 +276,6 @@ stepsDocument.then(function(querySnapshot) {
         }
         
 
-
         if(!isReviewOnly)
         {
             if(stepState && doesUserHaveEditAccess)
@@ -287,7 +287,7 @@ stepsDocument.then(function(querySnapshot) {
             else
             {
                 //console.log("Viewable step")
-                createViewableStep(doc)
+                createViewableStep(doc, isValidDownloadPDF)
             }
         }
         //Step is a review step and is active
@@ -313,11 +313,14 @@ stepsDocument.then(function(querySnapshot) {
             
         }
 
-        showStepOwner(stepOwners);
+        // showStepOwner(stepOwners);
 
         
     });
 });
+
+let currentStepOwner = workflowData.step_owners
+showStepOwner(currentStepOwner);
     
 }
 
@@ -524,7 +527,7 @@ function createEditableStep(stepDoc)
         
 }
 
-function createViewableStep(stepDoc)
+function createViewableStep(stepDoc, isValidDownloadPDF)
 {
 
         stepID=stepDoc.id
@@ -560,8 +563,8 @@ function createViewableStep(stepDoc)
         }
         for (i=0;i<numberOfFields;i++)
         {
-            console.log('NUMBER FIELDS ------->', fieldData[i])
-            viewField(stepID,fieldList[i], fieldData[i])
+            // console.log('NUMBER FIELDS ------->', fieldData[i])
+            viewField(stepID,fieldList[i], fieldData[i], isValidDownloadPDF)
         }
 
 }
@@ -703,7 +706,7 @@ function createField(stepid, fieldMeta, index, fieldData)
 
 
 
-function viewField(stepID,fieldsList, fieldData)
+function viewField(stepID,fieldsList, fieldData, isValidDownloadPDF)
 {
     
     label=fieldsList["label"]
@@ -723,15 +726,59 @@ function viewField(stepID,fieldsList, fieldData)
         {
             fieldDisplay=fieldsList["displayAs"]
         }
-
         fieldValue=value;
-        if(fieldDisplay==="url")
+        if(fieldDisplay==="url" && value)
         {
-            fieldValue=$("<a>")
-                        .attr("href", value)
-                        .attr("class", "fieldlink")
-                        .append(value)
+            // fieldValue=$("<a>")
+            //             .attr("href", value)
+            //             .attr("class", "fieldlink")
+            //             .append(value)
+            
+
+            // Button visible for valid doc url
+            fieldValue = `<a href=${value} class='fieldlink col-6'>${value}</a>`
+
+            if(isValidDocUrl(value) && isValidDownloadPDF)
+            {
+
+               downloadButton=$("<button/>")
+               $(downloadButton).attr("id", "urlButtonValue")
+               imgButton=$("<img/>")
+               $(imgButton).attr("width", "48")
+               $(imgButton).attr("src", "img/pdf-download.png")
+               $(downloadButton).append(imgButton)
+               $(downloadButton).addClass("col-6, button-img")               
+               $(downloadButton).attr("onclick", "downloadPdf(value)")
+               
+               $(downloadButton).attr("value", value)
+            //    $(downloadButton).attr("src", "img/pdf-download.png")
+            //    $(downloadButton).attr("width", "48")
+               
+               //$(downloadButton).attr("id", "urlButtonValue")
+                
+               //fieldValue=fieldValue+ `<button id="urlButtonValue" value=${value} onclick="downloadPdf(value)" class=''>Download</button>`
+
+            
+                
+
+            divURL = $('<div/>').attr("class", "grid_5 field row mr-auto text-overflow").append(fieldValue)
+            divButton=$('<div/>').attr("class", "grid_1 field row mr-auto").append($(downloadButton))
+           
+
+
+            //console.log($(inputBox))        
+
+            $("#" + stepID).append($(divURL))
+            $("#" + stepID).append($(divButton))
+
+            //Create a div to go to next line.
+
+
+
+            $("#" + stepID).append($('<div/>').attr("class", "clear"))
+            return 0
         }
+    }
 
         
     
@@ -748,4 +795,138 @@ function viewField(stepID,fieldsList, fieldData)
 
     
      $("#"+stepID).append($('<div/>').attr("class", "clear"))
+}
+
+const getWatermark = async (done) => {
+    try {
+        if (workflowData && workflowData['flowType']) {
+            var watermarkImage = await db.collection("Watermarks").where('workflowType', '==', workflowData['flowType'])
+                .get()
+            done(watermarkImage.docs[0].data())
+        }
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+const downloadPdf = async (url) => {
+    try {
+        console.log(url)
+        let workflowImages;
+
+        await getWatermark(async function (image) {
+            workflowImages = image.imageChoices
+            console.log(workflowImages)
+            var imageTemplate = ''
+            workflowImages.map(doc => {
+                imageTemplate += `<label>
+                <input type="radio" name="imageButton" value=${doc.path} ${doc.isDefault ? 'checked' : ''}>
+                <img src=${doc.path}>
+              </label>`
+            })
+            var radioButton = `<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+                <link rel="stylesheet" href="css/radioImages.css" />
+            </head>
+            <body>
+            ${imageTemplate}
+            </body>
+            </html>`
+            Swal.queue([{
+                title: `<i>Choose Watermark</i>`,
+                confirmButtonText: 'Generate PDF',
+                html: radioButton,
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    var imgUrl = $('input[name=imageButton]:checked').val()
+
+                    let userDetails = getLoggedInUserObject()
+                    let userData = {
+                        "name": userDetails["name"],
+                        "email": userDetails["email"],
+                        "photo": userDetails["photo"]
+                    }
+                    let params = {
+                        "docUrl": url,
+                        "watermarkUrl": imgUrl,
+                        "flowId": flow_id,
+                        "userData": userData
+                    }
+                    // HTTP Request 
+                    await axios.post('https://us-central1-renamingfilesforquiz.cloudfunctions.net/app/api/pdfConvert',
+                        params
+                    ).then((res) => {
+                        if (res && res.data && res.data.success && res.data.data) {
+                            var popUp = window.open(
+                                res.data.data,
+                                '_blank', // <- it open in a new window.
+                                'toolbar=0,location=0,directories=0,status=1,menubar=0,titlebar=0,scrollbars=1,resizable=1,width=' + 1000 + ',height=' + 500
+                            );
+                            try {
+                                popUp.focus()
+                                swal({
+                                    title: "File has been created, Successfully!",
+                                    icon: "success",
+                                    button: true,
+                                });
+                            }
+                            catch {
+                                swal({
+                                    title: "File has been created, Successfully!",
+                                    text: "Note- Pop-up Blocker is enabled! Please add this site to your exception list.",
+                                    icon: "success",
+                                    button: true,
+                                });
+                            }
+                        }
+                        else {
+                            swal({
+                                title: 'Error',
+                                icon: 'error',
+                                text: res.data.data.message
+                            })
+                        }
+                    }).catch((err) => {
+                        swal({
+                            title: 'Error',
+                            icon: 'error',
+                            text: err.message
+                        })
+                    })
+                }
+            }])
+        })
+    }
+    catch (err) {
+        swal({
+            title: 'Error',
+            icon: 'error',
+            text: err.message
+        })
+    }
+}
+
+const isValidDocUrl = (url) => {
+    // doc url validate
+    var urlRegx = new RegExp('(docs.google.com|(drive.google.com))(://[A-Za-z]+-my.sharepoint.com)?', 'i');
+    return urlRegx.test(url)
+}
+
+const isValidStepForDownload = async () => {
+    try {
+        if (workflowData && workflowData['active_step_id']) {
+            var activeStep = await db.collection("Workflows").doc(flow_id).collection('steps').doc(workflowData['active_step_id']).get()
+            if (activeStep && activeStep.exists) {
+                return activeStep.data()['isDownloadPDF']
+            }
+        }
+        return 0
+    } catch(err) {
+        console.log(err)
+    }
 }
