@@ -114,6 +114,26 @@ function userAction(action)
 
 	}
 
+	// On approved save checklist response on step
+	if (action === 'approved') {
+		var radioButtonInput = $('input:radio:checked')
+		var checklistResponse = new Array();
+
+		$(radioButtonInput).each(function(){
+			checklistResponse.push($(this).val())
+		});
+
+		let checklistResponseRef = db.collection("ChecklistResponse").doc()
+		let checklistResponseDocument = db.collection("ChecklistResponse").doc(checklistResponseRef.id)
+		checklistResponseDocument.set({ checklistResponse: checklistResponse })
+
+		db.collection("Workflows")
+			.doc(flowID)
+			.collection("steps")
+			.doc(stepID)
+			.update({ checklistResponse: checklistResponseRef })
+	}
+
 	
 	
 	
@@ -124,7 +144,7 @@ function userAction(action)
 	cacheDocument=db.collection("Cache").doc(cacheDocRef.id)	
 	cacheDocument.set(approvedData)
 	console.log(cacheDocRef.id)
-	//console.log(approvedData)
+	console.log(approvedData)
 
 	
 	

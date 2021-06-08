@@ -39,7 +39,11 @@
     
 </head>
 <body>
-
+<!-- <select>
+  <option value="1">one</option>
+  <option value="2">two</option>
+  <option value="3">three</option>
+</select> -->
 <div class="container_12">
   <div class="grid_12">
     &nbsp;
@@ -81,6 +85,8 @@
    &nbsp;
   </div>
 
+  <div class="clear"></div>
+
 
   <div class="clear"></div>  
 
@@ -110,14 +116,14 @@
 
   <div class="grid_4 alignright">
     <a id="rejectButton" class="button" 
-    style='width:25%'
     onclick="javascript:userAction('rejected')">Reject
   </a>
-    <a  id="approveButton"
+    <button  id="approveButton"
+    title='Button Disable'
     class="button" 
-    style='width:25%' 
+    disabled
     onclick="javascript:userAction('approved')">Approve
-    </a>
+</button>
   </div>   
 </div>
 
@@ -168,6 +174,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <!-- end .container_16 -->
 </body>
