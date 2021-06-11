@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Set Checklist Questions</title>
+    <link rel="icon" href="img/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/text.css" />
+    <link rel="stylesheet" href="css/960.css" />
+    <link rel="stylesheet" href="css/demo.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-auth.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.min.js"></script>
+
+
+    <script type="text/javascript" src="js/firebaseConfig.js"></script>
+
+    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="js/auth.js"></script>
+    <script type="text/javascript" src="js/setChecklistQuestion.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+
+
+</head>
+
+<body>
+
+    <div class="container_12">
+        <div class="grid_12 ">
+            &nbsp;
+        </div>
+        <!-- end .grid_12 -->
+        <div class="clear"></div>
+
+    </div>
+
+    <div class="container_12 step" id="p_container">
+        <div class="grid_12 stepheader">Select the Process</div>
+
+        <div class="grid_4 fieldlabel">
+            Process Name
+        </div>
+        <div class="grid_6 field">
+            <select id="process_selector">
+                <option value="-1" selected>Select</option>
+                <option value="CurriculumWorkflow">
+                    Curriculum Workflow
+                </option>
+                <option value="CurriculumWorkFlow1to2">
+                    Curriculum WorkFlow Multi
+                </option>
+                <option value="VisualAids">
+                    Visual Aids Workflow
+                </option>
+            </select>
+        </div>
+        <!-- end .grid_12 -->
+        <div class="clear"></div>
+
+
+
+        <!-- end .grid_12 -->
+        <div class="clear"></div>
+
+    </div>
+
+
+    <div class="container_12 step" id="groupKeyFields">
+        <div class="grid_12 stepheader">Select Step</div>
+
+
+        <div class="clear"></div>
+
+        <div class="grid_4 fieldlabel">
+            Step Name
+        </div>
+        <div class="grid_6 field">
+            <select id="stepList" disabled>
+
+            </select>
+        </div>
+
+        <div class="clear"></div>
+
+    </div>
+
+    <div class="container_12 step hide questionsGroup-background" id="stepNotifyList">
+        <div class="grid_12 stepheader">
+            <div class="headertitle">Update Questions List</div>
+
+            <div class="clear"></div>
+
+
+
+
+        </div>
+
+        <form onsubmit="addRemoveQuestionGroup(event,'submit')">
+            <div id='questionsBoxGroup'>
+                <div style="margin: 30px;" id="TextBoxDiv1" class="row-local">
+                    <div class="column-local">
+                        <label>
+                            <strong style="font-size: x-large;">Q1. </strong>
+                            <label>
+                                <textarea placeholder="Please enter question" name="textareaQuestion1" cols="40"
+                                    rows="2" spellcheck="true"
+                                    style="margin-top: 0px; margin-bottom: 0px; height: 54px;" required></textarea>
+                            </label>
+                        </label>
+                    </div>
+                    <div style="font-size: medium;" class="column-local">Options: YES,&nbsp;NO</div>
+                    <div class="column-local">
+                        <input name="checkboxQuestion1" type="checkbox">
+                        <label style="font-size: medium;">
+                            Is Mandatory
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="checklist-form-wrapper">
+
+                <input class="button" onclick="addRemoveQuestionGroup(null, 'add')" type='button'
+                    value='Add More Question' id='addQuestionButton' />
+                <input class="button" onclick="addRemoveQuestionGroup(null, 'remove')" type='button'
+                    value='Remove Question' id='removeQuestionButton' />
+                <input class="button" type='submit' id='submitQuestion' value="Submit Question" />
+            </div>
+        </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div id="loading" class="modal custommodal">
+            <div class='modalmessage'>Loading...</div>
+            <div><img src='img/loading.gif' height="52px"></div>
+        </div>
+
+        <div id="loginmodal" class="modal custommodal">
+            <div class='modalmessage'>Please Wait..</div>
+            <div><img src='img/loading.gif' height="52px"></div>
+        </div>
+
+        <div id="savingmodal" class="modal custommodal">
+            <div class='modalmessage'>Saving your Data..</div>
+            <div><img src='img/loading.gif' height="52px"></div>
+        </div>
+
+
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <script src="/js/jquery.connections.js"></script>
+        <!-- end .container_16 -->
+</body>
+
+</html>

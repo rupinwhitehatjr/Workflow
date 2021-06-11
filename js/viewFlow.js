@@ -790,7 +790,7 @@ async function checklistTemplate(checklist, stepid) {
               >`
         })
         questionTemplate += `<div>
-        <span><strong>Q${questionIndex + 1}</strong>: ${item.questions}${item.mandatory ? `<sup><i style="color: #fff; font-size: 0.75rem; margin: 5px; margin-top: 5px" class="fa fa-asterisk" aria-hidden="true"></i></sup>` : ""}</span>
+        <span><strong>Q${questionIndex + 1}</strong>: ${item.question}${item.mandatory ? `<sup><i style="color: #fff; font-size: 0.75rem; margin: 5px; margin-top: 5px" class="fa fa-asterisk" aria-hidden="true"></i></sup>` : ""}</span>
     </div>
 
       <div>
@@ -836,7 +836,7 @@ async function createViewableChecklistTemplate(checklist, checklistResponse, ste
                 />${checklistResponse[questionIndex]}</label
               >`
         questionTemplate += `<div>
-        <span><strong>Q${questionIndex + 1}</strong>: ${item.questions}${item.mandatory ? `<sup><i style="color: #fff; font-size: 0.75rem; margin: 5px; margin-top: 5px" class="fa fa-asterisk" aria-hidden="true"></i></sup>` : ""}</span>
+        <span><strong>Q${questionIndex + 1}</strong>: ${item.question}${item.mandatory ? `<sup><i style="color: #fff; font-size: 0.75rem; margin: 5px; margin-top: 5px" class="fa fa-asterisk" aria-hidden="true"></i></sup>` : ""}</span>
         ${optionsTemplate}
     </div>`
         optionsTemplate = ''
@@ -865,6 +865,7 @@ async function createViewableChecklistTemplate(checklist, checklistResponse, ste
 async function checklistQuery(searchParam, checklistSearchStepID) {
     let query = db.collection("Checklist")
     query = query.where("stepID", "==", checklistSearchStepID)
+    query = query.where("flowType", "==", workflowData['flowType'])
     for (searchParamsItem in searchParam) {
         if (searchParam[searchParamsItem].isChecklistTerm)
             query = query.where(searchParamsItem, "==", searchParam[searchParamsItem].value)
@@ -953,8 +954,15 @@ async function getReviewStepsChecklist() {
                     
                     // Create all view checklist steps
                     else {
-                        createViewableChecklistTemplate(stepChecklist.data()['checklist'], stepChecklistResponse.data()['checklistResponse'],
-                            item.id + "checklistContainerEditView")
+                        if ($("#" + item.id) && ($("#" + item.id).find("div")) && ($("#" + item.id).find("div")).length > 0 && ($("#" + item.id).find("div"))[0].innerHTML && ($("#" + item.id).find("div"))[0].innerHTML === item.data()['name']) {
+                            createViewableChecklistTemplate(stepChecklist.data()['checklist'], stepChecklistResponse.data()['checklistResponse'],
+                                item.id)
+                            $("#" + item.id + "checklistContainerEditViewWrapper").remove()
+                        }
+                            
+                        else
+                            createViewableChecklistTemplate(stepChecklist.data()['checklist'], stepChecklistResponse.data()['checklistResponse'],
+                                item.id + "checklistContainerEditView")
                     }
                 }
 
