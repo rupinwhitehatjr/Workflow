@@ -119,24 +119,19 @@ function userAction(action)
 		if (action === 'approved') {
 			var radioButtonInput = $('input:radio')
 			var checklistResponse = new Array();
+			let setQuestionValue = {}
 			var questionNo = 0;
 
-			for (var i = 0; i < radioButtonInput.length; i += 2) {
+			$(radioButtonInput).each(function(){
+				if(!setQuestionValue[this.name])
+					setQuestionValue[this.name] = null
+				if($(this).is(':checked'))
+					setQuestionValue[(this.name)] = $(this).val()
+			});
 
-				if ($(radioButtonInput[i]).is(':checked')) {
-					checklistResponse[questionNo] = $(radioButtonInput[i]).attr('value');
-				}
+			checklistResponse = Object.keys(setQuestionValue).map((i) => setQuestionValue[i])
 
-				else if ($(radioButtonInput[i + 1]).is(':checked')) {
-					checklistResponse[questionNo] = $(radioButtonInput[i + 1]).attr('value');
-				}
-
-				else {
-					checklistResponse[questionNo] = "N/A";
-				}
-
-				questionNo++;
-			}
+			console.log("CHECKLIST RESPONSE ----->", checklistResponse)
 
 			let checklistResponseRef = db.collection("ChecklistResponse").doc()
 			let checklistResponseDocument = db.collection("ChecklistResponse").doc(checklistResponseRef.id)
