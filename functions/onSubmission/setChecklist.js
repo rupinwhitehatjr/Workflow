@@ -71,6 +71,7 @@ async function checklistQuery(searchParam, checklistSearchStepID) {
     try {
         let query = db.collection("Checklist")
         query = query.where("stepID", "==", checklistSearchStepID)
+        query = query.where("isActive", "==", true)
 
         for (searchParamsItem in searchParam) {
             if (searchParam[searchParamsItem].isChecklistTerm)

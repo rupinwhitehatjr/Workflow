@@ -866,6 +866,7 @@ async function checklistQuery(searchParam, checklistSearchStepID) {
     let query = db.collection("Checklist")
     query = query.where("stepID", "==", checklistSearchStepID)
     query = query.where("flowType", "==", workflowData['flowType'])
+    query = query.where("isActive", "==", true)
     for (searchParamsItem in searchParam) {
         if (searchParam[searchParamsItem].isChecklistTerm)
             query = query.where(searchParamsItem, "==", searchParam[searchParamsItem].value)
@@ -928,9 +929,12 @@ async function getReviewStepsChecklist() {
     if (workflowData && workflowData['active_step_id']) {
         var activeStepData = await getActiveStepId(workflowData, flow_id)
         var activeStepChecklist = await activeStepData.data()["checklist"].get()
+
+        console.log(activeStepChecklist.data())
     }
     let stepsData = await getStepData(flow_id)
         if (stepsData && !stepsData.empty && stepsData.docs && stepsData.docs.length > 0) {
+            console.log("STEP DATA ----->", stepsData)
             stepsData.docs.map(async (item) => {
 
                 // Create checklist sections for steps
@@ -941,14 +945,18 @@ async function getReviewStepsChecklist() {
                 $(createChecklistSection).insertBefore("#commentssection")
 
                 // Checklist enabler & close workflow condition added
-                if ((item.data()["checklist"] && item.data()["checklistResponse"] && activeStepData && activeStepData.data() && item.data()['index'] <= activeStepData.data()['index']) || workflowData.closed) {
+                if ((item.data()["checklist"] && activeStepData && activeStepData.data() && item.data()['index'] <= activeStepData.data()['index']) || workflowData.closed) {
 
                     // Reference from steps key checklist
                     let stepChecklist = await item.data()["checklist"].get()
-                    let stepChecklistResponse = await item.data()["checklistResponse"].get()
+                    console.log(stepChecklist)
+                    if(item.data()["checklistResponse"]) 
+                        var stepChecklistResponse = await item.data()["checklistResponse"].get()
+
 
                     // One active id step
                     if (activeStepData && activeStepData.id && item.id === activeStepData.id) {
+                        console.log("ACTIVE STEP ID")
                         checklistTemplate(activeStepChecklist.data()['checklist'], activeStepData.id + "checklistContainerEditView")
                     }
                     

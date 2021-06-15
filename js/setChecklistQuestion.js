@@ -15,6 +15,9 @@ $(document).on("authready", function (event) {
 });
 
 $(document).on('change', '#process_selector', function () {
+    if (!$("#stepNotifyList").hasClass("hide")) {
+        $("#stepNotifyList").addClass("hide")
+    }
     selectedProcess = $(this).val()
     $(".dynamic").remove();
     $(".notifylistdiv").remove()
@@ -30,14 +33,17 @@ $(document).on('change', '#process_selector', function () {
 
 processSteps = []
 async function fetchDataForProcess(processName) {
-
     $("#stepList").removeClass("standout");
     $("#stepList").empty()
     stepsList = await db.collection(processName).orderBy("index").get()
+    // stepsList = await db.collection(processName).where("onlyreview", '==', false).orderBy("index").get()
     processSteps = []
+    let allStepsProcess = new Array()
     stepsList.forEach((doc) => {
-        processSteps.push(doc)
-        //console.log(doc.data())
+        allStepsProcess.push(doc)
+        // processSteps.push(doc)
+        var validStepField = doc.data().fields ? doc.data().fields.filter(function (each) { return each.type === "dropdown"; }) : null;
+        validStepField && validStepField.length > 0 ? processSteps.push(doc) : null
     })
     //console.log(processSteps[0].id)
     numberofsteps = processSteps.length
@@ -55,7 +61,55 @@ async function fetchDataForProcess(processName) {
     }
     $("#stepList").removeAttr("disabled").attr("class", "standout");
 
+    createEmptyNotifyLists(allStepsProcess);
+
 }
+
+let questionListCounter = {}
+//Create Empty Notify Lists, to be updated when the group key gets generated
+function createEmptyNotifyLists(allStepsProcess) {
+    $("#questionContainerForm").empty()
+    numberofsteps = allStepsProcess.length
+
+    for (stepIndex = 0; stepIndex < numberofsteps; stepIndex++) {
+        questionListCounter[allStepsProcess[stepIndex].id] = 1
+        // style="margin: 90px; padding: 5px;"
+        var formContainer = `<div>
+    <div style = "margin-bottom: 20px;" class="step">
+                    <div class="stepheader">${allStepsProcess[stepIndex].data()['name']}</div>
+                <div id=${allStepsProcess[stepIndex].id}>
+                </div>
+                <div class="checklist-form-wrapper">
+            
+                    <input class="button" onclick="addRemoveQuestionGroup(null, 'add', '${allStepsProcess[stepIndex].id}')" type="button" value="Add More Question"
+                        id="addQuestionButton${stepIndex}">
+                    <input class="button" onclick="addRemoveQuestionGroup(null, 'remove', '${allStepsProcess[stepIndex].id}')" type="button" value="Remove Question"
+                        id="removeQuestionButton${stepIndex}">
+                </div>
+                </div>
+                </div>
+                <div class="clear"></div> 
+                <div class="clear"></div>
+                ${stepIndex === numberofsteps - 1 ? `<input style="float: right;" class="button" type='submit' id='submitQuestion' value="Save" />` : ''}`
+
+
+        $("#questionContainerForm").append(formContainer)
+
+        addRemoveQuestionGroup(null, 'add', allStepsProcess[stepIndex].id, null, true)
+
+
+    }
+}
+
+// async function editViewPresentChecklist() {
+//     let groupKeyFields = $("select.groupKey")
+
+//         for (index = 0; index < groupKeyFields.length; index++) {
+//             let fieldsValue = $("select#" + index).val()
+//                 console.log(fieldsValue)            
+//         }
+// }
+
 
 $(document).on('change', '#stepList', function () {
     selectedStep = $(this).val()
@@ -66,6 +120,65 @@ $(document).on('change', '#stepList', function () {
     createGroupKeyChoices(selectedStep);
 
 
+});
+
+
+$(document).on('focus', 'select.groupKey', function () {
+    let onTriggerDocument = new Array()
+    let groupKeyFields = $("select.groupKey")
+
+    for (index = 0; index < groupKeyFields.length; index++) {
+        groupKeyValue = $("select#" + index).val()
+        let indexOnTriggerDocument = {
+            label: groupKeyLabels[index],
+            value: groupKeyValue
+        }
+        onTriggerDocument.push(indexOnTriggerDocument)
+    }
+    // Store the current value on focus, before it changes
+    $(document).on('change', 'select.groupKey', function () {
+
+        let saveMsg = false
+
+        let optionsID = new Array()
+
+        $("textarea").each(function () {
+            if (this.value !== '') {
+
+                saveMsg = true
+
+                optionsID.push($(this).attr("data-questionFormID"))
+            }
+        });
+
+        if (saveMsg) {
+            swal({
+                title: "Form Save",
+                text: "Do you want to save?",
+                icon: "warning",
+                buttons: true,
+                buttons: ['Yes!', 'No!'],
+            }).then((deny) => {
+                if (deny) {
+                    swal("Question form has been reset!");
+                    $('form').each(function () {
+                        this.reset();
+                    });
+                } else {
+                    let isValidOption = true
+                    optionsID.map((item) => {
+                        if ($(`input[name=optionBoxQuestion${item}]`).val() === '') {
+
+                            isValidOption = false
+                            swal("Options are required!");
+                        }
+                    })
+                    isValidOption ? addRemoveQuestionGroup(null, 'submit', null, onTriggerDocument) : null
+                }
+            });
+        }
+
+    });
 });
 
 
@@ -139,6 +252,7 @@ function createGroupKeyChoices(selectedStep) {
 
 
 
+
     }
 }
 
@@ -158,7 +272,12 @@ function createFieldRow(fieldMeta, sequence) {
         $(dd).attr("required", true)
     }
     for (index = 0; index < options.length; index++) {
-        option = $("<option/>").val(options[index]).text(options[index])
+        if (index === 0) {
+            option = $("<option/>").val(options[index]).text(options[index]).attr('selected', 'true')
+        }
+        else {
+            option = $("<option/>").val(options[index]).text(options[index])
+        }
 
         $(dd).append($(option))
     }
@@ -167,60 +286,111 @@ function createFieldRow(fieldMeta, sequence) {
     $("#groupKeyFields").append($(emptyDiv))
 }
 
-var questionGroupCount = 2;
-async function addRemoveQuestionGroup(event, action) {
+async function setInactiveCurrentChecklist(isOnChangeTriggerDocument) {
+    try {
+        for (IDCount in questionListCounter) {
+
+            let queryChecklist = db.collection("Checklist")
+            queryChecklist = queryChecklist.where("stepID", "==", IDCount)
+            queryChecklist.flowType = selectedProcess
+            let groupKeyFields = $("select.groupKey")
+
+            for (index = 0; index < groupKeyFields.length; index++) {
+                groupKeyValue = $("select#" + index).val()
+                queryChecklist = queryChecklist.where(groupKeyLabels[index], '==', groupKeyValue)
+            }
+
+            if (isOnChangeTriggerDocument && isOnChangeTriggerDocument.length > 0) {
+                for (let item in isOnChangeTriggerDocument) {
+                    queryChecklist = queryChecklist.where(isOnChangeTriggerDocument[item].label, '==', isOnChangeTriggerDocument[item].label)
+                }
+            }
+
+            let existChecklist = await queryChecklist.get()
+
+            if (existChecklist && !existChecklist.empty) {
+
+                existChecklist.docs.map(async (item) => {
+                    await db.collection("Checklist").doc(item.id).update({ isActive: false })
+                })
+            }
+        }
+        return 0
+    } catch (err) {
+        console.log("ERROR ----->", err)
+        return 0
+    }
+}
+
+// Question form for new added question
+function newQuestionForm(ID) {
+    let newQuestion = `<div class="row-local">
+            <div class="column-local">
+              <label>
+                <strong style="font-size: x-large;">Q${questionStepCounter[ID] - 1}. </strong>
+                <label>
+                  <textarea data-questionFormID=${ID + questionStepCounter[ID]} placeholder="Please enter question" name="textareaQuestion${ID + questionStepCounter[ID]}" cols="40"
+                    rows="2" spellcheck="true" style="margin-top: 0px; margin-bottom: 0px; height: 54px;" required=""></textarea>
+                </label>
+              </label>
+            </div>
+            <label style="font-size: medium;" class="column-local">Answer choices: <input
+                name="optionBoxQuestion${ID + questionStepCounter[ID]}" type="text" placeholder="Enter comma sperated options"
+                required /></label>
+            <div class="column-local">
+              <input name="checkboxQuestion${ID + questionStepCounter[ID]}" type="checkbox">
+              <label style="font-size: medium;">
+                Is Mandatory
+              </label>
+            </div>
+          </div>`
+
+    $("#" + ID).append(newQuestion)
+}
+
+var questionGroupCount = 1;
+let questionStepCounter = {}
+async function addRemoveQuestionGroup(event, action, ID, isOnChangeTriggerDocument, isQuestionDynamic) {
+
 
     // If action add then create new section for question
     if (action === 'add') {
-        var textareaInput = $(`textarea[name=textareaQuestion${questionGroupCount - 1}]`)
-        if (!textareaInput.val()) {
+
+        if (!questionStepCounter[ID]) {
+            questionStepCounter[ID] = 2
+        }
+
+
+
+        var textareaInput = $(`textarea[name=textareaQuestion${ID + questionListCounter[ID]}]`)
+        var optionInput = $(`input[name=optionBoxQuestion${ID + questionListCounter[ID]}]`)
+        if (textareaInput.length > 0 && !textareaInput.val()) {
+            if(!isQuestionDynamic) {
+                swal({
+                    title: "Unable to add questions!",
+                    text: `Please insert question no. ${questionStepCounter[ID] - 2}`,
+                    icon: "warning",
+                    button: true,
+                });
+            }
+            return false;
+        }
+
+        if (optionInput.length > 0 && !optionInput.val()) {
             swal({
                 title: "Unable to add questions!",
-                text: `Please insert question no. ${questionGroupCount - 1}`,
+                text: `Answer choices can't be empty`,
                 icon: "warning",
                 button: true,
             });
             return false;
         }
 
-        // If more than one section of question then submit button name should be Submit Questions
-        $('#submitQuestion').val('Submit Questions')
+        newQuestionForm(ID)
 
-
-        // Limit 10 question per window
-        if (questionGroupCount > 10) {
-            swal({
-                title: "Unable to add more question!",
-                text: "Only 10 questions allow",
-                icon: "warning",
-                button: true,
-            });
-            return false;
-        }
-
-        let newQuestion = `<div style="margin: 30px;" id="questionBoxContainer${questionGroupCount}" class="row-local">
-                  <div class="column-local">
-                      <label>
-                          <strong style="font-size: x-large;">Q${questionGroupCount}. </strong>
-                          <label>
-                              <textarea name="textareaQuestion${questionGroupCount}" cols="40" rows="2" spellcheck="true"
-                                  style="margin-top: 0px; margin-bottom: 0px; height: 54px;" required placeholder="Please enter question"></textarea>
-                          </label>
-                      </label>
-                  </div>
-                  <div style="font-size: medium;" class="column-local">Options: YES,&nbsp;NO</div>
-                  <div class="column-local">
-                      <input name="checkboxQuestion${questionGroupCount}" type="checkbox">
-                      <label style="font-size: medium;">
-                          Is Mandatory
-                      </label>
-                  </div>
-              </div>`
-
-        $("#questionsBoxGroup").append(newQuestion)
-
-
-        questionGroupCount++;
+        // questionGroupCount++;
+        questionStepCounter[ID]++
+        questionListCounter[ID]++
 
     }
 
@@ -228,7 +398,7 @@ async function addRemoveQuestionGroup(event, action) {
     // If action remove then remove last section of question
     if (action === 'remove') {
 
-        if (questionGroupCount == 2) {
+        if (questionGroupCount === 2) {
             swal({
                 title: "Unable to remove question!",
                 text: "No more questions allow to remove",
@@ -238,12 +408,13 @@ async function addRemoveQuestionGroup(event, action) {
             return false
         }
 
-        // If only one section of question then submit button name should be Submit Question
-        if (questionGroupCount === 3)
-            $('#submitQuestion').val('Submit Question')
+        // questionGroupCount --
+        questionStepCounter[ID]--
+        questionListCounter[ID]--
 
-        questionGroupCount --
-        $("#questionBoxContainer" + questionGroupCount).remove();
+        // $('#' + ID).children().last().remove()
+
+        $('#' + ID).children().last().fadeOut(500, function () { $(this).remove(); });
 
 
     }
@@ -251,7 +422,10 @@ async function addRemoveQuestionGroup(event, action) {
     // If action submit then submit form of questions
     if (action === 'submit') {
 
-        event.preventDefault()
+
+        if (event) {
+            event.preventDefault()
+        }
 
         $("#savingmodal").modal({
             escapeClose: false,
@@ -259,90 +433,72 @@ async function addRemoveQuestionGroup(event, action) {
             showClose: false
         });
 
-        let setQuestions = {}
-        setQuestions.flowType = selectedProcess
-        setQuestions.stepID = selectedStep
-        let fieldValue = []
-        let groupKeyFields = $("select.groupKey")
+        await setInactiveCurrentChecklist(isOnChangeTriggerDocument)
         
-        for (index = 0; index < groupKeyFields.length; index++) {
-            let fieldValueKeys = {}
 
-            groupKeyValue = $("select#" + index).val()
-            fieldValueKeys["label"] = groupKeyLabels[index]
-            fieldValueKeys["value"] = groupKeyValue
+        for (IDCount in questionListCounter) {
 
-            fieldValue.push(fieldValueKeys)
-        }
+            let setDocument = { isActive: true }
 
-        let queryChecklist = db.collection("Checklist")
+            setDocument.flowType = selectedProcess
+            let groupKeyFields = $("select.groupKey")
 
-        // fieldValue have key value pair of label & value
-        fieldValue.map((item) => {
-            setQuestions[item.label] = item.value
-            queryChecklist = queryChecklist.where(item.label, '==', item.value)
-        })
-        
-        // Is checklist exist of groupKeyFields
-        var existChecklist = await queryChecklist.where('flowType', '==', selectedProcess).where('stepID', '==', selectedStep).get()
-
-        let checklist = new Array()
-
-        for (let i = 1; i < questionGroupCount; i++) {
-
-            let textareaValue = $(`textarea[name=textareaQuestion${i}]`).val()
-
-            // question mark for textarea value
-            if (textareaValue) {
-
-                textareaValue = textareaValue.split('')
-
-                if (textareaValue[textareaValue.length - 1] !== '?')
-                    textareaValue.push('?')
-
-                textareaValue = textareaValue.join('')
+            for (index = 0; index < groupKeyFields.length; index++) {
+                groupKeyValue = $("select#" + index).val()
+                setDocument[groupKeyLabels[index]] = groupKeyValue
             }
 
-            let isMandatory = false;
+            if (isOnChangeTriggerDocument && isOnChangeTriggerDocument.length > 0) {
+                for (let item in isOnChangeTriggerDocument) {
+                    setDocument[isOnChangeTriggerDocument[item].label] = isOnChangeTriggerDocument[item].value
+                }
+            }
 
-            if ($(`input[name=checkboxQuestion${i}]`).is(":checked"))
-                isMandatory = true
+            setDocument.stepID = IDCount
+
+            let questionList = questionListCounter[IDCount]
+
+            let checklist = new Array()
+
+            for (let i = 1; i < questionList + 1; i++) {
+
+                let textareaValue = $(`textarea[name=textareaQuestion${IDCount + i}]`).val()
+
+                // console.log("TEXT AREA ----->", textareaValue)
+
+                // question mark for textarea value
+                if (textareaValue) {
+
+                    textareaValue = textareaValue.split('')
+
+                    if (textareaValue[textareaValue.length - 1] !== '?')
+                        textareaValue.push('?')
+
+                    textareaValue = textareaValue.join('')
+                    let isMandatory = false;
+                    if ($(`input[name=checkboxQuestion${IDCount + i}]`).is(":checked"))
+                        isMandatory = true
+
+                    let optionValue = $(`input[name=optionBoxQuestion${IDCount + i}]`).val()
+                    let options = optionValue.split(',')
+
+                    checklist.push({
+
+                        options: options,
+                        mandatory: isMandatory,
+                        question: textareaValue
+                    })
+                }
+            }
 
 
-            checklist.push({
-
-                options: [
-                    'Yes',
-                    'No'
-                ],
-
-                mandatory: isMandatory,
-                question: textareaValue
-            })
+            if (checklist.length > 0) {
+                setDocument.checklist = checklist
+                console.log("FINAL SET DOCUMENT ----->", setDocument)
+                // Set document
+                await db.collection("Checklist").doc().set(setDocument)
+            }
         }
-
-        setQuestions.checklist = checklist
-
-        // Add question in existing checklist
-        if (existChecklist && !existChecklist.empty) {
-
-            existChecklist.docs.map(async (item) => {
-
-                let checklistQuestions = item.data()['checklist'] ? item.data()['checklist'] : []
-
-                // Join existing and created question, new question always be insert from last
-                checklistQuestions.push(...checklist)
-
-                // Insert checklist
-                await db.collection("Checklist").doc(item.id).update({ checklist: checklistQuestions })
-            })
-        }
-
-        // Create new set of checklist
-        else
-            await db.collection("Checklist").doc().set(setQuestions)
-
-        // console.log("QUESTION SUBMIT")
 
         closeAllModals()
 
