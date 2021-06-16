@@ -575,12 +575,13 @@ $(document).on('fieldTrigger', async function (event, stepData) {
     if (stepData && stepData.fieldData && stepData.fieldData.length > 0 && stepData.createEditableStepData && stepData.createEditableStepData.fields && stepData.createEditableStepData.fields.length > 0) {
 
         (stepData.createEditableStepData.fields).map((item, index) => {
-
-            searchParam[item.name] = {
+            searchParam[item.label] = {
                 isChecklistTerm: item.isChecklistTerm,
                 value: stepData.fieldData[index]
             }
         })
+
+        console.log("SEARCH PARAMS ----->", searchParam)
 
         var checklistItems = await checklistQuery(searchParam, stepData.createEditableStepId)
 
@@ -778,11 +779,12 @@ async function checklistTemplate(checklist, stepid) {
     let questionTemplate = ''
     let optionsTemplate = ''
     checklist.map((item, questionIndex) => {
-        (item.options).map((options) => {
-            optionsTemplate += `<label
+        (item.options).map((options, index) => {
+            optionsTemplate += `<label for=${questionIndex + '' + index}
                 ><input
                   name=${questionIndex}
                   value=${options}
+                  id=${questionIndex + '' + index}
                   type="radio"
                   class="input-checkbox"
                   onclick="checklistResponseButton(value, ${questionIndex + 1}, ${totalquestion}, ${item.mandatory})"
@@ -865,6 +867,8 @@ async function createViewableChecklistTemplate(checklist, checklistResponse, ste
 async function checklistQuery(searchParam, checklistSearchStepID) {
     let query = db.collection("Checklist")
     query = query.where("stepID", "==", checklistSearchStepID)
+    console.log("STEP ID ----->", checklistSearchStepID)
+    console.log("WORKFLOW TYPE ----->", searchParam)
     query = query.where("flowType", "==", workflowData['flowType'])
     query = query.where("isActive", "==", true)
     for (searchParamsItem in searchParam) {
@@ -879,25 +883,32 @@ async function checklistQuery(searchParam, checklistSearchStepID) {
         }
     }
 
+    console.log("DOCUMENT ----->", responseChecklist)
+
     return {
         success: true,
         data: responseChecklist
     }
 }
 
-let responseArray = new Array();
+let responseArray = {}
 let responseOfQuestion = {}
 let mandatoryQuestionCount = 0
 
 // Toggle on radio button options
 function checklistResponseButton(optionChosen, questionNo, totalMandatoryQuestion, mandatoryQuestion) {
+
+    if (mandatoryQuestion && !responseArray.hasOwnProperty(questionNo))
+        mandatoryQuestionCount++
+
+
     responseOfQuestion.questionNo = questionNo
     responseOfQuestion.response = optionChosen
     responseOfQuestion.mandatoryQuestion = mandatoryQuestion
 
-    if (mandatoryQuestion)
-        mandatoryQuestionCount++
-    responseArray.push(responseOfQuestion)
+    responseArray[questionNo] = responseOfQuestion
+
+    console.log("MANDATORY QUESTION ------->", mandatoryQuestionCount)
 
     if (mandatoryQuestionCount === totalMandatoryQuestion) {
         $("#checklistlabel").removeClass("checklist-label-nonActive")
@@ -928,9 +939,7 @@ function accordianChecklist() {
 async function getReviewStepsChecklist() {
     if (workflowData && workflowData['active_step_id']) {
         var activeStepData = await getActiveStepId(workflowData, flow_id)
-        var activeStepChecklist = await activeStepData.data()["checklist"].get()
-
-        console.log(activeStepChecklist.data())
+        var activeStepChecklist = activeStepData.data() && activeStepData.data()["checklist"] ? await activeStepData.data()["checklist"].get() : $('#' + 'approveButton').attr('disabled', false)
     }
     let stepsData = await getStepData(flow_id)
         if (stepsData && !stepsData.empty && stepsData.docs && stepsData.docs.length > 0) {

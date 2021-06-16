@@ -122,11 +122,18 @@ function userAction(action)
 			let setQuestionValue = {}
 			var questionNo = 0;
 
+			let index = 0
+
 			$(radioButtonInput).each(function(){
 				if(!setQuestionValue[this.name])
 					setQuestionValue[this.name] = null
-				if($(this).is(':checked'))
-					setQuestionValue[(this.name)] = $(this).val()
+				if($(this).is(':checked')) {
+					var idVal = $(this).attr("id");
+					setQuestionValue[this.name] = $("label[for='" + idVal + "']").text()
+				}
+
+				index ++
+					
 			});
 
 			checklistResponse = Object.keys(setQuestionValue).map((i) => setQuestionValue[i])
@@ -155,7 +162,7 @@ function userAction(action)
 	cacheDocument=db.collection("Cache").doc(cacheDocRef.id)	
 	cacheDocument.set(approvedData)
 	console.log(cacheDocRef.id)
-	//console.log(approvedData)
+	// console.log(approvedData)
 
 	
 	
