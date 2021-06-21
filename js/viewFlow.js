@@ -798,7 +798,7 @@ async function checklistTemplate(checklist, stepid) {
       <div>
       ${optionsTemplate}
       
-      </div><br />`
+      </div><hr />`
         optionsTemplate = ''
     })
     inputBox = `<ul class="accordion">
@@ -840,7 +840,7 @@ async function createViewableChecklistTemplate(checklist, checklistResponse, ste
         questionTemplate += `<div>
         <span><strong>Q${questionIndex + 1}</strong>: ${item.question}${item.mandatory ? `<sup><i style="color: #fff; font-size: 0.75rem; margin: 5px; margin-top: 5px" class="fa fa-asterisk" aria-hidden="true"></i></sup>` : ""}</span>
         ${optionsTemplate}
-    </div>`
+    </div><hr />`
         optionsTemplate = ''
     })
     inputBox = `<ul class="accordion">
