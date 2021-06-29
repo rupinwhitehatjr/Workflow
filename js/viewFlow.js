@@ -248,7 +248,7 @@ function populateSteps(flow_id, isValidDownloadPDF) {
             if (!isReviewOnly) {
                 if (step && stepState && doesUserHaveEditAccess) {
                     // console.log("Editable step")
-                    createEditableStep(doc, step, step_id)
+                    createEditableStep(doc)
 
                 }
                 else {
@@ -430,7 +430,7 @@ function appendComments(flow_id) {
 }
 
 let editableStepsFields = 0
-function createEditableStep(stepDoc, createEditableStepData) {
+function createEditableStep(stepDoc) {
     //The whole logic assumes there will always be one form
     // Because there can only be one step which is actionable.
     // console.log("edi6table")
@@ -470,7 +470,7 @@ function createEditableStep(stepDoc, createEditableStepData) {
             editableStepsFields++
     }
     let stepData = {
-        createEditableStepData: createEditableStepData,
+        stepContentData: stepContent,
         createEditableStepId: stepID,
         fieldData: fieldData
     }
@@ -572,28 +572,32 @@ let checkSameSelectToggle = {
 // fieldTrigger on options
 $(document).on('fieldTrigger', async function (event, stepData) {
     // Reopen worklfow condition added
-    if (stepData && stepData.fieldData && stepData.fieldData.length > 0 && stepData.createEditableStepData && stepData.createEditableStepData.fields && stepData.createEditableStepData.fields.length > 0) {
+    if (stepData && stepData.fieldData && stepData.fieldData.length > 0) {
+        if (stepData.stepContentData) {
+            if (stepData.stepContentData.fields && stepData.stepContentData.fields.length > 0) {
+                (stepData.stepContentData.fields).map((item, index) => {
+                    searchParam[item.label] = {
+                        isChecklistTerm: item.isChecklistTerm,
+                        value: stepData.fieldData[index]
+                    }
+                })
 
-        (stepData.createEditableStepData.fields).map((item, index) => {
-            searchParam[item.label] = {
-                isChecklistTerm: item.isChecklistTerm,
-                value: stepData.fieldData[index]
+
+
+                var checklistItems = await checklistQuery(searchParam)
+
+                if (checklistItems.success && checklistItems.data && checklistItems.data.docs && checklistItems.data.docs.length > 0) {
+                    let doc = checklistItems.data.docs[0]
+                    let checklist = doc.data().checklist
+                    let stepIdActive = stepData.createEditableStepId
+                    checklistTemplate(checklist, stepIdActive)
+                    formInputReset = true
+                    $("#approveButton").attr({
+                        'disabled': true,
+                        'title': "Button Enable"
+                    })
+                }
             }
-        })
-
-        console.log("SEARCH PARAMS ----->", searchParam)
-
-        var checklistItems = await checklistQuery(searchParam, stepData.createEditableStepId)
-
-        if (checklistItems.success && checklistItems.data && checklistItems.data.docs && checklistItems.data.docs.length > 0) {
-            let doc = checklistItems.data.docs[0]
-            let checklist = doc.data().checklist
-            checklistTemplate(checklist, stepData.createEditableStepId)
-            formInputReset = true
-            $("#approveButton").attr({
-                'disabled': true,
-                'title': "Button Enable"
-            })
         }
     }
 
@@ -605,7 +609,7 @@ $(document).on('fieldTrigger', async function (event, stepData) {
         checkSameSelectToggle.present = labelName
         let isChecklistTerm = false;
 
-        (stepData.createEditableStepData.fields).map((item) => {
+        (stepData.stepContentData.fields).map((item) => {
             if (item.label === labelName) {
                 isChecklistTerm = item.isChecklistTerm
             }
@@ -615,19 +619,29 @@ $(document).on('fieldTrigger', async function (event, stepData) {
             isChecklistTerm: isChecklistTerm,
             value: $('option:selected', $(this)).val()
         }
-        
-        if ((checkSameSelectToggle.present !== checkSameSelectToggle.previous && !checkSameSelectToggle.visited.has(labelName)) || (formInputReset && isChecklistTerm)) {
-            
+
+        // If user select same field multiple times then filledField can not increment
+        // If user select field which is already select then filledField can not increment
+
+        if ((checkSameSelectToggle.present !== checkSameSelectToggle.previous
+            && !checkSameSelectToggle.visited.has(labelName))
+            || (formInputReset && isChecklistTerm)) {
+
+            // If whole form field is selected & user changes any fields then checklist will reset
+            // formInputReset is boolean and taking care of reset any value in from field
+
             if ((filledField === editableStepsFields - 1) || (formInputReset && isChecklistTerm)) {
 
-                var checklistItems = await checklistQuery(searchParam, stepData.createEditableStepId)
+                var checklistItems = await checklistQuery(searchParam)
 
                 if (checklistItems.success && checklistItems.data && checklistItems.data.docs && checklistItems.data.docs.length > 0) {
 
                     let doc = checklistItems.data.docs[0]
                     let checklist = doc.data().checklist
+                    
+                    let stepIdActive = stepData.createEditableStepId
 
-                    checklistTemplate(checklist, stepData.createEditableStepId)
+                    checklistTemplate(checklist, stepIdActive)
 
                     $("#approveButton").attr({
                         'disabled': true,
@@ -864,10 +878,11 @@ async function createViewableChecklistTemplate(checklist, checklistResponse, ste
 }
 
 // Query on checklist
-async function checklistQuery(searchParam, checklistSearchStepID) {
+async function checklistQuery(searchParam) {
+    console.log("ID STEP DATA ----->", stepID)
     let query = db.collection("Checklist")
-    query = query.where("stepID", "==", checklistSearchStepID)
-    console.log("STEP ID ----->", checklistSearchStepID)
+    query = query.where("stepID", "==", stepID)
+    // console.log("STEP ID ----->", checklistSearchStepID)
     console.log("WORKFLOW TYPE ----->", searchParam)
     query = query.where("flowType", "==", workflowData['flowType'])
     query = query.where("isActive", "==", true)
@@ -883,7 +898,7 @@ async function checklistQuery(searchParam, checklistSearchStepID) {
         }
     }
 
-    console.log("DOCUMENT ----->", responseChecklist)
+    // console.log("DOCUMENT ----->", responseChecklist)
 
     return {
         success: true,
@@ -908,7 +923,7 @@ function checklistResponseButton(optionChosen, questionNo, totalMandatoryQuestio
 
     responseArray[questionNo] = responseOfQuestion
 
-    console.log("MANDATORY QUESTION ------->", mandatoryQuestionCount)
+    // console.log("MANDATORY QUESTION ------->", mandatoryQuestionCount)
 
     if (mandatoryQuestionCount === totalMandatoryQuestion) {
         $("#checklistlabel").removeClass("checklist-label-nonActive")
@@ -965,7 +980,6 @@ async function getReviewStepsChecklist() {
 
                     // One active id step
                     if (activeStepData && activeStepData.id && item.id === activeStepData.id) {
-                        console.log("ACTIVE STEP ID")
                         checklistTemplate(activeStepChecklist.data()['checklist'], activeStepData.id + "checklistContainerEditView")
                     }
                     
