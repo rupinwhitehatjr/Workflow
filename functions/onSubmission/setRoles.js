@@ -26,6 +26,7 @@ exports.setRoles = functions
     userData=snapshot.data()
     flowID=userData["flowID"]
     stepID=userData["stepID"]
+    processName=userData["processName"] 
   	stepInfoPromise=getStepInfo(flowID,stepID)
     stepStructure=null
     stepInfoPromise.then((snapshot)=>{
@@ -164,6 +165,7 @@ exports.setRoles = functions
           executeQuery=true
        }
 
+       query=query.where("processName", "==", processName)
        if(!executeQuery)
        {
         return 0
