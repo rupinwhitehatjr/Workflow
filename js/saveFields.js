@@ -36,6 +36,9 @@ $(document).on('change', 'input', function() {
 function userAction(action)
 {
 	primaryForm=$("form")
+	//find this variable in viewFlow.js
+	//console.log(processName)
+	//return;
 
 	if($(primaryForm).length>0)
 	{
@@ -79,8 +82,9 @@ function userAction(action)
 	//approvedData["notify"]=getLoggedInUserObject()// common.js
 	approvedData["timestamp"]=Date.now();
 	approvedData["flowID"]=flowID
+	approvedData["processName"]=processName
 	
-	console.log(stepID)
+	//console.log(stepID)
 	if(stepID===null)
 	{
 		stepID=$("#activestepid").val()
@@ -123,7 +127,7 @@ function userAction(action)
 	cacheDocRef=db.collection("Cache").doc()	
 	cacheDocument=db.collection("Cache").doc(cacheDocRef.id)	
 	cacheDocument.set(approvedData)
-	console.log(cacheDocRef.id)
+	//console.log(cacheDocRef.id)
 	//console.log(approvedData)
 
 	

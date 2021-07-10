@@ -40,10 +40,13 @@ $(document).on("authready", function(event){
     
 });
 var workFlowClosedState=false;
+var processName=null
 $(document).on("dataready", function(event, doc){
 
     //console.log(doc.data())
     workflowMeta=doc.data()
+    processName=workflowMeta.flowType
+    console.log(processName)
     displayBreadCrumbs(workflowMeta)
     //$( document ).tooltip();
   //  addHiddenFieldForStepID(workflowMeta["active_step_id"])
@@ -523,6 +526,7 @@ function createEditableStep(stepDoc)
         addHiddenField("activestepid", stepID)
 
         //Add validators to the newly created form.
+        $('*[data-type="date"]').datepicker();
         $(stepForm).validate({errorElement : 'span', errorClass: "formerror"});
         
 }
@@ -686,6 +690,35 @@ function createField(stepid, fieldMeta, index, fieldData)
                 .attr("data-index", index)
                 .attr("id", index)
                 .attr("name", index)
+        //console.log($(inputBox))        
+        if(mandatory)
+        {
+            $(inputBox).attr("required", true)
+        } 
+        if(fieldData!=undefined)
+        {
+            $(inputBox).val(fieldData)
+        }
+        $("#"+stepid).append($(div).append($(inputBox)))
+
+        //Create a div to go to next line.
+       
+
+    }
+
+    if(type==="date")
+    {
+        
+        div=$('<div/>').attr("class", "grid_6 field")
+
+        inputBox=$('<input/>')
+                .attr("type", "text")
+                .attr('class', 'inputbox')
+                .attr("data-stepid",stepid)
+                .attr("data-index", index)
+                .attr("id", index)
+                .attr("name", index)
+                .attr("data-type", "date")
         //console.log($(inputBox))        
         if(mandatory)
         {
