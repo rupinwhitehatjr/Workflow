@@ -36,9 +36,6 @@ $(document).on('change', 'input', function() {
 function userAction(action)
 {
 	primaryForm=$("form")
-	//find this variable in viewFlow.js
-	//console.log(processName)
-	//return;
 
 	if($(primaryForm).length>0)
 	{
@@ -82,9 +79,8 @@ function userAction(action)
 	//approvedData["notify"]=getLoggedInUserObject()// common.js
 	approvedData["timestamp"]=Date.now();
 	approvedData["flowID"]=flowID
-	approvedData["processName"]=processName
 	
-	//console.log(stepID)
+	console.log(stepID)
 	if(stepID===null)
 	{
 		stepID=$("#activestepid").val()
@@ -118,6 +114,44 @@ function userAction(action)
 
 	}
 
+	// On approved save checklist response on step
+	const setChecklistResponse = (flowType) => {
+		if (action === 'approved') {
+			var radioButtonInput = $('input:radio')
+			var checklistResponse = new Array();
+			let setQuestionValue = {}
+			var questionNo = 0;
+
+			let index = 0
+
+			$(radioButtonInput).each(function(){
+				if(!setQuestionValue[this.name])
+					setQuestionValue[this.name] = null
+				if($(this).is(':checked')) {
+					var idVal = $(this).attr("id");
+					setQuestionValue[this.name] = $("label[for='" + idVal + "']").text()
+				}
+
+				index ++
+					
+			});
+
+			checklistResponse = Object.keys(setQuestionValue).map((i) => setQuestionValue[i])
+
+			console.log("CHECKLIST RESPONSE ----->", checklistResponse)
+
+			let checklistResponseRef = db.collection("ChecklistResponse").doc()
+			let checklistResponseDocument = db.collection("ChecklistResponse").doc(checklistResponseRef.id)
+			checklistResponseDocument.set({ checklistResponse: checklistResponse, flowID: flowID, stepID: stepID, flowType: flowType })
+
+			db.collection("Workflows")
+				.doc(flowID)
+				.collection("steps")
+				.doc(stepID)
+				.update({ checklistResponse: checklistResponseRef })
+		}
+	}
+
 	
 	
 	
@@ -127,8 +161,8 @@ function userAction(action)
 	cacheDocRef=db.collection("Cache").doc()	
 	cacheDocument=db.collection("Cache").doc(cacheDocRef.id)	
 	cacheDocument.set(approvedData)
-	//console.log(cacheDocRef.id)
-	//console.log(approvedData)
+	console.log(cacheDocRef.id)
+	// console.log(approvedData)
 
 	
 	
@@ -154,6 +188,7 @@ function userAction(action)
         //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
         //console.log(source, " data: ", doc.data());
         console.log(doc.metadata.hasPendingWrites)
+		setChecklistResponse(doc.data()['flowType'])
         if(!doc.metadata.hasPendingWrites)
         {
             

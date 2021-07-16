@@ -617,6 +617,133 @@ table.resultstable >tbody> tr >td
   overflow-wrap: break-word
 }
 
+.accordianUl {
+  margin: auto;
+}
+
+.inner {
+  padding-left: 1em;
+  overflow: hidden;
+  display: none;
+}
+
+
+li a.toggle {
+  width: 100%;
+  display: block;
+  background: rgba(0, 0, 0, 0.78);
+  color: #fefefe;
+  padding: 0.75em;
+  border-radius: 0.15em;
+  transition: background 0.3s ease;
+}
+
+li a.toggle:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.div-toggle {
+  cursor: pointer;
+  background-color: #4CAF4F;
+  width: 200px;
+  height: auto;
+  color: #fff;
+  margin-top: -15px;
+  padding: 5px;
+  text-align: center;
+}
+
+.show {
+  display: block
+}
+
+.hide {
+  display: none
+}
+
+.checklist-label-nonActive {
+  font-size: 20px;  
+  padding-top:10px;
+  padding-bottom:10px;
+  background-color: #DC143C;
+  margin-bottom:10px;
+  padding-left:10px;
+  color: #FFF;
+}
+
+.checklist-label-active {
+  font-size: 20px;  
+  padding-top:10px;
+  padding-bottom:10px;
+  background-color: #4CAF4F;
+  margin-bottom:10px;
+  padding-left:10px;
+  color: #222831;
+}
+
+.view-checklist {
+  font-size: 20px;  
+  padding-top:10px;
+  padding-bottom:10px;
+  margin-bottom:10px;
+  padding-left:10px;
+  color: #222831;
+}
+
+.view-checklist-wrapper {
+  width: 795px;
+  padding: auto;
+  overflow: auto;
+
+}
+
+.view-checklist-response {
+  float: right;
+
+}
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+.checklist-form-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.column-local {
+  float: left;
+  width: 45.33%;
+  padding: 5px;
+}
+
+.row-local:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.questionsGroup-background {
+  background-color: #fff;
+  background-size: 100% 1.2em;
+  background-image: 
+    linear-gradient(
+      90deg, 
+      transparent 79px, 
+      #abced4 79px, 
+      #abced4 81px, 
+      transparent 81px
+    ),
+    linear-gradient(
+      #eee .1em, 
+      transparent .1em
+    );
+}
+
 
 
 
