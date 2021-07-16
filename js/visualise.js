@@ -53,14 +53,26 @@ async function displayWorkflow(workflowType)
         var nodes=[]
         var edges=[]
         startx=5;
+        nextStepTarget=null
+        lastStepSource=null
         steps.forEach((doc)=>{
             stepData=doc.data() 
             startx=startx+200  
             nodeObject={}
             nodeObject["id"]=stepData.index
             nodeObject["label"]=stepData.name
+            //console.log(stepData.name)
+            if(stepData.reopenhere)
+            {
+                nextStepTarget=stepData.index;
+            }
+
+            if(stepData.nextStep===null)
+            {
+                lastStepSource=stepData.index;
+            }
             nodeObject["x"]=startx
-            nodeObject["y"]=500 + Math.floor(Math.random() * 200);
+            nodeObject["y"]=500 + Math.floor(Math.random() * 300);
             nodeObject["fixed"]=true
             nodes.push(nodeObject)            
             
@@ -81,6 +93,7 @@ async function displayWorkflow(workflowType)
                edgeObject["to"]=destination
 
                edgeObject["arrows"]=arrowMeta
+               edgeObject["color"]={"color":"green"}
                //console.log(edgeObject)
                edges.push(edgeObject)
             } 
@@ -100,12 +113,25 @@ async function displayWorkflow(workflowType)
                edges.push(edgeObject)
             } 
 
+
+
             
               
 
         })
-        console.log(nodes)
-        console.log(edges)
+            if(nextStepTarget && lastStepSource )
+            {
+               edgeObject={}
+               edgeObject["from"]=lastStepSource
+               edgeObject["to"]=nextStepTarget
+               
+               edgeObject["arrows"]=arrowMeta
+               edgeObject["color"]={"color":"blue"}
+               //console.log(edgeObject)
+               edges.push(edgeObject)
+            } 
+        //console.log(nodes)
+       // console.log(edges)
         createVisualisation(nodes,edges)
 
 

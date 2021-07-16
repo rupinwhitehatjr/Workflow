@@ -209,6 +209,7 @@ function addRow(doc)
             dataKeyList.push(doc_data[displayKeyItem])
         }
     }
+    console.log(dataKeyList)
 
     if(!actioners)
     {
@@ -235,7 +236,7 @@ function addRow(doc)
 
 
     dataKey=dataKeyList.join("-")
-
+    console.log(dataKey)
     viewFlowLink=$("<a/>").attr("onclick", "javascript:openFlow('"+doc.id+"')")
                           .attr("class", "buttonsm")
                           .text(dataKey)

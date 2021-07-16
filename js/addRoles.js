@@ -13,6 +13,7 @@ $(document).on("authready", function(event){
    
     
 });
+selectedProcess=null;
 
 $(document).on('change', '#process_selector', function() {
     selectedProcess=$(this).val()
@@ -278,6 +279,7 @@ async function displayNotifyList(userGroupKeyMeta)
         
         
     }
+      query = query.where("processName", '==', selectedProcess);
 
       notifyList=[]
 	
@@ -430,6 +432,8 @@ function saveRoles()
 		}
 		userGroupObject["keyList"]=userGroupKeyMeta
 		userGroupObject["groupList"]=stepGroupList;
+		userGroupObject["processName"]=selectedProcess;
+		console.log(userGroupObject)
 		userGroupDocumentID=updateUserGroup(userGroupDocumentID,userGroupObject)
 		
 }
