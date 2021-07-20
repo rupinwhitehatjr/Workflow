@@ -15,7 +15,7 @@ $(document).on("authready", function(event){
 
     //openWaitingModal()
 
-    displayWorkflow("CurriculumWorkflow");
+    displayWorkflow("CurriculumWorkFlow1to2");
    
     
 });

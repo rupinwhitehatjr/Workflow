@@ -9,36 +9,22 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 
-
-
 #steps = db.collection(u'CurriculumWorkflow').order_by(u'position').stream()
 
 userData={}	
-userData["users"]=["bhavesh.bangera@whitehatjr.com"]
+#userData["users"]=["dattatraya.more@whitehatjr.com"]
+userData["users"]=["heeral.tyagi@whitehatjr.com"]
+
 
 docs=[]
-# docs.append("tQ1nJE5SUlw8UZWr6CsV")
-# docs.append("g9MBmNIMbk1Hj2OeoMxp")
-# docs.append("zaolWYMR3uPHShv24MQc")
-# docs.append("uctRvFiDT1gd6Vmf7w4t")
-# docs.append("Z1UOvKKyesKGVEhO23oh")
-# docs.append("qZnBqaeQOGwNkzMRnez1")
-# docs.append("3YKiOg5NbBJBkiJAW2e7")
-# docs.append("2TYojJbKPUJbUxJyVxib")
-# docs.append("FNhtVrqyIeF99NmD4NNP")
-# docs.append("twNF4f9aARx1M8bZPZRc")
-# docs.append("qLGBmMjlMhXzFdsQtK9y")
-# docs.append("KYgpuJUIZ9cKmSW2xOFz")
-# docs.append("y6FHXCWuAtMBdR1rVM8z")
-# docs.append("tBdCYn5OBlu5VoEVOuBa")
-# docs.append("ZNC5jnPLXbjZPK7bKzPK")
-# docs.append("wiDLyWCno5RXkJjp3Ltl")
-# docs.append("DI4hPzYXFdXCeaJraO3l")
-# docs.append("R5ZefLcQD0SjWrY5p7jp")
-# docs.append("piM0QpRywm4QyuMCfFj8")
-
-
-docs.append("fEO8plawiWnNskFq7Vb3")
+docs.append("eqel00nhTsbivHv83PdO")
+docs.append("nBEsHPZg86qBWSZ8GYVg")
+docs.append("IWgqA3ryVgyz5rYx4703")
+docs.append("QOV15HQ9mbrPhMuiYq50")
+docs.append("Hx4IqkEYbxrpRJ9YbIXp")
+docs.append("KfPRfh3z8Vn2nbeZBjCR")
+docs.append("wwMzOop9QMj7lWvG1bJ6")
+docs.append("JkpCfOO5r1xIylmOIrP3")
 
 
 
