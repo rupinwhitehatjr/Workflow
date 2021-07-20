@@ -31,3 +31,21 @@ function getGIF() {
        
 }
 
+$(document).ready(function(){
+    params=getParams(window.location.href)
+    flow_id=params.id
+    workflowLink=getFlowURL(flow_id)
+    $("#workflowlink").attr("href", workflowLink)
+
+});
+
+function getFlowURL(flowId)
+{
+    URL="/viewFlow.html?id="+flowId
+    flowURL=getLinkFromBasePath(URL)
+    //console.log(flowURL)
+   return flowURL;
+}
+
+
+

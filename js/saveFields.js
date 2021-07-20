@@ -162,7 +162,7 @@ function userAction(action)
             //console.log("we are ready");
             //console.log(doc_ref.id)
             //location.reload(); 
-            URL="dummyPage.html"
+            URL="dummyPage.html?id="+doc.id
     		window.location.replace(URL)	
                     
                 
