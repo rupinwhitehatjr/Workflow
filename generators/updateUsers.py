@@ -13,18 +13,16 @@ db = firestore.client()
 
 userData={}	
 #userData["users"]=["dattatraya.more@whitehatjr.com"]
-userData["users"]=["heeral.tyagi@whitehatjr.com"]
+userData["users"]=["adrian.cardoza@whitehatjr.com"]
 
 
 docs=[]
-docs.append("eqel00nhTsbivHv83PdO")
-docs.append("nBEsHPZg86qBWSZ8GYVg")
-docs.append("IWgqA3ryVgyz5rYx4703")
-docs.append("QOV15HQ9mbrPhMuiYq50")
-docs.append("Hx4IqkEYbxrpRJ9YbIXp")
-docs.append("KfPRfh3z8Vn2nbeZBjCR")
-docs.append("wwMzOop9QMj7lWvG1bJ6")
-docs.append("JkpCfOO5r1xIylmOIrP3")
+docs.append("gLDZhB2T3agxd0ZOzMLS")
+docs.append("PpEVu40NxX1Vj2SAT9Rq")
+docs.append("5TuDtgTECvA3YlKKZiqv")
+docs.append("9I0UbdJg4G6OHJSqSpeq")
+docs.append("4K0ZTmugRlzGu5B1byB9")
+docs.append("h82OyKnlDKqHw7dIqBuF")
 
 
 

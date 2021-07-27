@@ -44,6 +44,9 @@ function createNewWorkFlow(flow_type)
         creationData["ready"]=false
         creationData["created_on"]=Date.now()
         creationData["updated_on"]=Date.now()
+        creationData["flowID"]=doc_ref.id
+        
+        console.log(doc_ref.id)
         
         newFlowID=db.collection("Workflows").doc(doc_ref.id).set(creationData)
         console.log(doc_ref.id)
