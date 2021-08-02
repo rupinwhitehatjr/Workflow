@@ -600,6 +600,8 @@ table.resultstable >tbody> tr >td
 .step-owner {
   float: right; 
   margin-right: 2%;
+  text-align: right;
+  font-size: 14px;
 }
 
 .cross-img {
