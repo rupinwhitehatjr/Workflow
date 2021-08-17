@@ -66,3 +66,21 @@ function getLinkFromBasePath(path)
 	//console.log(newPath)
 	return newPath
 }
+
+async function redirectToNew(pathname, ID) {
+	let isRedirect = await db.collection('VersionRelease').get()
+	if (isRedirect && isRedirect.docs && isRedirect.docs.length > 0 && isRedirect.docs[0].data().isNewUI) {
+		if(pathname && pathname === '/') {
+			location.href = 'https://renamingfilesforquiz.web.app/curriculum-workflow/'
+		}
+		else if(pathname && (new RegExp('dashboards')).test(pathname)) {
+			location.href = 'https://renamingfilesforquiz.web.app/search-workflows/'
+		}
+		else if(pathname && pathname === '/viewFlow.html' && ID) {
+			location.href = 'https://renamingfilesforquiz.web.app/curriculum-workflow/' + ID
+		}
+		// else {
+		// 	location.href = 'https://renamingfilesforquiz.web.app'
+		// }
+	}
+}

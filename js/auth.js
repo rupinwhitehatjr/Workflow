@@ -1,6 +1,11 @@
 
       initApp = function() {
         firebase.auth().onAuthStateChanged(function(user) {
+          const pathname = window.location.pathname
+          const queryString = window.location.search
+          const urlParams = new URLSearchParams(queryString);
+          const ID = urlParams.get('id')
+          redirectToNew(pathname, ID)
           if (user) {
             console.log("User signed in");
             // User is signed in.
