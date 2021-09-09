@@ -12,12 +12,19 @@ db = firestore.client()
 #steps = db.collection(u'CurriculumWorkflow').order_by(u'position').stream()
 
 userData={}	
-#userData["users"]=["dattatraya.more@whitehatjr.com"]
-userData["users"]=["adrian.cardoza@whitehatjr.com"]
+userData["users"]=["dattatraya.more@whitehatjr.com", "adrian.cardoza@whitehatjr.com"]
+#userData["users"]=["adrian.cardoza@whitehatjr.com"]
 
 
 docs=[]
-docs.append("VtWRlR58wWicimbu1kmQ")
+docs.append("X9aOnMX7E8sUlaBUyvzk")
+docs.append("xT2izBUjvvEIhctxnGXK")
+docs.append("y9a1WaUDarqnGQ55uDhC")
+docs.append("6vlIe6UZoiLRCGVLDM3E")
+docs.append("9FzwzD1wTmpRlbHYI19M")
+docs.append("en1wZChXkKGacbIwprHl")
+docs.append("yM3AaynTD1pHuF4Z42iN")
+docs.append("ZWip6wjJAq2qWaFhrapj")
 
 
 

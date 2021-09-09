@@ -15,7 +15,7 @@ $(document).on("authready", function(event){
 
     //openWaitingModal()
 
-    displayWorkflow("CurriculumWorkflow");
+    displayWorkflow("CurriculumWorkflow-Brazil");
    
     
 });
@@ -72,7 +72,7 @@ async function displayWorkflow(workflowType)
                 lastStepSource=stepData.index;
             }
             nodeObject["x"]=startx
-            nodeObject["y"]=500 + Math.floor(Math.random() * 300);
+            nodeObject["y"]=500 + Math.floor(Math.random() * 0);
             nodeObject["fixed"]=true
             nodes.push(nodeObject)            
             
@@ -109,6 +109,14 @@ async function displayWorkflow(workflowType)
                
                edgeObject["arrows"]=arrowMeta
                edgeObject["color"]={"color":"red"}
+
+               edgeCurve={          
+                            "type": "curvedCCW",
+                            "forceDirection": "none",
+                            "roundness": 0.3
+                        }
+
+                edgeObject["smooth"]=edgeCurve;
                console.log(edgeObject)
                edges.push(edgeObject)
             } 
@@ -127,6 +135,13 @@ async function displayWorkflow(workflowType)
                
                edgeObject["arrows"]=arrowMeta
                edgeObject["color"]={"color":"blue"}
+               edgeCurve={          
+                            "type": "curvedCW",
+                            "forceDirection": "none",
+                            "roundness": 0.1
+                        }
+
+                edgeObject["smooth"]=edgeCurve;
                //console.log(edgeObject)
                edges.push(edgeObject)
             } 

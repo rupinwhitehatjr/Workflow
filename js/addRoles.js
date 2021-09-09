@@ -306,6 +306,7 @@ async function displayNotifyList(userGroupKeyMeta)
 	if(notifyListLength===1)
 	{
 		userGroupDocumentID=notifyList[0].id
+		console.log("User Group ID="+userGroupDocumentID);
 	}
 	
 	//alert(userGroupDocumentID)
