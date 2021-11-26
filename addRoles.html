@@ -66,8 +66,8 @@
     </div>
     <div class="grid_6 field">
       <select id="process_selector">
-        <option value="-1" selected>Select</option>
-        <option value="CurriculumWorkflow">
+        <!-- <option value="-1" selected>Select</option> -->
+        <!-- <option value="CurriculumWorkflow">
           CurriculumWorkflow
         </option>
         <option value="CurriculumWorkFlow1to2">
@@ -94,7 +94,7 @@
 
         <option value="CurriculumWorkflowTablet1:4">
           CurriculumWorkflowTablet1:4
-        </option>
+        </option> -->
         
       </select>
     </div>
@@ -207,5 +207,19 @@
   <script src="/js/jquery.connections.js"></script>
   <!-- end .container_16 -->
 </body>
+
+<script>
+  async function flowList(){
+    let processList = await db.collection('ProcessList').where('isLive', '==', true).orderBy('index', 'asc').get()
+    processList.forEach(item => {
+      let documentID = document.getElementById('process_selector')
+      let optionChild = document.createElement("option")
+      optionChild.text = item.data()['description'];
+      optionChild.value = item.data()['processName'];
+      documentID.appendChild(optionChild);
+    });
+  }
+  flowList();
+</script>
 
 </html>
